@@ -1046,7 +1046,7 @@ export function initApp() {
   btnShareScore?.addEventListener('click', async () => {
     if (!currentResult) return;
     const summary = [
-      '🛡️ SCAM SPOTTER ANALYSIS',
+      '🛡️ SCAMY FRAUD ANALYSIS',
       `Score: ${currentResult.score}/100 (${currentResult.riskLevel} RISK)`,
       currentResult.scamProfile ? `Identified Archetype: ${currentResult.scamProfile.name}` : '',
       `Warning Signs: ${currentResult.breakdown.map((b) => b.label).join(', ')}`,

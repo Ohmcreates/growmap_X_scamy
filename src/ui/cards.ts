@@ -243,7 +243,7 @@ export function renderPricingModal(activeTier: string = 'FREE'): string {
     <div class="pricing-modal-content">
       <div class="modal-header">
         <h2>Sustainable Scam Defense Plans</h2>
-        <p>Scam Spotter is free for personal awareness, supported by premium family tools and institutional FinTech APIs.</p>
+        <p>Scamy is free for personal awareness, supported by premium family tools and institutional FinTech APIs.</p>
       </div>
       <div id="pricingNoticeBox" class="pricing-notice-box" style="display: none;"></div>
       <div class="pricing-grid">
