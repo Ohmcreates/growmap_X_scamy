@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Scam Spotter — Explainable fraud intelligence with transparent rules, exact evidence highlighting, and risk scoring."
+    />
+    <title>Scam Spotter — Explainable Scam Detection & Risk Analyzer</title>
+    <link rel="stylesheet" href="/src/ui/styles.css" />
+  </head>
+  <body>
+    <div class="app-container">
+      <!-- Navigation Header -->
+      <header class="top-nav" role="banner">
+        <div class="brand-title">
+          <span class="brand-shield" aria-hidden="true">🛡️</span>
+          <h1>Scam Spotter</h1>
+        </div>
+        <nav class="nav-actions" aria-label="Main Navigation">
+          <button id="navHistoryBtn" class="nav-btn" aria-haspopup="dialog">
+            <span>📜</span> History
+          </button>
+          <button id="navPricingBtn" class="nav-btn" aria-haspopup="dialog">
+            <span>💎</span> Pricing
+          </button>
+          <button id="navReportBtn" class="nav-btn" aria-haspopup="dialog">
+            <span>📢</span> Report
+          </button>
+        </nav>
+      </header>
+
+      <!-- Hero Header -->
+      <section class="hero-section">
+        <h2 class="hero-heading">Verify Suspicious Messages</h2>
+        <p class="hero-subtitle">
+          Transparent, deterministic fraud analysis. See exact highlighted warning signs, calculated risk points, and regulatory mitigation steps.
+        </p>
+      </section>
+
+      <!-- Message Input Area -->
+      <section class="input-section" aria-label="Message Input">
+        <div class="input-header">
+          <label for="messageInput" class="input-label">Paste Message Text</label>
+          <div id="charCounter" class="char-counter">0 / 5,000</div>
+        </div>
+
+        <textarea
+          id="messageInput"
+          class="message-textarea"
+          rows="5"
+          placeholder="Paste the SMS, WhatsApp, or email message you received..."
+          aria-describedby="privacyNotice"
+          maxlength="5000"
+        ></textarea>
+
+        <div id="inlineError" class="inline-error" role="alert">
+          Please paste or type a message first before running analysis.
+        </div>
+
+        <!-- Example Chips -->
+        <div class="example-chips-row">
+          <span class="chips-label">Try Examples:</span>
+          <button id="btnExampleSbi" class="chip-btn" type="button">
+            🚨 SBI KYC Scam (High)
+          </button>
+          <button id="btnExampleBank" class="chip-btn" type="button">
+            ✅ Real Bank Alert (Low)
+          </button>
+          <button id="btnExampleDelivery" class="chip-btn" type="button">
+            📦 Customs Delivery (Med)
+          </button>
+          <button id="btnExampleUpi" class="chip-btn" type="button">
+            💳 UPI PIN Trick (High)
+          </button>
+        </div>
+
+        <!-- Actions -->
+        <div class="actions-row">
+          <div class="privacy-notice" id="privacyNotice">
+            <span>🔒</span> Checked in your browser — your message is never uploaded.
+          </div>
+          <div class="action-buttons-group">
+            <button id="btnClear" class="btn-secondary" type="button">Clear</button>
+            <button id="btnAnalyze" class="btn-primary" type="button">
+              <span>⚡</span> Analyze Message
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Area -->
+      <main id="resultsContainer" class="results-container" aria-live="polite">
+        <!-- 1. Score Gauge & Headline Card -->
+        <div id="gaugeMount"></div>
+
+        <!-- 2. Evidence Highlighting Canvas -->
+        <section class="evidence-section" aria-label="Detected Evidence">
+          <div class="section-title">
+            <span>Highlighted Warning Signs</span>
+            <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">
+              Click any highlight to view rule
+            </span>
+          </div>
+
+          <div class="highlight-legend" aria-hidden="true">
+            <div class="legend-item">
+              <span class="legend-line solid"></span> Credential Request
+            </div>
+            <div class="legend-item">
+              <span class="legend-line wavy"></span> Suspicious Link
+            </div>
+            <div class="legend-item">
+              <span class="legend-line dashed"></span> Pressure / Threat
+            </div>
+          </div>
+
+          <div id="highlightedTextBox" class="highlighted-text-box" tabindex="0"></div>
+        </section>
+
+        <!-- 3. Explanation Cards & Total Sum -->
+        <section class="breakdown-section" aria-label="Risk Breakdown">
+          <div class="section-title">
+            <span>Point-by-Point Breakdown</span>
+          </div>
+          <div id="breakdownCardsMount"></div>
+        </section>
+
+        <!-- 4. Unmatched Checks Drawer -->
+        <div id="unmatchedMount"></div>
+
+        <!-- 5. Safe Next Steps & Regulatory Advice -->
+        <div id="nextStepsMount"></div>
+
+        <!-- 6. AI Second Opinion Section -->
+        <section class="ai-section" aria-label="AI Second Opinion">
+          <div class="ai-header-row">
+            <div>
+              <span class="ai-tag">Optional Advisory</span>
+              <h4 style="margin-top: 4px;">Contextual AI Second Opinion</h4>
+            </div>
+            <button id="btnGetAiOpinion" class="btn-secondary" type="button">
+              ✨ Get AI Opinion
+            </button>
+          </div>
+          <div id="aiOutputBox" class="ai-output-box"></div>
+        </section>
+      </main>
+
+      <!-- History Modal -->
+      <div id="historyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+        <div class="modal-container">
+          <button id="closeHistoryModal" class="modal-close-btn" aria-label="Close modal">×</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 id="historyModalTitle">Local Scan History</h3>
+            <button id="btnClearHistory" class="btn-secondary" style="min-height: 36px; padding: 6px 12px; font-size: 0.8rem;">
+              Clear All
+            </button>
+          </div>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+            Stored privately in your browser's local storage (up to 50 scans). Sensitive phone numbers and accounts are masked.
+          </p>
+          <div id="historyListMount"></div>
+        </div>
+      </div>
+
+      <!-- Pricing Modal -->
+      <div id="pricingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pricingModalTitle">
+        <div class="modal-container">
+          <button id="closePricingModal" class="modal-close-btn" aria-label="Close modal">×</button>
+          <div id="pricingMount"></div>
+        </div>
+      </div>
+
+      <!-- Report Modal -->
+      <div id="reportModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+        <div class="modal-container">
+          <button id="closeReportModal" class="modal-close-btn" aria-label="Close modal">×</button>
+          <h3 id="reportModalTitle" style="margin-bottom: 12px;">Submit Threat Report</h3>
+          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;">
+            Help protect the community by submitting verified phishing domains, fraudulent phone numbers, or fake UPI IDs.
+          </p>
+          <form id="reportForm">
+            <div style="margin-bottom: 14px;">
+              <label style="display: block; font-size: 0.85rem; margin-bottom: 6px;">Indicator Type</label>
+              <select id="reportType" style="width: 100%; padding: 10px; background: #080c14; border: 1px solid var(--border-color); color: #fff; border-radius: 6px;">
+                <option value="DOMAIN">Phishing Web Domain / URL</option>
+                <option value="PHONE">Fraudulent Phone Number (SMS/Call)</option>
+                <option value="UPI_ID">Fraudulent UPI VPA Address</option>
+              </select>
+            </div>
+            <div style="margin-bottom: 14px;">
+              <label style="display: block; font-size: 0.85rem; margin-bottom: 6px;">Target Value</label>
+              <input id="reportValue" type="text" placeholder="e.g. sbi-kyc-verify.xyz or +919876543210" required style="width: 100%; padding: 10px; background: #080c14; border: 1px solid var(--border-color); color: #fff; border-radius: 6px;" />
+            </div>
+            <div style="margin-bottom: 18px;">
+              <label style="display: block; font-size: 0.85rem; margin-bottom: 6px;">Fraud Category</label>
+              <input id="reportCategory" type="text" placeholder="e.g. Bank KYC / Electricity Threat" required style="width: 100%; padding: 10px; background: #080c14; border: 1px solid var(--border-color); color: #fff; border-radius: 6px;" />
+            </div>
+            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
+              Submit for Verification
+            </button>
+          </form>
+          <div id="reportSuccess" style="display: none; margin-top: 14px; color: var(--risk-low); font-size: 0.9rem;">
+            ✓ Report successfully recorded for community threat intelligence verification.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
