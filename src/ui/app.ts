@@ -11,6 +11,7 @@ import { renderPricingModal, renderUnmatchedChecks } from './cards.js';
 import { renderDashboardHtml } from './dashboard.js';
 import { checkWebsiteUrl } from '../engine/websiteChecker.js';
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
+import { inspectApkBuffer, createDemoSampleApk, ApkSecurityReport } from '../services/apkInspector.js';
 
 export function initApp() {
   // Navigation & Theme Elements
@@ -25,6 +26,7 @@ export function initApp() {
   const menuScanMessage = document.getElementById('menuScanMessage') as HTMLButtonElement;
   const menuScanLink = document.getElementById('menuScanLink') as HTMLButtonElement;
   const menuScanImage = document.getElementById('menuScanImage') as HTMLButtonElement;
+  const menuScanApk = document.getElementById('menuScanApk') as HTMLButtonElement;
   const menuThreatDb = document.getElementById('menuThreatDb') as HTMLButtonElement;
   const menuEvaluation = document.getElementById('menuEvaluation') as HTMLButtonElement;
   const menuHistory = document.getElementById('menuHistory') as HTMLButtonElement;
@@ -36,21 +38,56 @@ export function initApp() {
   const tabTextMessage = document.getElementById('tabTextMessage') as HTMLButtonElement;
   const tabScanLink = document.getElementById('tabScanLink') as HTMLButtonElement;
   const tabUploadImage = document.getElementById('tabUploadImage') as HTMLButtonElement;
+  const tabApkScan = document.getElementById('tabApkScan') as HTMLButtonElement;
 
   const panelTextMessage = document.getElementById('panelTextMessage') as HTMLElement;
   const panelScanLink = document.getElementById('panelScanLink') as HTMLElement;
   const panelUploadImage = document.getElementById('panelUploadImage') as HTMLElement;
+  const panelApkScan = document.getElementById('panelApkScan') as HTMLElement;
 
   const textarea = document.getElementById('messageInput') as HTMLTextAreaElement;
   const urlInput = document.getElementById('urlInput') as HTMLInputElement;
   const charCounter = document.getElementById('charCounter') as HTMLElement;
   const inlineError = document.getElementById('inlineError') as HTMLElement;
   const ocrStatusNotice = document.getElementById('ocrStatusNotice') as HTMLElement;
+  const apkStatusNotice = document.getElementById('apkStatusNotice') as HTMLElement;
   const langScriptPill = document.getElementById('langScriptPill') as HTMLElement;
 
   const dropZone = document.getElementById('dropZone') as HTMLElement;
   const btnBrowseOcr = document.getElementById('btnBrowseOcr') as HTMLButtonElement;
   const ocrFileInput = document.getElementById('ocrFileInput') as HTMLInputElement;
+
+  // APK DropZone & Demo Test Buttons
+  const apkDropZone = document.getElementById('apkDropZone') as HTMLElement;
+  const btnBrowseApk = document.getElementById('btnBrowseApk') as HTMLButtonElement;
+  const apkFileInput = document.getElementById('apkFileInput') as HTMLInputElement;
+  const btnApkDemoTrojan = document.getElementById('btnApkDemoTrojan') as HTMLButtonElement;
+  const btnApkDemoClean = document.getElementById('btnApkDemoClean') as HTMLButtonElement;
+
+  // APK Inspector Elements (SpotTheScam 6-Dimensional Model)
+  const apkInspectorCard = document.getElementById('apkInspectorCard') as HTMLElement;
+  const apkNameText = document.getElementById('apkNameText') as HTMLElement;
+  const apkPackageText = document.getElementById('apkPackageText') as HTMLElement;
+  const apkScoreBadge = document.getElementById('apkScoreBadge') as HTMLElement;
+  const apkVerdictBadge = document.getElementById('apkVerdictBadge') as HTMLElement;
+  const apkSha256Text = document.getElementById('apkSha256Text') as HTMLElement;
+  const apkSummaryText = document.getElementById('apkSummaryText') as HTMLElement;
+
+  const dimAppIdScore = document.getElementById('dimAppIdScore') as HTMLElement;
+  const dimAppIdReason = document.getElementById('dimAppIdReason') as HTMLElement;
+  const dimPermScore = document.getElementById('dimPermScore') as HTMLElement;
+  const dimPermReason = document.getElementById('dimPermReason') as HTMLElement;
+  const dimCertScore = document.getElementById('dimCertScore') as HTMLElement;
+  const dimCertReason = document.getElementById('dimCertReason') as HTMLElement;
+  const dimTargetSdkScore = document.getElementById('dimTargetSdkScore') as HTMLElement;
+  const dimTargetSdkReason = document.getElementById('dimTargetSdkReason') as HTMLElement;
+  const dimMinSdkScore = document.getElementById('dimMinSdkScore') as HTMLElement;
+  const dimMinSdkReason = document.getElementById('dimMinSdkReason') as HTMLElement;
+  const dimVersionScore = document.getElementById('dimVersionScore') as HTMLElement;
+  const dimVersionReason = document.getElementById('dimVersionReason') as HTMLElement;
+
+  const apkPermissionsList = document.getElementById('apkPermissionsList') as HTMLElement;
+  const apkRecommendationsList = document.getElementById('apkRecommendationsList') as HTMLElement;
 
   // Example Buttons (English + Multilingual Hinglish & Hindi)
   const btnExampleSbi = document.getElementById('btnExampleSbi') as HTMLButtonElement;
@@ -154,7 +191,7 @@ export function initApp() {
   const reportSuccess = document.getElementById('reportSuccess') as HTMLElement;
 
   let currentResult: ScanResult | null = null;
-  let activeTab: 'TEXT' | 'LINK' | 'IMAGE' = 'TEXT';
+  let activeTab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' = 'TEXT';
   let alarmInterval: number | null = null;
   let alarmTimeout: number | null = null;
 
@@ -170,15 +207,15 @@ export function initApp() {
   // --------------------------------------------------------------------------
   // Tab Switching
   // --------------------------------------------------------------------------
-  function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE') {
+  function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK') {
     activeTab = tab;
 
-    [tabTextMessage, tabScanLink, tabUploadImage].forEach((t) => t?.classList.remove('active'));
-    [panelTextMessage, panelScanLink, panelUploadImage].forEach((p) => {
+    [tabTextMessage, tabScanLink, tabUploadImage, tabApkScan].forEach((t) => t?.classList.remove('active'));
+    [panelTextMessage, panelScanLink, panelUploadImage, panelApkScan].forEach((p) => {
       if (p) p.style.display = 'none';
     });
 
-    [menuScanMessage, menuScanLink, menuScanImage].forEach((m) => m?.classList.remove('active'));
+    [menuScanMessage, menuScanLink, menuScanImage, menuScanApk].forEach((m) => m?.classList.remove('active'));
 
     if (tab === 'TEXT') {
       tabTextMessage?.classList.add('active');
@@ -194,16 +231,22 @@ export function initApp() {
       tabUploadImage?.classList.add('active');
       menuScanImage?.classList.add('active');
       if (panelUploadImage) panelUploadImage.style.display = 'block';
+    } else if (tab === 'APK') {
+      tabApkScan?.classList.add('active');
+      menuScanApk?.classList.add('active');
+      if (panelApkScan) panelApkScan.style.display = 'block';
     }
   }
 
   tabTextMessage?.addEventListener('click', () => switchTab('TEXT'));
   tabScanLink?.addEventListener('click', () => switchTab('LINK'));
   tabUploadImage?.addEventListener('click', () => switchTab('IMAGE'));
+  tabApkScan?.addEventListener('click', () => switchTab('APK'));
 
   menuScanMessage?.addEventListener('click', () => switchTab('TEXT'));
   menuScanLink?.addEventListener('click', () => switchTab('LINK'));
   menuScanImage?.addEventListener('click', () => switchTab('IMAGE'));
+  menuScanApk?.addEventListener('click', () => switchTab('APK'));
 
   // --------------------------------------------------------------------------
   // Multilingual Script Detection & Character Counter
@@ -579,6 +622,10 @@ export function initApp() {
         .join('');
     } else if (websiteInspectorCard) {
       websiteInspectorCard.style.display = 'none';
+    }
+
+    if (apkInspectorCard) {
+      apkInspectorCard.style.display = 'none';
     }
 
     // Evidence Highlighting
@@ -990,7 +1037,13 @@ export function initApp() {
   btnBrowseOcr?.addEventListener('click', () => ocrFileInput?.click());
   ocrFileInput?.addEventListener('change', () => {
     if (ocrFileInput.files && ocrFileInput.files[0]) {
-      handleOcrFile(ocrFileInput.files[0]);
+      const chosen = ocrFileInput.files[0];
+      if (chosen.name.toLowerCase().endsWith('.apk') || chosen.type.includes('package-archive')) {
+        switchTab('APK');
+        handleApkFile(chosen);
+      } else {
+        handleOcrFile(chosen);
+      }
     }
   });
 
@@ -1005,9 +1058,248 @@ export function initApp() {
     e.preventDefault();
     dropZone.style.borderColor = 'var(--border-color)';
     if (e.dataTransfer && e.dataTransfer.files[0]) {
-      handleOcrFile(e.dataTransfer.files[0]);
+      const droppedFile = e.dataTransfer.files[0];
+      if (droppedFile.name.toLowerCase().endsWith('.apk') || droppedFile.type.includes('package-archive')) {
+        switchTab('APK');
+        handleApkFile(droppedFile);
+      } else {
+        handleOcrFile(droppedFile);
+      }
     }
   });
+
+  // --------------------------------------------------------------------------
+  // SpotTheScam.in Android APK Security Inspector Flow
+  // --------------------------------------------------------------------------
+  async function renderApkReport(report: ApkSecurityReport) {
+    if (!apkInspectorCard) return;
+
+    // 1. Hide other cards & show APK card
+    if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
+    if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
+    apkInspectorCard.style.display = 'flex';
+
+    // 2. Populate Identity & Verification Badges
+    apkNameText.textContent = report.appName || report.fileName;
+    apkPackageText.textContent = report.packageName || 'Unknown Package';
+    apkSha256Text.textContent = report.sha256Hash;
+    apkScoreBadge.textContent = `Malware Risk: ${report.overallScore}/100`;
+
+    if (report.verdict === 'CRITICAL_MALWARE_RISK') {
+      apkVerdictBadge.className = 'web-verdict-pill danger';
+      apkVerdictBadge.textContent = '🚨 CRITICAL MALWARE';
+    } else if (report.verdict === 'SUSPICIOUS_RISK') {
+      apkVerdictBadge.className = 'web-verdict-pill warning';
+      apkVerdictBadge.textContent = '⚠️ SUSPICIOUS APK';
+    } else {
+      apkVerdictBadge.className = 'web-verdict-pill success';
+      apkVerdictBadge.textContent = '✅ CLEAN APPLICATION';
+    }
+
+    apkSummaryText.textContent = report.summary;
+
+    // 3. Render 6-Dimensional Security Audit Dimensions (SpotTheScam.in Model)
+    const dims = [
+      { elScore: dimAppIdScore, elReason: dimAppIdReason, data: report.dimensions.appIdentity },
+      { elScore: dimPermScore, elReason: dimPermReason, data: report.dimensions.permissionRisk },
+      { elScore: dimCertScore, elReason: dimCertReason, data: report.dimensions.certificateTrust },
+      { elScore: dimTargetSdkScore, elReason: dimTargetSdkReason, data: report.dimensions.targetSdk },
+      { elScore: dimMinSdkScore, elReason: dimMinSdkReason, data: report.dimensions.minSdk },
+      { elScore: dimVersionScore, elReason: dimVersionReason, data: report.dimensions.versionTag },
+    ];
+
+    dims.forEach(({ elScore, elReason, data }) => {
+      if (elScore && elReason && data) {
+        elScore.className = `dim-score-pill ${
+          data.status === 'CRITICAL' ? 'danger' : data.status === 'WARNING' ? 'warning' : 'safe'
+        }`;
+        elScore.textContent = `${data.status} (${data.score}/100)`;
+        elReason.textContent = data.reason;
+      }
+    });
+
+    // 4. Render Detected Dangerous Permissions
+    if (report.detectedPermissions.length > 0) {
+      apkPermissionsList.innerHTML = report.detectedPermissions
+        .map(
+          (p) => `
+          <div class="apk-perm-item ${p.category.toLowerCase()}">
+            <div class="apk-perm-top">
+              <span class="apk-perm-name">${escapeHtml(p.name)}</span>
+              <span class="apk-perm-badge">${p.category} (+${p.points})</span>
+            </div>
+            <strong style="font-size: 0.8rem; margin: 2px 0;">${escapeHtml(p.riskDescription)}</strong>
+            <p class="apk-trojan-pattern">${escapeHtml(p.trojanPattern)}</p>
+          </div>
+        `
+        )
+        .join('');
+    } else {
+      apkPermissionsList.innerHTML = `
+        <div style="font-size: 0.85rem; color: #16a34a; padding: 6px 0;">
+          ✓ No dangerous or trojan permissions requested. Standard sandboxed capability.
+        </div>
+      `;
+    }
+
+    // 5. Render Emergency Recommendations
+    apkRecommendationsList.innerHTML = report.recommendations
+      .map((rec) => `<li>${escapeHtml(rec)}</li>`)
+      .join('');
+
+    // 6. Sync Original Message box & Warnings table
+    highlightedTextBox.innerHTML = `
+      <div style="font-family: var(--font-mono); font-size: 0.82rem; background: var(--bg-card-subtle); padding: 10px; border-radius: 6px; line-height: 1.6;">
+        <strong>[Android APK Binary Analysis]</strong> ${escapeHtml(report.fileName)} (${(report.fileSizeBytes / 1024).toFixed(1)} KB)<br>
+        <strong>Package:</strong> <code>${escapeHtml(report.packageName)}</code> | <strong>Target SDK:</strong> <code>${report.targetSdkVersion}</code> | <strong>Min SDK:</strong> <code>${report.minSdkVersion}</code><br>
+        <strong>SHA-256 Fingerprint:</strong> <code>${escapeHtml(report.sha256Hash)}</code>
+      </div>
+    `;
+
+    warningSignsMount.innerHTML = report.detectedPermissions
+      .map(
+        (p) => `
+        <div class="warning-sign-row">
+          <div class="sign-left-cluster">
+            <span class="sign-icon">📱</span>
+            <span class="sign-label">${escapeHtml(p.riskDescription)}</span>
+            <span class="sign-evidence-quote">"${escapeHtml(p.name)}"</span>
+          </div>
+          <span class="sign-points-badge">+${p.points}</span>
+        </div>
+      `
+      )
+      .join('');
+
+    // 7. Update Score Gauge & Widgets
+    const fakeScanResult: ScanResult = {
+      score: report.overallScore,
+      riskLevel: report.riskLevel,
+      headline:
+        report.verdict === 'CRITICAL_MALWARE_RISK'
+          ? 'Critical Android Malware Risk Detected'
+          : report.verdict === 'SUSPICIOUS_RISK'
+          ? 'Suspicious Android Application'
+          : 'Clean Android Package',
+      summary: report.summary,
+      breakdown: report.detectedPermissions.map((p) => ({
+        ruleId: p.name,
+        label: `${p.riskDescription} (${p.category})`,
+        group: 'credential' as const,
+        rawPoints: p.points,
+        awardedPoints: p.points,
+        category: 'MALWARE_PERMISSION',
+        cappedByGroup: false,
+        explanation: p.trojanPattern,
+        evidence: [
+          {
+            ruleId: p.name,
+            ruleLabel: p.riskDescription,
+            group: 'credential' as const,
+            matchedText: p.name,
+            startIndex: 0,
+            endIndex: p.name.length,
+            negated: false,
+            category: 'MALWARE_PERMISSION',
+          },
+        ],
+      })),
+      unmatchedRules: [],
+      allEvidence: [],
+      activeEvidence: [],
+      negatedEvidence: [],
+      rawScore: report.overallScore,
+      advice: report.recommendations[0] || 'Inspect application before installation.',
+      floorApplied: report.overallScore >= 67,
+      metadata: {
+        characterCount: report.fileSizeBytes,
+        scannedAt: new Date().toISOString(),
+        engineVersion: '2.4.0-spotthescam',
+        totalChecksRun: 6,
+      },
+    };
+
+    currentResult = fakeScanResult;
+    updateScoreWidgets(fakeScanResult);
+
+    // 8. Save Scan in Private History
+    HistoryService.saveScan(`[APK Scan] ${report.appName} (${report.fileName})`, fakeScanResult);
+
+    // 9. Trigger Full-Screen Blinking Alarm (5–10s, 7s default)
+    if (report.overallScore >= 60) {
+      triggerScreenAlarm('RED', report.overallScore, 7);
+    } else if (report.overallScore >= 30) {
+      triggerScreenAlarm('YELLOW', report.overallScore, 7);
+    } else {
+      triggerScreenAlarm('GREEN', report.overallScore, 7);
+    }
+
+    // 10. Display Analysis Card & Scroll
+    analysisResultCard.style.display = 'flex';
+    analysisResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function handleApkFile(file: File) {
+    apkStatusNotice.style.display = 'block';
+    apkStatusNotice.className = 'ocr-status-notice ocr-loading';
+    apkStatusNotice.innerHTML = `⏳ Reading and analyzing APK package <code>${escapeHtml(file.name)}</code> (${(file.size / 1024).toFixed(1)} KB)...`;
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const report = await inspectApkBuffer(buffer, file.name);
+      apkStatusNotice.className = 'ocr-status-notice ocr-success';
+      apkStatusNotice.innerHTML = `✓ APK inspection complete for <code>${escapeHtml(report.appName || report.fileName)}</code>. Displaying SpotTheScam security report.`;
+      await renderApkReport(report);
+    } catch (err: any) {
+      console.error('APK inspection failed:', err);
+      apkStatusNotice.className = 'ocr-status-notice ocr-error';
+      apkStatusNotice.innerHTML = `❌ Failed to inspect APK archive: ${escapeHtml(err.message || 'Invalid ZIP/APK structure')}`;
+    }
+  }
+
+  async function handleDemoApk(type: 'MALICIOUS_SBI_TROJAN' | 'BENIGN_CALCULATOR') {
+    apkStatusNotice.style.display = 'block';
+    apkStatusNotice.className = 'ocr-status-notice ocr-loading';
+    apkStatusNotice.innerHTML = `⏳ Generating and analyzing synthetic ${type === 'MALICIOUS_SBI_TROJAN' ? 'SBI Trojan APK' : 'Clean Calculator APK'} demo package...`;
+
+    try {
+      const buffer = await createDemoSampleApk(type);
+      const fileName = type === 'MALICIOUS_SBI_TROJAN' ? 'SBI_YONO_Update_v2.apk' : 'Simple_Calculator_v1.apk';
+      const report = await inspectApkBuffer(buffer, fileName);
+      apkStatusNotice.className = 'ocr-status-notice ocr-success';
+      apkStatusNotice.innerHTML = `✓ APK inspection complete for <code>${escapeHtml(report.appName)}</code>.`;
+      await renderApkReport(report);
+    } catch (err: any) {
+      console.error('Demo APK failed:', err);
+      apkStatusNotice.className = 'ocr-status-notice ocr-error';
+      apkStatusNotice.innerHTML = `❌ Failed demo APK generation: ${escapeHtml(err.message)}`;
+    }
+  }
+
+  btnBrowseApk?.addEventListener('click', () => apkFileInput?.click());
+  apkFileInput?.addEventListener('change', () => {
+    if (apkFileInput.files && apkFileInput.files[0]) {
+      handleApkFile(apkFileInput.files[0]);
+    }
+  });
+
+  apkDropZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    apkDropZone.style.borderColor = 'var(--accent-red)';
+  });
+  apkDropZone?.addEventListener('dragleave', () => {
+    apkDropZone.style.borderColor = 'var(--border-color)';
+  });
+  apkDropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    apkDropZone.style.borderColor = 'var(--border-color)';
+    if (e.dataTransfer && e.dataTransfer.files[0]) {
+      handleApkFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  btnApkDemoTrojan?.addEventListener('click', () => handleDemoApk('MALICIOUS_SBI_TROJAN'));
+  btnApkDemoClean?.addEventListener('click', () => handleDemoApk('BENIGN_CALCULATOR'));
 
   textarea.addEventListener('paste', (e: ClipboardEvent) => {
     if (e.clipboardData && e.clipboardData.items) {

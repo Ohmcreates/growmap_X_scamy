@@ -77,6 +77,10 @@
             <span class="sidebar-icon">🖼️</span>
             <span class="sidebar-label">Scan Image / QR</span>
           </button>
+          <button id="menuScanApk" class="sidebar-item" type="button">
+            <span class="sidebar-icon">📱</span>
+            <span class="sidebar-label">Scan APK File</span>
+          </button>
           <button id="menuThreatDb" class="sidebar-item" type="button">
             <span class="sidebar-icon">🛡️</span>
             <span class="sidebar-label">Threat Database</span>
@@ -162,6 +166,9 @@
                 <button id="tabUploadImage" class="tab-button" role="tab" aria-selected="false" type="button">
                   <span>🖼️</span> Upload Image / QR
                 </button>
+                <button id="tabApkScan" class="tab-button" role="tab" aria-selected="false" type="button">
+                  <span>📱</span> APK File Scan
+                </button>
               </div>
 
               <!-- Multilingual Script Detector Pill -->
@@ -210,19 +217,38 @@
               <div id="panelUploadImage" class="tab-panel" style="display: none;">
                 <div id="dropZone" class="upload-dropzone">
                   <div class="dropzone-icon">📸</div>
-                  <strong>Upload Screenshot, Payment Receipt, or QR Code</strong>
-                  <p>Drag and drop your file here, or click to browse (PNG, JPG, WEBP)</p>
+                  <strong>Upload Screenshot, Payment Receipt, QR Code, or APK</strong>
+                  <p>Drag and drop your file here, or click to browse (PNG, JPG, WEBP, APK)</p>
                   <button id="btnBrowseOcr" class="btn-browse-file" type="button">
                     Select File
                   </button>
-                  <input type="file" id="ocrFileInput" accept="image/png, image/jpeg, image/webp" style="display: none;" />
+                  <input type="file" id="ocrFileInput" accept="image/png, image/jpeg, image/webp, .apk, application/vnd.android.package-archive" style="display: none;" />
+                </div>
+              </div>
+
+              <!-- APK File Scan Panel (Reverse Engineered from SpotTheScam.in) -->
+              <div id="panelApkScan" class="tab-panel" style="display: none;">
+                <div id="apkDropZone" class="upload-dropzone">
+                  <div class="dropzone-icon">📱</div>
+                  <strong>Upload Android Package File (.APK)</strong>
+                  <p>Reverse-engineered client-side APK inspector (SpotTheScam.in standard). 100% private, zero upload.</p>
+                  <button id="btnBrowseApk" class="btn-browse-file" type="button">
+                    Select .APK File
+                  </button>
+                  <input type="file" id="apkFileInput" accept=".apk,application/vnd.android.package-archive" style="display: none;" />
+                </div>
+                <div class="apk-demo-chips-row">
+                  <span class="chips-intro">SpotTheScam Test Samples:</span>
+                  <button id="btnApkDemoTrojan" class="chip-item chip-danger" type="button">🚨 Test SBI Banking Trojan APK</button>
+                  <button id="btnApkDemoClean" class="chip-item chip-lang" type="button">✅ Test Clean Calculator APK</button>
                 </div>
               </div>
 
               <div id="inlineError" class="inline-error" style="display: none;" role="alert">
-                Please enter a message, URL, or upload an image first.
+                Please enter a message, URL, or upload an image/APK first.
               </div>
               <div id="ocrStatusNotice" class="ocr-status-notice" style="display: none;"></div>
+              <div id="apkStatusNotice" class="ocr-status-notice" style="display: none;"></div>
 
               <!-- Bottom Action Row: Examples & Analyze Button -->
               <div class="input-actions-row">
@@ -322,6 +348,96 @@
               <div id="webRecommendationsContainer" class="web-recommendations-container">
                 <h4 class="web-threats-title">🛡️ Consumer Safety Protocol & Next Steps</h4>
                 <ul id="webRecommendationsList" class="web-recs-list"></ul>
+              </div>
+            </div>
+
+            <!-- APK Security Inspector Card (Reverse Engineered from SpotTheScam.in) -->
+            <div id="apkInspectorCard" class="apk-inspector-card" style="display: none;">
+              <div class="apk-inspector-header">
+                <div class="apk-identity-pill">
+                  <span class="apk-app-icon">📱</span>
+                  <div>
+                    <strong id="apkNameText" class="apk-app-title">SBI YONO Update</strong>
+                    <div id="apkPackageText" class="apk-pkg-mono">com.sbi.kyc.update.official</div>
+                  </div>
+                </div>
+                <div class="apk-verdict-cluster">
+                  <span id="apkScoreBadge" class="web-confidence-pill">Malware Risk: 95/100</span>
+                  <span id="apkVerdictBadge" class="web-verdict-pill danger">🚨 CRITICAL MALWARE</span>
+                </div>
+              </div>
+
+              <div class="apk-hash-banner">
+                <span class="hash-label">SHA-256:</span>
+                <code id="apkSha256Text" class="apk-hash-code">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>
+              </div>
+
+              <div class="web-summary-banner">
+                <p id="apkSummaryText" class="web-summary-desc"></p>
+              </div>
+
+              <!-- SpotTheScam 6-Dimensional Metric Grid -->
+              <h4 class="apk-section-title">SpotTheScam 6-Dimensional Security Audit</h4>
+              <div class="apk-dimensions-grid">
+                <div class="apk-dim-cell" id="dimCellAppIdentity">
+                  <div class="dim-head">
+                    <span class="dim-label">1. App Identity</span>
+                    <span id="dimAppIdScore" class="dim-score-pill danger">Critical</span>
+                  </div>
+                  <p id="dimAppIdReason" class="dim-reason"></p>
+                </div>
+
+                <div class="apk-dim-cell" id="dimCellPermissionRisk">
+                  <div class="dim-head">
+                    <span class="dim-label">2. Permission Risk</span>
+                    <span id="dimPermScore" class="dim-score-pill danger">Critical</span>
+                  </div>
+                  <p id="dimPermReason" class="dim-reason"></p>
+                </div>
+
+                <div class="apk-dim-cell" id="dimCellCertificate">
+                  <div class="dim-head">
+                    <span class="dim-label">3. Certificate Trust</span>
+                    <span id="dimCertScore" class="dim-score-pill danger">Critical</span>
+                  </div>
+                  <p id="dimCertReason" class="dim-reason"></p>
+                </div>
+
+                <div class="apk-dim-cell" id="dimCellTargetSdk">
+                  <div class="dim-head">
+                    <span class="dim-label">4. Target SDK Evasion</span>
+                    <span id="dimTargetSdkScore" class="dim-score-pill danger">Critical</span>
+                  </div>
+                  <p id="dimTargetSdkReason" class="dim-reason"></p>
+                </div>
+
+                <div class="apk-dim-cell" id="dimCellMinSdk">
+                  <div class="dim-head">
+                    <span class="dim-label">5. Minimum SDK</span>
+                    <span id="dimMinSdkScore" class="dim-score-pill safe">Safe</span>
+                  </div>
+                  <p id="dimMinSdkReason" class="dim-reason"></p>
+                </div>
+
+                <div class="apk-dim-cell" id="dimCellVersion">
+                  <div class="dim-head">
+                    <span class="dim-label">6. Version Tag</span>
+                    <span id="dimVersionScore" class="dim-score-pill safe">Safe</span>
+                  </div>
+                  <p id="dimVersionReason" class="dim-reason"></p>
+                </div>
+              </div>
+
+              <!-- Detected Dangerous Permissions with Trojan Tactics -->
+              <div id="apkPermissionsContainer" class="apk-permissions-container">
+                <h4 class="apk-section-title">Detected Critical & Dangerous Permissions</h4>
+                <div id="apkPermissionsList" class="apk-permissions-list"></div>
+              </div>
+
+              <!-- Recommendations -->
+              <div id="apkRecommendationsContainer" class="web-recommendations-container">
+                <h4 class="web-threats-title">🛡️ Emergency Malware Incident Protocol</h4>
+                <ul id="apkRecommendationsList" class="web-recs-list"></ul>
               </div>
             </div>
 

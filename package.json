@@ -13,12 +13,14 @@
     "benchmark": "vitest run src/engine/__tests__/benchmark.test.ts"
   },
   "devDependencies": {
+    "@types/jszip": "^3.4.0",
     "typescript": "^5.7.0",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
   },
   "dependencies": {
     "jsqr": "^1.4.0",
+    "jszip": "^3.10.2",
     "tesseract.js": "^7.0.0"
   }
 }

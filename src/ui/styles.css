@@ -2148,4 +2148,267 @@ body {
   margin-bottom: 4px;
 }
 
+/* ==========================================================================
+   SPOTTHESCAM.IN APK SECURITY INSPECTOR STYLES
+   ========================================================================== */
+
+.chip-danger {
+  background-color: #fef2f2 !important;
+  border-color: #fecaca !important;
+  color: #b91c1c !important;
+}
+
+.chip-danger:hover {
+  background-color: #fee2e2 !important;
+  border-color: #fca5a5 !important;
+}
+
+.apk-demo-chips-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.apk-inspector-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
+}
+
+.apk-inspector-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.apk-identity-pill {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.apk-app-icon {
+  font-size: 1.8rem;
+}
+
+.apk-app-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: block;
+}
+
+.apk-pkg-mono {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+
+.apk-hash-banner {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 6px 12px;
+  font-size: 0.76rem;
+  overflow-x: auto;
+}
+
+.apk-hash-banner .hash-label {
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+}
+
+.apk-hash-code {
+  font-family: var(--font-mono);
+  color: var(--text-main);
+  word-break: break-all;
+}
+
+.apk-section-title {
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: var(--text-main);
+  margin: 4px 0 0 0;
+}
+
+.apk-dimensions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+}
+
+.apk-dim-cell {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: all 0.2s;
+}
+
+.dim-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dim-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.dim-score-pill {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  text-transform: uppercase;
+}
+
+.dim-score-pill.danger {
+  background: #fee2e2;
+  color: #b91c1c;
+}
+
+.dim-score-pill.warning {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+.dim-score-pill.safe {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.dim-reason {
+  font-size: 0.8rem;
+  line-height: 1.4;
+  color: var(--text-main);
+  margin: 0;
+}
+
+.apk-permissions-container {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.apk-permissions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.apk-perm-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  font-size: 0.82rem;
+}
+
+.apk-perm-item.critical {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+}
+
+.apk-perm-item.dangerous {
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+}
+
+.apk-perm-item.normal {
+  background: #f0fdf4;
+  border: 1px solid #dcfce7;
+}
+
+.apk-perm-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.apk-perm-name {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.apk-perm-item.critical .apk-perm-name {
+  color: #991b1b;
+}
+
+.apk-perm-item.dangerous .apk-perm-name {
+  color: #92400e;
+}
+
+.apk-perm-item.normal .apk-perm-name {
+  color: #166534;
+}
+
+.apk-perm-badge {
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+  text-transform: uppercase;
+}
+
+.apk-perm-item.critical .apk-perm-badge {
+  background: #ef4444;
+  color: #ffffff;
+}
+
+.apk-perm-item.dangerous .apk-perm-badge {
+  background: #f59e0b;
+  color: #ffffff;
+}
+
+.apk-perm-item.normal .apk-perm-badge {
+  background: #22c55e;
+  color: #ffffff;
+}
+
+.apk-trojan-pattern {
+  font-size: 0.78rem;
+  line-height: 1.4;
+  margin: 0;
+}
+
+.apk-perm-item.critical .apk-trojan-pattern {
+  color: #7f1d1d;
+}
+
+.apk-perm-item.dangerous .apk-trojan-pattern {
+  color: #78350f;
+}
+
+.apk-perm-item.normal .apk-trojan-pattern {
+  color: #14532d;
+}
+
 
