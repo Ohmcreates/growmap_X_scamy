@@ -10,6 +10,7 @@ import { IndicatorType, ReportingService, VerifiedIndicator } from '../services/
 import { renderPricingModal, renderUnmatchedChecks } from './cards.js';
 import { renderDashboardHtml } from './dashboard.js';
 import { checkWebsiteUrl } from '../engine/websiteChecker.js';
+import { predictPhishingMlAsync, MlModelAssessment } from '../engine/phishingMl.js';
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
 import { inspectApkBuffer, createDemoSampleApk, ApkSecurityReport } from '../services/apkInspector.js';
 import {
@@ -240,8 +241,17 @@ export function initApp() {
   const webThreatsList = document.getElementById('webThreatsList') as HTMLElement;
   const webRecommendationsList = document.getElementById('webRecommendationsList') as HTMLElement;
 
+  // ML Phishing Forensics Elements
+  const webMlSection = document.getElementById('webMlSection') as HTMLElement;
+  const webMlModelName = document.getElementById('webMlModelName') as HTMLElement;
+  const webMlSourceBadge = document.getElementById('webMlSourceBadge') as HTMLElement;
+  const webMlProbability = document.getElementById('webMlProbability') as HTMLElement;
+  const webMlVerdictPill = document.getElementById('webMlVerdictPill') as HTMLElement;
+  const webMlFeaturesGrid = document.getElementById('webMlFeaturesGrid') as HTMLElement;
+
   const btnUrlSbiPhish = document.getElementById('btnUrlSbiPhish') as HTMLButtonElement;
   const btnUrlChallanPhish = document.getElementById('btnUrlChallanPhish') as HTMLButtonElement;
+  const btnUrlIpPhish = document.getElementById('btnUrlIpPhish') as HTMLButtonElement;
   const btnUrlShortener = document.getElementById('btnUrlShortener') as HTMLButtonElement;
   const btnUrlOfficialSbi = document.getElementById('btnUrlOfficialSbi') as HTMLButtonElement;
 
@@ -502,7 +512,13 @@ export function initApp() {
 
   btnUrlChallanPhish?.addEventListener('click', () => {
     switchTab('LINK');
-    urlInput.value = 'http://echallan-parivahan-gov.in.xyz';
+    urlInput.value = 'https://mparivahan.redirectme.net/6/RTO.MoRTH';
+    runAnalysis();
+  });
+
+  btnUrlIpPhish?.addEventListener('click', () => {
+    switchTab('LINK');
+    urlInput.value = 'http://192.168.1.1/secure-bank-login-verify/account.html';
     runAnalysis();
   });
 
@@ -761,8 +777,82 @@ export function initApp() {
       webRecommendationsList.innerHTML = webResult.recommendations
         .map((rec) => `<li>${rec}</li>`)
         .join('');
+
+      // Machine Learning Phishing Forensics (Random Forest 10-Feature Vector)
+      if (webResult.mlAssessment) {
+        renderMlAssessment(webResult.mlAssessment);
+
+        predictPhishingMlAsync(rawText)
+          .then((asyncMl) => {
+            renderMlAssessment(asyncMl);
+          })
+          .catch(() => {});
+      }
     } else if (websiteInspectorCard) {
       websiteInspectorCard.style.display = 'none';
+    }
+
+    function renderMlAssessment(ml: MlModelAssessment) {
+      if (!webMlSection || !webMlFeaturesGrid) return;
+      webMlSection.style.display = 'flex';
+
+      if (webMlModelName) {
+        webMlModelName.textContent = ml.modelName || 'RandomForestClassifier (100 Trees)';
+      }
+
+      if (webMlProbability) {
+        webMlProbability.textContent = `ML Phishing Risk: ${ml.phishingProbability}%`;
+      }
+
+      if (webMlSourceBadge) {
+        webMlSourceBadge.textContent =
+          ml.engineSource === 'PYTHON_FLASK_API'
+            ? 'Flask ML Server (phishing_model.pkl)'
+            : 'Client ML Engine (10-Feature)';
+      }
+
+      if (webMlVerdictPill) {
+        if (ml.isPhishing) {
+          webMlVerdictPill.className = 'web-ml-verdict-pill danger';
+          webMlVerdictPill.textContent = `🚨 PHISHING (${ml.confidenceScore}% Confidence)`;
+        } else {
+          webMlVerdictPill.className = 'web-ml-verdict-pill success';
+          webMlVerdictPill.textContent = `🛡️ LEGITIMATE (${ml.confidenceScore}% Confidence)`;
+        }
+      }
+
+      const featureDefs = [
+        { key: 'url_length', label: 'URL Length' },
+        { key: 'dot_count', label: 'Dot Count' },
+        { key: 'hyphen_count', label: 'Hyphen Count' },
+        { key: 'at_symbol', label: '@ Redirection' },
+        { key: 'double_slash_redirect', label: '// Redirect' },
+        { key: 'has_ip_address', label: 'Raw IP Host' },
+        { key: 'subdomain_count', label: 'Subdomains' },
+        { key: 'domain_length', label: 'Domain Length' },
+        { key: 'https_flag', label: 'HTTPS Scheme' },
+        { key: 'suspicious_words', label: 'Suspicious Keywords' },
+      ];
+
+      webMlFeaturesGrid.innerHTML = featureDefs
+        .map((item) => {
+          const val = (ml.featureVector as any)[item.key];
+          let valClass = '';
+          if (['has_ip_address', 'double_slash_redirect', 'suspicious_words', 'at_symbol'].includes(item.key) && val > 0) {
+            valClass = 'risk';
+          } else if (item.key === 'https_flag' && val === 1) {
+            valClass = 'safe';
+          } else if (item.key === 'hyphen_count' && val >= 2) {
+            valClass = 'risk';
+          }
+          return `
+            <div class="web-ml-feature-cell">
+              <span class="f-name">${item.label}</span>
+              <span class="f-val ${valClass}">${val !== undefined ? val : '-'}</span>
+            </div>
+          `;
+        })
+        .join('');
     }
 
     if (apkInspectorCard) {

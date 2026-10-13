@@ -2568,6 +2568,179 @@ code, pre, .font-mono {
   margin-bottom: 4px;
 }
 
+/* Machine Learning Phishing Forensics Section */
+.web-ml-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-card-subtle);
+  border: 1.5px solid #3b82f6;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-top: 4px;
+}
+
+body.theme-dark .web-ml-section {
+  background: #0f172a;
+  border-color: #2563eb;
+}
+
+.web-ml-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.web-ml-badge-cluster {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.web-ml-pill-tag {
+  background: #2563eb;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.web-ml-model-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-main);
+}
+
+.web-ml-source-badge {
+  font-size: 0.72rem;
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  font-family: var(--font-mono);
+}
+
+.web-ml-verdict-cluster {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.web-ml-prob-pill {
+  font-size: 0.82rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(239, 68, 68, 0.12);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.web-ml-verdict-pill {
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.web-ml-verdict-pill.danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+body.theme-dark .web-ml-verdict-pill.danger {
+  background: #45121b;
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+.web-ml-verdict-pill.success {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+body.theme-dark .web-ml-verdict-pill.success {
+  background: #052e16;
+  color: #86efac;
+  border-color: #166534;
+}
+
+.web-ml-body {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.web-ml-intro {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.web-ml-sub {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+}
+
+.web-ml-features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+
+.web-ml-feature-cell {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+body.theme-dark .web-ml-feature-cell {
+  background: #111827;
+  border-color: #1f2937;
+}
+
+.web-ml-feature-cell .f-name {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: var(--font-mono);
+}
+
+.web-ml-feature-cell .f-val {
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  color: var(--text-main);
+}
+
+.web-ml-feature-cell .f-val.risk {
+  color: #ef4444;
+}
+
+.web-ml-feature-cell .f-val.safe {
+  color: #22c55e;
+}
+
 /* ==========================================================================
    SPOTTHESCAM.IN APK SECURITY INSPECTOR STYLES
    ========================================================================== */

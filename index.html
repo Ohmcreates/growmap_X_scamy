@@ -7,31 +7,699 @@
       name="description"
       content="Scamy — Check if it's a scam. Protect privacy with Scamy."
     />
-    <title>Scamy — Protect Privacy with Scamy</title>
+    <title>Scam Spotter — Detect. Understand. Stay Safe.</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/src/ui/styles.css" />
+    <link rel="stylesheet" href="/src/ui/landing.css" />
   </head>
   <body class="theme-light">
-    <!-- Full-Screen Dynamic Alarm Overlay (5-10 second blinking) -->
-    <div id="screenAlarmOverlay" class="screen-alarm-overlay" style="display: none;">
-      <div class="alarm-banner">
-        <div class="alarm-content">
-          <span id="alarmIcon" class="alarm-icon">🚨</span>
-          <div class="alarm-text-block">
-            <strong id="alarmTitle">CRITICAL HIGH RISK SCAM DETECTED</strong>
-            <span id="alarmSubtitle">Score: 100/100 • Blinking Alert Active (<span id="alarmCountdown">7</span>s)</span>
-          </div>
-        </div>
-        <button id="btnDismissAlarm" class="btn-dismiss-alarm" type="button">✕ Dismiss Alert</button>
+    <!-- ==========================================================================
+         SIGNATURE INTERACTIVE MAGNIFYING LENS OVERLAY (METIC.STUDIO INSPIRED)
+         ========================================================================== -->
+    <div id="meticLensOverlayRoot" class="metic-lens-overlay-root" aria-hidden="true">
+      <canvas id="meticLensCanvas" class="metic-lens-inspection-canvas"></canvas>
+      <div id="meticLensCircle" class="metic-lens-circle"></div>
+      <div id="meticLensHudTag" class="metic-lens-hud-tag">
+        <span class="hud-tag-el">&lt;INSPECT&gt;</span>
+        <span>0 × 0px</span>
       </div>
     </div>
 
-    <!-- Top Navigation Bar -->
-    <header class="top-nav" role="banner">
-      <div class="nav-left">
-        <div class="brand-logo">
+    <!-- Floating Technical Inspector Hint / Shortcut -->
+    <div id="meticFloatingInspectHint" class="metic-floating-inspect-hint" role="button" tabindex="0" title="Click or press [I] to toggle technical inspection layer">
+      <span>Hold pointer to inspect</span>
+      <span class="metic-hint-key">[I]</span>
+    </div>
+
+    <!-- ==========================================================================
+         DRAGGABLE PHYSICAL MAGNIFYING GLASS & MALWARE X-RAY (USER ASSET)
+         ========================================================================== -->
+    <div id="draggableMagnifier" class="draggable-magnifier" role="region" aria-label="Draggable Malware Magnifying Glass">
+      <div id="magnifierDragHint" class="magnifier-drag-hint">✋ Drag glass to scan for malware</div>
+      <div id="magnifierLensViewport" class="magnifier-viewport">
+        <div id="magnifierHudContent"></div>
+      </div>
+      <img src="/assets/magnifying_glass.png" alt="Forensic Magnifying Glass" class="magnifier-frame-image" draggable="false" />
+    </div>
+
+    <!-- Magnifier Floating Dock Controls -->
+    <div id="magnifierDockBar" class="magnifier-dock-bar" role="toolbar" aria-label="Magnifier Preset Controls">
+      <div class="dock-status-label">
+        <span class="live-dot"></span>
+        <span>MALWARE RADAR</span>
+      </div>
+      <button id="btnGlideToHero" class="dock-btn active" type="button" title="Glide glass over Hero scam sample">📍 Scan Hero</button>
+      <button id="btnGlideToDemo" class="dock-btn" type="button" title="Glide glass over Live Demo">📍 Scan Demo</button>
+      <button id="btnGlideToLinks" class="dock-btn" type="button" title="Glide glass over Link Security">📍 Scan Links</button>
+      <button id="btnToggleMagnifier" class="dock-btn" type="button" title="Hide or show the magnifying glass">👁️ Toggle Glass</button>
+    </div>
+
+    <!-- ==========================================================================
+         SCAM SPOTTER — EDITORIAL LANDING PAGE (#landingView)
+         Inspired by metic.studio: Minimalist, Architectural, Handcrafted
+         ========================================================================== -->
+    <div id="landingView" class="view-panel active">
+      <div class="metic-blueprint-grid"></div>
+
+      <!-- Editorial Header -->
+      <header class="metic-header" role="banner">
+        <div class="metic-container">
+          <div class="metic-header-inner">
+            <a href="#landing" class="metic-brand" data-route-to="landing">
+              <div class="metic-logo-mark">SS</div>
+              <div class="metic-brand-text">
+                <span class="metic-brand-name">Scam Spotter</span>
+                <span class="metic-tagline">Detect. Understand. Stay Safe.</span>
+              </div>
+            </a>
+
+            <nav class="metic-nav-links" aria-label="Editorial Navigation">
+              <li><a href="#how-it-works">How It Works</a></li>
+              <li><a href="#features">Features</a></li>
+              <li><a href="#build">Inspection</a></li>
+              <li><a href="#live-demo">Live Demo</a></li>
+              <li><a href="#link-security">Link Security</a></li>
+              <li><a href="#trust">Safety & Trust</a></li>
+            </nav>
+
+            <div class="metic-header-actions">
+              <button id="btnToggleInspect" class="metic-inspect-toggle" type="button" title="Toggle technical layout inspection overlay">
+                <span class="inspect-dot"></span>
+                <span>Inspect [I]</span>
+              </button>
+              <a href="#login" class="metic-btn-ghost" data-route-to="login">Sign In</a>
+              <a href="#login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
+              <button class="metic-menu-toggle" type="button" aria-label="Toggle Navigation Menu">☰</button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <!-- ====================================================================
+             HERO SECTION
+             ==================================================================== -->
+        <section class="metic-hero-section">
+          <div class="metic-container">
+            <div class="metic-hero-grid">
+              <div class="metic-hero-content">
+                <div class="metic-editorial-tag">00 // FRAUD FORENSICS ENGINE</div>
+                <h1 class="metic-hero-headline">
+                  Look <em>closer</em>.<br>Stay safer.
+                </h1>
+                <p class="metic-hero-copy">
+                  Suspicious message, unfamiliar link, or unexpected payment request? Understand the warning signs before you act.
+                </p>
+                <div class="metic-hero-ctas">
+                  <a href="#login" class="metic-btn-primary" data-route-to="login">
+                    <span>Check a Message</span>
+                    <span>→</span>
+                  </a>
+                  <a href="#how-it-works" class="metic-btn-secondary">
+                    <span>See How It Works</span>
+                  </a>
+                </div>
+                <div class="metic-press-instruction">
+                  Drag the forensic magnifying glass over any message, card, or link to reveal active malware &amp; threats.
+                </div>
+              </div>
+
+              <!-- Compact Interactive Scam-Analysis Preview -->
+              <div class="metic-hero-preview-box" id="heroPreviewBox">
+                <div class="metic-preview-header">
+                  <span class="preview-tag">01 // LIVE SIGNAL PREVIEW</span>
+                  <span class="preview-risk-chip">HIGH RISK (100/100)</span>
+                </div>
+                <div class="metic-sample-message">
+                  “Dear SBI Customer, your account will be <span class="metic-highlight-urgency">blocked today</span> due to incomplete KYC. Update immediately at <span class="metic-highlight-link">http://sbi-kyc-update.xyz</span> and enter OTP to verify.”
+                </div>
+                <div class="metic-preview-breakdown">
+                  <div class="preview-signal-item">
+                    <span class="preview-signal-name">Fake Urgency ("blocked today")</span>
+                    <span class="preview-signal-pts">+20 pts</span>
+                  </div>
+                  <div class="preview-signal-item">
+                    <span class="preview-signal-name">Account Threat ("incomplete KYC")</span>
+                    <span class="preview-signal-pts">+15 pts</span>
+                  </div>
+                  <div class="preview-signal-item">
+                    <span class="preview-signal-name">Suspicious Link ("sbi-kyc-update.xyz")</span>
+                    <span class="preview-signal-pts">+25 pts</span>
+                  </div>
+                  <div class="preview-signal-item">
+                    <span class="preview-signal-name">OTP Request ("enter OTP to verify")</span>
+                    <span class="preview-signal-pts">+40 pts</span>
+                  </div>
+                </div>
+                <div class="metic-preview-footer">
+                  <span>Transparent arithmetic: 100/100</span>
+                  <a href="#live-demo" class="metic-preview-link">
+                    Test in Live Demo →
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             INTERACTIVE BUILD & PROGRESSIVE CONSTRUCTION SECTION
+             ==================================================================== -->
+        <section id="build" class="metic-section">
+          <div class="metic-container">
+            <div class="metic-section-intro">
+              <div class="metic-section-number">01 // TRANSPARENT HEURISTICS</div>
+              <h2 class="metic-section-title">
+                Transparent by Design: <em>Anatomy of Fraud Detection</em>
+              </h2>
+              <p class="metic-section-sub">
+                Explore how Scam Spotter inspects visual coercion and computes transparent risk scores without black-box generative AI hallucination.
+              </p>
+            </div>
+
+            <!-- 7-Stage Progressive Construction Workspace -->
+            <div id="progressiveBuildSection" class="metic-build-workspace">
+              <div class="metic-build-toolbar">
+                <div class="metic-stage-selector" role="tablist">
+                  <button class="metic-stage-pill active" data-stage="1" role="tab" aria-selected="true">01. Alignment Line</button>
+                  <button class="metic-stage-pill" data-stage="2" role="tab" aria-selected="false">02. Page Grid</button>
+                  <button class="metic-stage-pill" data-stage="3" role="tab" aria-selected="false">03. Content Layout</button>
+                  <button class="metic-stage-pill" data-stage="4" role="tab" aria-selected="false">04. Typography</button>
+                  <button class="metic-stage-pill" data-stage="5" role="tab" aria-selected="false">05. Color System</button>
+                  <button class="metic-stage-pill" data-stage="6" role="tab" aria-selected="false">06. Rule Engine</button>
+                  <button class="metic-stage-pill" data-stage="7" role="tab" aria-selected="false">07. Finished System</button>
+                </div>
+                <div id="buildStageCounter" class="metic-stage-counter">01 / 07</div>
+              </div>
+
+              <div class="metic-build-main">
+                <div class="metic-build-canvas-wrapper">
+                  <div id="buildStageDisplayCanvas" class="metic-build-canvas stage-1">
+                    <!-- Layer 1: Datum -->
+                    <div class="stage-layer layer-datum"></div>
+                    <!-- Layer 2: Grid -->
+                    <div class="stage-layer layer-grid"></div>
+                    <!-- Layer 3: Wireframe Layout -->
+                    <div class="stage-layer layer-layout">
+                      <div class="wire-box">INPUT CONTAINER [100% × 120px]</div>
+                      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                        <div class="wire-box">TOKEN HIGHLIGHT BOX</div>
+                        <div class="wire-box">RISK METER GAUGE</div>
+                      </div>
+                      <div class="wire-box">ACTIONABLE NEXT STEPS CHECKLIST</div>
+                    </div>
+                    <!-- Layer 4: Typography -->
+                    <div class="stage-layer layer-typography" style="position: relative; z-index: 3; display: none;">
+                      <h3 style="font-family: var(--metic-font-serif); font-size: 22px; margin: 0 0 6px 0;">Look closer. Stay safer.</h3>
+                      <p style="font-family: var(--metic-font-sans); font-size: 12px; color: #64748b; margin: 0 0 10px 0;">Editorial typography paired with technical monospace telemetry.</p>
+                      <code style="font-family: var(--metic-font-mono); font-size: 11px; color: #dc2626;">RULE_FIRED: URGENCY (+20) // LATENCY: 2.4ms</code>
+                    </div>
+                    <!-- Layer 5: Color -->
+                    <div class="stage-layer layer-color" style="position: relative; z-index: 4; display: none; margin-top: 10px;">
+                      <div style="display: flex; gap: 8px;">
+                        <div style="padding: 6px 10px; background: #fbfbfa; border: 1px solid #e2e8f0; font-size: 10px; font-family: var(--metic-font-mono);">#FBFBFA CANVAS</div>
+                        <div style="padding: 6px 10px; background: #121316; color: #fff; font-size: 10px; font-family: var(--metic-font-mono);">#121316 INK</div>
+                        <div style="padding: 6px 10px; background: #dc2626; color: #fff; font-size: 10px; font-family: var(--metic-font-mono);">#DC2626 CRIMSON</div>
+                      </div>
+                    </div>
+                    <!-- Layer 6: Engine -->
+                    <div class="stage-layer layer-engine" style="position: relative; z-index: 5; display: none; margin-top: 10px;">
+                      <div style="background: #fee2e2; border: 1px solid #fca5a5; padding: 8px 12px; border-radius: 4px; font-size: 11px; color: #991b1b; font-family: var(--metic-font-mono);">
+                        SCORE: 100/100 (HIGH RISK) • 4 ACTIVE EVIDENCE VECTORS DETECTED
+                      </div>
+                    </div>
+                    <!-- Layer 7: Finished Experience Preview -->
+                    <div class="stage-layer layer-finished" style="position: relative; z-index: 6; display: none;">
+                      <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 10px;">
+                        <strong style="font-size: 13px;">Scam Spotter v1.0 Production Engine</strong>
+                        <span style="font-size: 10px; font-family: var(--metic-font-mono); background: #dcfce7; color: #16a34a; padding: 2px 6px; border-radius: 4px;">ACTIVE &amp; AUDITED</span>
+                      </div>
+                      <p style="font-size: 12px; line-height: 1.5; color: #334155; margin: 0 0 10px 0;">
+                        Deterministic client-side heuristics engine running 16 fraud categories with zero data egress.
+                      </p>
+                      <button class="metic-btn-solid" style="padding: 6px 14px; font-size: 11px;" type="button">Run Sandbox</button>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="metic-build-info-sidebar">
+                  <div>
+                    <h3 id="buildStageTitle" class="build-stage-heading">The Alignment Line</h3>
+                    <div id="buildStageSubtitle" class="build-stage-sub">Zero-tolerance horizontal datum</div>
+                    <p id="buildStageDescription" class="build-stage-desc">
+                      Every fraud analysis begins with a strict mathematical axis. No ambiguous heuristics; clear alignment ensures unambiguous boundary definitions between benign prose and malicious coercion.
+                    </p>
+                    <div id="buildStageSpec" class="build-stage-spec">
+                      ALIGN: X-AXIS 0.00° // TOLERANCE: ±0.00px // SPEC: DETERMINISTIC_DATUM
+                    </div>
+                  </div>
+
+                  <div class="metic-build-nav-buttons">
+                    <button id="btnBuildPrev" class="metic-btn-step" type="button" disabled>← Previous Stage</button>
+                    <button id="btnBuildNext" class="metic-btn-step" type="button">Next Stage →</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             FEATURE SECTION
+             ==================================================================== -->
+        <section id="features" class="metic-section">
+          <div class="metic-container">
+            <div class="metic-section-intro">
+              <div class="metic-section-number">02 // CORE CAPABILITIES</div>
+              <h2 class="metic-section-title">
+                Architected for <em>Absolute Clarity</em>
+              </h2>
+              <p class="metic-section-sub">
+                Six discrete forensics modules inspect text messages, links, screenshots, and UPI transactions.
+              </p>
+            </div>
+
+            <div class="metic-features-grid">
+              <!-- Feature 1 -->
+              <div class="metic-feature-card">
+                <div class="feature-index">01 // MESSAGE DECOMPOSITION</div>
+                <h3 class="feature-title">Message Analysis</h3>
+                <p class="feature-description">
+                  Deterministic token pattern matching across 16 scam categories. Identifies false urgency, authority threats, and payment coercion without generative hallucinations.
+                </p>
+                <div class="feature-meta">LATENCY: &lt; 5ms // SCRIPT: MULTILINGUAL &amp; HINGLISH</div>
+              </div>
+
+              <!-- Feature 2 -->
+              <div class="metic-feature-card">
+                <div class="feature-index">02 // URL REPUTATION</div>
+                <h3 class="feature-title">Suspicious-Link Scanning</h3>
+                <p class="feature-description">
+                  Deconstructs suspicious URLs, punycode lookalike domains, spoofed bank paths, and unsafe IP redirects without executing untrusted external code.
+                </p>
+                <div class="feature-meta">SAFETY: ZERO-EXECUTION // SSRF MITIGATION: ENFORCED</div>
+              </div>
+
+              <!-- Feature 3 -->
+              <div class="metic-feature-card">
+                <div class="feature-index">03 // OCR EXTRACTOR</div>
+                <h3 class="feature-title">Image &amp; Screenshot OCR</h3>
+                <p class="feature-description">
+                  Fast, private in-browser OCR extracts text directly from WhatsApp screenshots, payment receipts, and QR codes before running rule forensics.
+                </p>
+                <div class="feature-meta">PRIVACY: 100% IN-BROWSER // EXFILTRATION: NONE</div>
+              </div>
+
+              <!-- Feature 4 -->
+              <div class="metic-feature-card">
+                <div class="feature-index">04 // PAYMENT INTEGRITY</div>
+                <h3 class="feature-title">UPI &amp; Payment Scam Awareness</h3>
+                <p class="feature-description">
+                  Uncovers deceptive "Pay to Receive" inversions, fraudulent UPI PIN requests, and cloned payment handles targeting mobile banking users.
+                </p>
+                <div class="feature-meta">PROTOCOL: NPCI / BHIM // DETECTION: PIN-DEMAND INVERSIONS</div>
+              </div>
+
+              <!-- Feature 5 -->
+              <div class="metic-feature-card">
+                <div class="feature-index">05 // MATHEMATICAL SCORING</div>
+                <h3 class="feature-title">Explainable Risk Scoring</h3>
+                <p class="feature-description">
+                  Rule breakdowns with exact point weights (+20, +15, +40), group caps, and safety floors. No proprietary black boxes; every point is audited and traceable.
+                </p>
+                <div class="feature-meta">RANGE: 0 TO 100 // FLOORS: VERIFIED THREAT 60+</div>
+              </div>
+
+              <!-- Feature 6 -->
+              <div class="metic-feature-card">
+                <div class="feature-index">06 // EMERGENCY ACTIONS</div>
+                <h3 class="feature-title">Practical Safety Guidance</h3>
+                <p class="feature-description">
+                  Tailored safe next steps based on the exact scam profile: official bank helpline verification, reporting procedures, and SIM deactivation guidance.
+                </p>
+                <div class="feature-meta">VERIFICATION: OFFICIAL CHANNELS ONLY // SPEED: REAL-TIME</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             HOW IT WORKS (4 STEPS)
+             ==================================================================== -->
+        <section id="how-it-works" class="metic-section">
+          <div class="metic-container">
+            <div class="metic-section-intro">
+              <div class="metic-section-number">03 // FORENSIC PIPELINE</div>
+              <h2 class="metic-section-title">
+                Four Steps to <em>Certainty</em>
+              </h2>
+              <p class="metic-section-sub">
+                From raw unverified text to actionable safety containment in milliseconds.
+              </p>
+            </div>
+
+            <div class="metic-steps-row">
+              <div class="metic-step-box">
+                <div class="step-num">01</div>
+                <h3 class="step-title">Input Evidence</h3>
+                <p class="step-desc">
+                  Paste a message, email, link, or upload a payment screenshot directly into the private client sandbox.
+                </p>
+              </div>
+
+              <div class="metic-step-box">
+                <div class="step-num">02</div>
+                <h3 class="step-title">Analyze Signals</h3>
+                <p class="step-desc">
+                  Our deterministic engine decomposes language patterns, URL parameters, and coercion tactics against 16 master rule sets.
+                </p>
+              </div>
+
+              <div class="metic-step-box">
+                <div class="step-num">03</div>
+                <h3 class="step-title">Review Risk Score</h3>
+                <p class="step-desc">
+                  Inspect the exact highlighted phrases, point breakdown (+20 Urgency, +40 OTP), and transparent risk classification.
+                </p>
+              </div>
+
+              <div class="metic-step-box">
+                <div class="step-num">04</div>
+                <h3 class="step-title">Execute Safe Steps</h3>
+                <p class="step-desc">
+                  Follow concrete verification instructions: verify via official helpline numbers and report malicious domains safely.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             LIVE PRODUCT DEMONSTRATION SECTION
+             ==================================================================== -->
+        <section id="live-demo" class="metic-section">
+          <div class="metic-container">
+            <div class="metic-section-intro">
+              <div class="metic-section-number">04 // WORKING DEMONSTRATION</div>
+              <h2 class="metic-section-title">
+                Test the <em>Detection Engine</em> Live
+              </h2>
+              <p class="metic-section-sub">
+                Demonstrating the fictional SBI KYC scam with live scoring, phrase breakdown, and safe steps powered by the authentic Scam Spotter engine.
+              </p>
+            </div>
+
+            <div class="metic-demo-sandbox">
+              <div class="metic-demo-chips-bar">
+                <span class="chips-label">Sample presets:</span>
+                <button id="chipDemoSbi" class="metic-sample-chip active" type="button">⚠️ SBI Bank KYC Scam</button>
+                <button id="chipDemoPost" class="metic-sample-chip" type="button">📦 India Post Delivery Scam</button>
+                <button id="chipDemoElec" class="metic-sample-chip" type="button">⚡ Electricity Bill Threat</button>
+                <button id="chipDemoSafe" class="metic-sample-chip" type="button">🛡️ Benign Bank SMS</button>
+              </div>
+
+              <div class="metic-demo-grid">
+                <!-- Left: Text Area & Annotated Highlight View -->
+                <div class="demo-input-column">
+                  <label for="demoMessageInput" class="demo-label">Message Under Inspection:</label>
+                  <textarea id="demoMessageInput" class="metic-demo-textarea" rows="4" placeholder="Paste any suspicious message..."></textarea>
+                  
+                  <div class="metic-demo-run-bar">
+                    <span style="font-size: 11px; font-family: var(--metic-font-mono); color: var(--metic-ink-muted);">DETERMINISTIC EVALUATION</span>
+                    <button id="btnDemoAnalyze" class="metic-btn-analyze-demo" type="button">Analyze Message</button>
+                  </div>
+
+                  <div class="demo-annotation-view">
+                    <div class="annotation-header">EVIDENCE ANNOTATION &amp; HIGHLIGHTS</div>
+                    <div id="demoHighlightedTextMount"></div>
+                  </div>
+                </div>
+
+                <!-- Right: Live Score & Rule Breakdown -->
+                <div class="demo-output-column">
+                  <div class="metic-demo-score-banner">
+                    <div class="score-metric">
+                      <span class="score-title">Scam Spotter Score</span>
+                      <span id="demoScoreValue" class="score-num">100/100</span>
+                    </div>
+                    <span id="demoRiskBadge" class="metic-risk-badge risk-high">HIGH RISK</span>
+                  </div>
+
+                  <div>
+                    <div style="font-size: 11px; font-family: var(--metic-font-mono); font-weight: 700; margin-bottom: 8px;">CALCULATED RULE BREAKDOWN</div>
+                    <div id="demoBreakdownListMount" class="demo-breakdown-mount"></div>
+                  </div>
+
+                  <div class="demo-safe-steps-box">
+                    <div class="safe-steps-header">Recommended Safety Protocol:</div>
+                    <ul id="demoSafeStepsMount" class="safe-steps-list"></ul>
+                  </div>
+
+                  <button id="btnDemoOpenInWorkspace" class="metic-btn-workspace-link" type="button">
+                    Open in Full Scanner Workspace →
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             LINK SECURITY SECTION
+             ==================================================================== -->
+        <section id="link-security" class="metic-section">
+          <div class="metic-container">
+            <div class="metic-section-intro">
+              <div class="metic-section-number">05 // URL FORENSICS &amp; INTEGRITY</div>
+              <h2 class="metic-section-title">
+                Defensive Link <em>Evaluation</em>
+              </h2>
+              <p class="metic-section-sub">
+                How Scam Spotter inspects deceptive domains without compromising visitor safety or performing unauthorized probing.
+              </p>
+            </div>
+
+            <div class="metic-link-security-grid">
+              <div class="metic-security-card">
+                <h3>Lookalike Domains &amp; Typosquatting</h3>
+                <p>
+                  Attackers exploit visual similarities to mislead victims (e.g. <code>sbi-kyc-alert.xyz</code> or <code>onlinesbl.sbi</code> instead of <code>sbi.co.in</code>). Our lookalike engine calculates character substitutions, levenshtein distance, and high-risk generic top-level domains.
+                </p>
+                <div class="security-code-block">
+                  INPUT: http://sbi-kyc-update.xyz<br>
+                  STATUS: LOOKALIKE_DETECTED (+25 PTS)<br>
+                  TARGET: State Bank of India (sbi.co.in)<br>
+                  TLD RISK: .xyz UNAPPROVED_FINANCIAL_TLD
+                </div>
+              </div>
+
+              <div class="metic-security-card">
+                <h3>SSRF Protection &amp; Heuristic Separation</h3>
+                <p>
+                  To protect client and infrastructure integrity, Scam Spotter never automatically opens untrusted submitted URLs. All lookalike evaluations use local heuristics. We clearly distinguish heuristic indicators from verified threat intelligence feeds.
+                </p>
+                <div class="security-code-block">
+                  REMOTE_EXECUTION: BLOCKED (0% BROWSER INFECTION)<br>
+                  REDIRECT_RESOLVER: LOCAL_SANDBOX_ONLY<br>
+                  DISCLAIMER: Absence of threat flags does not guarantee safety.
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             SAFETY AND TRUST SECTION
+             ==================================================================== -->
+        <section id="trust" class="metic-section">
+          <div class="metic-container">
+            <div class="metic-section-intro">
+              <div class="metic-section-number">06 // INTEGRITY &amp; PRIVACY</div>
+              <h2 class="metic-section-title">
+                Built on <em>Verifiable Trust</em>
+              </h2>
+              <p class="metic-section-sub">
+                Zero hidden algorithms, zero telemetry leaks, and absolute transparency.
+              </p>
+            </div>
+
+            <div class="metic-trust-grid">
+              <div class="metic-trust-card">
+                <div class="trust-badge">RULE TRANSPARENCY</div>
+                <h3 class="trust-card-title">Why Transparent Rules Matter</h3>
+                <p class="trust-card-copy">
+                  Generative models can hallucinate or give inconsistent advice. Scam Spotter evaluates deterministically: you can inspect the exact rule, category, and point weight for every flagged token.
+                </p>
+              </div>
+
+              <div class="metic-trust-card">
+                <div class="trust-badge">ZERO ASSUMPTIONS</div>
+                <h3 class="trust-card-title">Low Score ≠ Guaranteed Safety</h3>
+                <p class="trust-card-copy">
+                  Novel scam templates emerge daily. A low score means no known coercion patterns matched, but you must always independently verify payment requests and never share an OTP.
+                </p>
+              </div>
+
+              <div class="metic-trust-card">
+                <div class="trust-badge">CLIENT-SIDE PRIVACY</div>
+                <h3 class="trust-card-title">100% In-Browser Processing</h3>
+                <p class="trust-card-copy">
+                  Your suspicious messages, telephone numbers, and uploaded screenshots are analyzed locally inside your browser memory. Nothing is transmitted to external AI endpoints.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ====================================================================
+             FINAL CTA SECTION
+             ==================================================================== -->
+        <section class="metic-final-cta-section">
+          <div class="metic-container">
+            <h2 class="metic-cta-headline">
+              Before you trust it, <em>check it.</em>
+            </h2>
+            <p class="metic-cta-sub">
+              Verify suspicious messages, links, and payment requests with zero guesswork. Protect your finances and personal identity now.
+            </p>
+            <a href="#login" class="metic-btn-cta-large" data-route-to="login">
+              <span>Scan a Suspicious Message</span>
+              <span>→</span>
+            </a>
+          </div>
+        </section>
+      </main>
+
+      <!-- Editorial Footer -->
+      <footer class="metic-footer">
+        <div class="metic-container">
+          <div class="metic-footer-grid">
+            <div class="footer-brand-col">
+              <div class="metic-brand">
+                <div class="metic-logo-mark">SS</div>
+                <div class="metic-brand-text">
+                  <span class="metic-brand-name">Scam Spotter</span>
+                  <span class="metic-tagline">Detect. Understand. Stay Safe.</span>
+                </div>
+              </div>
+              <p>
+                An open, explainable fraud forensics engine dedicated to transparent scam detection, consumer privacy, and digital literacy.
+              </p>
+            </div>
+
+            <div class="footer-nav-col">
+              <h4>PLATFORM</h4>
+              <ul>
+                <li><a href="#how-it-works">How It Works</a></li>
+                <li><a href="#features">Features</a></li>
+                <li><a href="#build">Inspection</a></li>
+                <li><a href="#live-demo">Live Demo</a></li>
+                <li><a href="#link-security">Link Security</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-nav-col">
+              <h4>FORENSICS</h4>
+              <ul>
+                <li><a href="#login" data-route-to="login">Message Scanner</a></li>
+                <li><a href="#login" data-route-to="login">URL Deconstruction</a></li>
+                <li><a href="#login" data-route-to="login">OCR Receipt Audit</a></li>
+                <li><a href="#login" data-route-to="login">APK Static Sandbox</a></li>
+                <li><a href="#login" data-route-to="login">VirusTotal File Scan</a></li>
+              </ul>
+            </div>
+
+            <div class="footer-nav-col">
+              <h4>OFFICIAL RESOURCES</h4>
+              <ul>
+                <li><a href="https://cybercrime.gov.in" target="_blank" rel="noopener">National Cyber Crime Portal (1930)</a></li>
+                <li><a href="https://sancharsaathi.gov.in" target="_blank" rel="noopener">Sanchar Saathi (DoT)</a></li>
+                <li><a href="https://rbi.org.in" target="_blank" rel="noopener">RBI Kehta Hai</a></li>
+                <li><a href="https://npci.org.in" target="_blank" rel="noopener">NPCI UPI Safety</a></li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="metic-footer-bottom">
+            <span>© 2026 Scam Spotter. Architectural fraud detection system.</span>
+            <span>100% Client-Side Evaluation • No Telemetry Stored</span>
+          </div>
+        </div>
+      </footer>
+    </div>
+
+    <!-- ==========================================================================
+         AUTHENTICATION VIEW (#authView)
+         Editorial sign-in screen connecting landing page to main workspace
+         ========================================================================== -->
+    <div id="authView" class="view-panel" style="display: none;">
+      <div class="metic-auth-container">
+        <div class="metic-auth-card">
+          <div class="metic-auth-header">
+            <div class="auth-editorial-tag">01 // ACCESS CONTROL</div>
+            <h2 class="auth-title">Analyst Sign In</h2>
+            <p class="auth-subtitle">
+              Sign in to access the full Scam Spotter Intelligence Workspace.
+            </p>
+          </div>
+
+          <form id="authForm" class="metic-auth-form">
+            <div class="auth-form-group">
+              <label for="authEmail">Email Address</label>
+              <input id="authEmail" type="email" value="analyst@scamspotter.org" required />
+            </div>
+
+            <div class="auth-form-group">
+              <label for="authPassword">Security Key / Password</label>
+              <input id="authPassword" type="password" value="••••••••••••" required />
+            </div>
+
+            <button type="submit" class="metic-btn-auth-submit">
+              Enter Workspace →
+            </button>
+          </form>
+
+          <div class="metic-auth-divider">
+            <span>OR CONTINUE DIRECTLY</span>
+          </div>
+
+          <button id="btnAuthDemo" class="metic-btn-auth-demo" type="button">
+            Instant Access (Guest Analyst)
+          </button>
+
+          <a href="#landing" class="metic-auth-back" data-route-to="landing">
+            ← Return to Editorial Landing Page
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==========================================================================
+         MAIN APPLICATION WORKSPACE (#appWorkspaceView)
+         Existing complete scam detection platform
+         ========================================================================== -->
+    <div id="appWorkspaceView" class="view-panel" style="display: none;">
+      <!-- Full-Screen Dynamic Alarm Overlay (5-10 second blinking) -->
+      <div id="screenAlarmOverlay" class="screen-alarm-overlay" style="display: none;">
+        <div class="alarm-banner">
+          <div class="alarm-content">
+            <span id="alarmIcon" class="alarm-icon">🚨</span>
+            <div class="alarm-text-block">
+              <strong id="alarmTitle">CRITICAL HIGH RISK SCAM DETECTED</strong>
+              <span id="alarmSubtitle">Score: 100/100 • Blinking Alert Active (<span id="alarmCountdown">7</span>s)</span>
+            </div>
+          </div>
+          <button id="btnDismissAlarm" class="btn-dismiss-alarm" type="button">✕ Dismiss Alert</button>
+        </div>
+      </div>
+
+      <!-- Top Navigation Bar -->
+      <header class="top-nav" role="banner">
+        <div class="nav-left">
+          <a href="#landing" class="nav-return-landing-btn" data-route-to="landing">← Landing Page</a>
+          <div class="brand-logo">
           <div class="shield-badge">
             <svg width="22" height="26" viewBox="0 0 24 28" fill="none">
               <path d="M12 2L3 6V13C3 19.5 7.5 24.5 12 26C16.5 24.5 21 19.5 21 13V6L12 2Z" fill="#dc2626" stroke="#0f172a" stroke-width="2"/>
@@ -224,8 +892,9 @@
                 </div>
                 <div class="url-chips-row">
                   <span class="chips-intro">Test URL samples:</span>
+                  <button id="btnUrlChallanPhish" class="chip-item chip-danger" type="button">🚨 mparivahan.redirectme.net</button>
+                  <button id="btnUrlIpPhish" class="chip-item chip-danger" type="button">⚠️ 192.168.1.1/bank-login</button>
                   <button id="btnUrlSbiPhish" class="chip-item" type="button">⚠️ sbi-kyc-update.xyz</button>
-                  <button id="btnUrlChallanPhish" class="chip-item" type="button">⚠️ echallan.parivahan.in.xyz</button>
                   <button id="btnUrlShortener" class="chip-item" type="button">🔗 bit.ly/indpst-fee</button>
                   <button id="btnUrlOfficialSbi" class="chip-item chip-lang" type="button">🛡️ sbi.co.in (Official)</button>
                 </div>
@@ -401,6 +1070,31 @@
                 <div>
                   <strong>The HTTPS Padlock Fallacy:</strong>
                   <span>A padlock icon only means traffic is encrypted — it says NOTHING about whether the website owner is honest. Scammers acquire free automated SSL certificates in under 5 minutes.</span>
+                </div>
+              </div>
+
+              <!-- Machine Learning Phishing URL Forensics (Random Forest 10-Feature Vector) -->
+              <div id="webMlSection" class="web-ml-section">
+                <div class="web-ml-header">
+                  <div class="web-ml-badge-cluster">
+                    <span class="web-ml-pill-tag">🤖 ML PHISHING FORENSICS</span>
+                    <span id="webMlModelName" class="web-ml-model-name">RandomForestClassifier (100 Trees)</span>
+                    <span id="webMlSourceBadge" class="web-ml-source-badge">Dual-Pipeline (Flask API + Client ML)</span>
+                  </div>
+                  <div class="web-ml-verdict-cluster">
+                    <span id="webMlProbability" class="web-ml-prob-pill">ML Phishing Risk: 100%</span>
+                    <span id="webMlVerdictPill" class="web-ml-verdict-pill danger">🚨 PHISHING DETECTED</span>
+                  </div>
+                </div>
+
+                <div class="web-ml-body">
+                  <div class="web-ml-intro">
+                    <span>10-Dimensional Numerical Cybersecurity Feature Vector:</span>
+                    <span class="web-ml-sub">scikit-learn & tldextract telemetry</span>
+                  </div>
+                  <div id="webMlFeaturesGrid" class="web-ml-features-grid">
+                    <!-- Populated dynamically with the 10 features -->
+                  </div>
                 </div>
               </div>
 
@@ -1157,6 +1851,7 @@
         </div>
       </div>
     </div>
+    </div> <!-- /appWorkspaceView -->
 
     <script type="module" src="/src/main.ts"></script>
   </body>

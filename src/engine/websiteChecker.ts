@@ -2,6 +2,7 @@ import { DEFAULT_OFFICIAL_DOMAINS } from './config.js';
 import { isPrivateOrReservedHost } from './threatGateway.js';
 import { levenshteinDistance } from './lookalike.js';
 import { ReportingService } from '../services/reporting.js';
+import { evaluatePhishingMl, MlModelAssessment } from './phishingMl.js';
 
 export interface ThreatSignal {
   id: string;
@@ -43,6 +44,7 @@ export interface WebsiteCheckResult {
   };
   threats: ThreatSignal[];
   recommendations: string[];
+  mlAssessment: MlModelAssessment;
 }
 
 const COMMON_SHORTENERS = new Set([
@@ -155,6 +157,7 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
         'Do not open this URL in your web browser.',
         'Never submit credentials, OTPs, or credit card details.',
       ],
+      mlAssessment: evaluatePhishingMl(rawInput),
     };
   }
 
@@ -204,12 +207,25 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
         'Always check the address bar to ensure the domain name remains verified as you browse.',
         'Official institutions will still never ask for your private ATM PIN or UPI PIN.',
       ],
+      mlAssessment: evaluatePhishingMl(rawInput),
     };
   }
 
   // 2. Evaluate Threat Signals
   const threats: ThreatSignal[] = [];
   let score = 0;
+
+  // Machine Learning Phishing Classification (10-Feature Vector)
+  const mlAssessment = evaluatePhishingMl(rawInput);
+  if (mlAssessment.isPhishing) {
+    threats.push({
+      id: 'ML_PHISHING_CLASSIFIER_FLAG',
+      title: `Random Forest Phishing Classifier Alert (${mlAssessment.confidenceScore}% Confidence)`,
+      severity: 'HIGH',
+      detail: `Machine learning model detected zero-day phishing patterns across 10 lexical and structural features (ML Risk Probability: ${mlAssessment.phishingProbability}%).`,
+    });
+    score = Math.max(score, 75);
+  }
 
   // SSRF / Private Network check
   if (isPrivateOrReservedHost(hostname)) {
@@ -433,5 +449,6 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
     },
     threats,
     recommendations,
+    mlAssessment,
   };
 }
