@@ -5,226 +5,474 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Scam Spotter — Explainable fraud intelligence with transparent rules, exact evidence highlighting, and risk scoring."
+      content="Scam Spotter — Check if it's a scam. Detect. Understand. Stay Safe."
     />
-    <title>Scam Spotter — Explainable Scam Detection & Risk Analyzer</title>
+    <title>Scam Spotter — Detect. Understand. Stay Safe.</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/src/ui/styles.css" />
   </head>
-  <body>
-    <div class="app-container">
-      <!-- Navigation Header -->
-      <header class="top-nav" role="banner">
-        <div class="brand-title">
-          <span class="brand-shield" aria-hidden="true">🛡️</span>
-          <h1>Scam Spotter</h1>
+  <body class="theme-light">
+    <!-- Full-Screen Dynamic Alarm Overlay (5-10 second blinking) -->
+    <div id="screenAlarmOverlay" class="screen-alarm-overlay" style="display: none;">
+      <div class="alarm-banner">
+        <div class="alarm-content">
+          <span id="alarmIcon" class="alarm-icon">🚨</span>
+          <div class="alarm-text-block">
+            <strong id="alarmTitle">CRITICAL HIGH RISK SCAM DETECTED</strong>
+            <span id="alarmSubtitle">Score: 100/100 • Blinking Alert Active (<span id="alarmCountdown">7</span>s)</span>
+          </div>
         </div>
-        <nav class="nav-actions" aria-label="Main Navigation">
-          <button id="navDashboardBtn" class="nav-btn" aria-haspopup="dialog">
-            <span>📊</span> Dashboard
+        <button id="btnDismissAlarm" class="btn-dismiss-alarm" type="button">✕ Dismiss Alert</button>
+      </div>
+    </div>
+
+    <!-- Top Navigation Bar -->
+    <header class="top-nav" role="banner">
+      <div class="nav-left">
+        <div class="brand-logo">
+          <div class="shield-badge">
+            <svg width="22" height="26" viewBox="0 0 24 28" fill="none">
+              <path d="M12 2L3 6V13C3 19.5 7.5 24.5 12 26C16.5 24.5 21 19.5 21 13V6L12 2Z" fill="#dc2626" stroke="#0f172a" stroke-width="2"/>
+              <path d="M12 7V21M7.5 12.5L12 17L16.5 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+          </div>
+          <div class="brand-text">
+            <h1 class="brand-title">Scam Spotter</h1>
+            <span class="brand-tagline">Detect. Understand. Stay Safe.</span>
+          </div>
+        </div>
+      </div>
+
+      <nav class="nav-center" aria-label="Main Navigation">
+        <a href="#" class="nav-link active">Home</a>
+        <a href="#" id="navHowItWorks" class="nav-link">How it works</a>
+        <a href="#" id="navResources" class="nav-link">Resources</a>
+        <a href="#" id="navPricing" class="nav-link">Pricing</a>
+        <a href="#" id="navAbout" class="nav-link">About</a>
+      </nav>
+
+      <div class="nav-right">
+        <button id="btnThemeToggle" class="icon-nav-btn" title="Toggle Theme" aria-label="Toggle Theme">☀️</button>
+        <button id="btnSearchNav" class="icon-nav-btn" title="Threat Analytics Dashboard" aria-label="Analytics Dashboard">📊</button>
+        <div class="user-avatar" title="Verified Safe Profile">P</div>
+      </div>
+    </header>
+
+    <!-- Main Application Layout with Left Sidebar -->
+    <div class="app-layout">
+      <!-- Left Sidebar Navigation -->
+      <aside class="sidebar" role="navigation" aria-label="Sidebar Navigation">
+        <nav class="sidebar-menu">
+          <button id="menuScanMessage" class="sidebar-item active" type="button">
+            <span class="sidebar-icon">💬</span>
+            <span class="sidebar-label">Scan Message</span>
           </button>
-          <button id="navHistoryBtn" class="nav-btn" aria-haspopup="dialog">
-            <span>📜</span> History
+          <button id="menuScanLink" class="sidebar-item" type="button">
+            <span class="sidebar-icon">🔗</span>
+            <span class="sidebar-label">Scan Link</span>
           </button>
-          <button id="navPricingBtn" class="nav-btn" aria-haspopup="dialog">
-            <span>💎</span> Pricing
+          <button id="menuScanImage" class="sidebar-item" type="button">
+            <span class="sidebar-icon">🖼️</span>
+            <span class="sidebar-label">Scan Image</span>
           </button>
-          <button id="navReportBtn" class="nav-btn" aria-haspopup="dialog">
-            <span>📢</span> Report
+          <button id="menuHistory" class="sidebar-item" type="button">
+            <span class="sidebar-icon">🕒</span>
+            <span class="sidebar-label">History</span>
+          </button>
+          <button id="menuLearn" class="sidebar-item" type="button">
+            <span class="sidebar-icon">📖</span>
+            <span class="sidebar-label">Learn</span>
+          </button>
+          <button id="menuReport" class="sidebar-item" type="button">
+            <span class="sidebar-icon">🚩</span>
+            <span class="sidebar-label">Report Scam</span>
           </button>
         </nav>
-      </header>
 
-      <!-- Hero Header -->
-      <section class="hero-section">
-        <h2 class="hero-heading">Verify Suspicious Messages</h2>
-        <p class="hero-subtitle">
-          Transparent, deterministic fraud analysis. See exact highlighted warning signs, calculated risk points, and regulatory mitigation steps.
-        </p>
-      </section>
-
-      <!-- Message Input Area -->
-      <section class="input-section" aria-label="Message Input">
-        <div class="input-header">
-          <label for="messageInput" class="input-label">Paste Message Text or Screenshot</label>
-          <div id="charCounter" class="char-counter">0 / 5,000</div>
-        </div>
-
-        <textarea
-          id="messageInput"
-          class="message-textarea"
-          rows="5"
-          placeholder="Paste the SMS, WhatsApp, or email message you received, or click 'Scan Image' to extract from a screenshot..."
-          aria-describedby="privacyNotice"
-          maxlength="5000"
-        ></textarea>
-
-        <div id="inlineError" class="inline-error" role="alert">
-          Please paste or type a message first before running analysis.
-        </div>
-
-        <div id="ocrStatusNotice" class="ocr-status-notice" style="display: none;"></div>
-
-        <!-- Example Chips & OCR Input -->
-        <div class="example-chips-row">
-          <button id="btnOcrUpload" class="chip-btn ocr-chip" type="button" title="Upload screenshot, payment receipt, or QR code image">
-            📸 Scan Screenshot / QR Code
-          </button>
-          <input type="file" id="ocrFileInput" accept="image/png, image/jpeg, image/webp" style="display: none;" />
-          <span class="chips-label" style="margin-left: 8px;">Try Examples:</span>
-          <button id="btnExampleSbi" class="chip-btn" type="button">
-            🚨 SBI KYC Scam (High)
-          </button>
-          <button id="btnExampleBank" class="chip-btn" type="button">
-            ✅ Real Bank Alert (Low)
-          </button>
-          <button id="btnExampleDelivery" class="chip-btn" type="button">
-            📦 Customs Delivery (Med)
-          </button>
-          <button id="btnExampleUpi" class="chip-btn" type="button">
-            💳 UPI PIN Trick (High)
-          </button>
-        </div>
-
-        <!-- Actions -->
-        <div class="actions-row">
-          <div class="privacy-notice" id="privacyNotice">
-            <span>🔒</span> Checked in your browser — your message is never uploaded.
-          </div>
-          <div class="action-buttons-group">
-            <button id="btnClear" class="btn-secondary" type="button">Clear</button>
-            <button id="btnAnalyze" class="btn-primary" type="button">
-              <span>⚡</span> Analyze Message
+        <!-- Sidebar Promo Cards -->
+        <div class="sidebar-cards-group">
+          <!-- Upgrade Card -->
+          <div class="sidebar-card upgrade-card">
+            <div class="upgrade-header">
+              <span class="crown-icon">👑</span>
+              <strong>Upgrade to Pro</strong>
+            </div>
+            <p>More scans, AI analysis, advanced link checks and priority support.</p>
+            <button id="btnViewPlansSidebar" class="btn-sidebar-cta" type="button">
+              View Plans →
             </button>
           </div>
+
+          <!-- Safer Internet Badge Card -->
+          <div class="sidebar-card safe-internet-card">
+            <div class="shield-icon-badge">🛡️</div>
+            <strong>Together for a Safer Internet</strong>
+            <p>Detect scams. Protect yourself. Help others.</p>
+          </div>
         </div>
-      </section>
+      </aside>
 
-      <!-- Results Area -->
-      <main id="resultsContainer" class="results-container" aria-live="polite">
-        <!-- 1. Score Gauge & Headline Card -->
-        <div id="gaugeMount"></div>
-
-        <!-- 2. Evidence Highlighting Canvas -->
-        <section class="evidence-section" aria-label="Detected Evidence">
-          <div class="section-title">
-            <span>Highlighted Warning Signs</span>
-            <span style="font-size: 0.8rem; font-weight: normal; color: var(--text-muted);">
-              Click any highlight to view rule
-            </span>
-          </div>
-
-          <div class="highlight-legend" aria-hidden="true">
-            <div class="legend-item">
-              <span class="legend-line solid"></span> Credential Request
+      <!-- Main Two-Column Content Grid -->
+      <main class="main-body-grid">
+        <!-- Center Column (Hero, Input, and Analysis Result) -->
+        <div class="center-column">
+          <!-- Hero Section -->
+          <section class="hero-banner">
+            <div class="hero-text-block">
+              <h2 class="hero-heading">Check if it’s a <span class="text-accent-red">Scam</span></h2>
+              <p class="hero-subtitle">
+                Paste a suspicious message, email or link. We’ll find the warning signs, show the risk level, and tell you what to do next.
+              </p>
             </div>
-            <div class="legend-item">
-              <span class="legend-line wavy"></span> Suspicious Link
+            <div class="hero-illustration-card" aria-hidden="true">
+              <div class="phone-illustration">
+                <div class="phone-screen-graphic">
+                  <span class="phone-alert-symbol">⚠️</span>
+                </div>
+              </div>
+              <div class="hero-illustration-text">
+                <span>Be alert.</span>
+                <span>Verify.</span>
+                <span>Stay safe.</span>
+              </div>
             </div>
-            <div class="legend-item">
-              <span class="legend-line dashed"></span> Pressure / Threat
+          </section>
+
+          <!-- Input Card -->
+          <section class="card-box input-card" aria-label="Input Section">
+            <!-- Tabs -->
+            <div class="input-tabs-bar" role="tablist">
+              <button id="tabTextMessage" class="tab-button active" role="tab" aria-selected="true" type="button">
+                <span>💬</span> Text Message
+              </button>
+              <button id="tabScanLink" class="tab-button" role="tab" aria-selected="false" type="button">
+                <span>🔗</span> URL / Link
+              </button>
+              <button id="tabUploadImage" class="tab-button" role="tab" aria-selected="false" type="button">
+                <span>🖼️</span> Upload Image
+              </button>
             </div>
-          </div>
 
-          <div id="highlightedTextBox" class="highlighted-text-box" tabindex="0"></div>
-        </section>
+            <!-- Tab Panels -->
+            <div class="input-content-area">
+              <!-- Text Area Panel -->
+              <div id="panelTextMessage" class="tab-panel active">
+                <div class="textarea-wrapper">
+                  <textarea
+                    id="messageInput"
+                    class="main-textarea"
+                    placeholder="Paste the suspicious message here..."
+                    maxlength="5000"
+                    rows="4"
+                  ></textarea>
+                  <div id="charCounter" class="char-count-pill">0/2000</div>
+                </div>
+              </div>
 
-        <!-- 3. Explanation Cards & Total Sum -->
-        <section class="breakdown-section" aria-label="Risk Breakdown">
-          <div class="section-title">
-            <span>Point-by-Point Breakdown</span>
-          </div>
-          <div id="breakdownCardsMount"></div>
-        </section>
+              <!-- URL / Link Panel -->
+              <div id="panelScanLink" class="tab-panel" style="display: none;">
+                <div class="url-input-container">
+                  <span class="url-protocol-label">Link:</span>
+                  <input
+                    id="urlInput"
+                    type="url"
+                    class="url-text-field"
+                    placeholder="https://sbi-kyc-update.xyz/login or bit.ly/promo"
+                  />
+                </div>
+              </div>
 
-        <!-- 4. Unmatched Checks Drawer -->
-        <div id="unmatchedMount"></div>
+              <!-- Upload Image / QR Code Panel -->
+              <div id="panelUploadImage" class="tab-panel" style="display: none;">
+                <div id="dropZone" class="upload-dropzone">
+                  <div class="dropzone-icon">📸</div>
+                  <strong>Upload Screenshot, Payment Receipt, or QR Code</strong>
+                  <p>Drag and drop your file here, or click to browse (PNG, JPG, WEBP)</p>
+                  <button id="btnBrowseOcr" class="btn-browse-file" type="button">
+                    Select File
+                  </button>
+                  <input type="file" id="ocrFileInput" accept="image/png, image/jpeg, image/webp" style="display: none;" />
+                </div>
+              </div>
 
-        <!-- 5. Safe Next Steps & Regulatory Advice -->
-        <div id="nextStepsMount"></div>
+              <div id="inlineError" class="inline-error" style="display: none;" role="alert">
+                Please enter a message, URL, or upload an image first.
+              </div>
+              <div id="ocrStatusNotice" class="ocr-status-notice" style="display: none;"></div>
 
-        <!-- 6. AI Second Opinion Section -->
-        <section class="ai-section" aria-label="AI Second Opinion">
-          <div class="ai-header-row">
-            <div>
-              <span class="ai-tag">Optional Advisory</span>
-              <h4 style="margin-top: 4px;">Contextual AI Second Opinion</h4>
+              <!-- Bottom Action Row: Examples & Analyze Button -->
+              <div class="input-actions-row">
+                <div class="example-chips-cluster">
+                  <span class="chips-intro">Try an example:</span>
+                  <button id="btnExampleSbi" class="chip-item" type="button">SBI KYC Scam</button>
+                  <button id="btnExampleDelivery" class="chip-item" type="button">Delivery Scam</button>
+                  <button id="btnExampleInvestment" class="chip-item" type="button">Investment Scam</button>
+                  <button id="btnExampleJob" class="chip-item" type="button">Job Scam</button>
+                </div>
+                <div class="action-submit-group">
+                  <button id="btnClearInput" class="btn-clear-text" type="button" title="Clear text">Clear</button>
+                  <button id="btnAnalyze" class="btn-analyze-red" type="button">
+                    <span>🔍</span> Analyze Message
+                  </button>
+                </div>
+              </div>
             </div>
-            <button id="btnGetAiOpinion" class="btn-secondary" type="button">
-              ✨ Get AI Opinion
-            </button>
-          </div>
-          <div id="aiOutputBox" class="ai-output-box"></div>
-        </section>
+          </section>
+
+          <!-- Analysis Result Card -->
+          <section id="analysisResultCard" class="card-box analysis-result-card" style="display: none;" aria-live="polite">
+            <div class="result-card-header">
+              <div class="result-card-title">
+                <span class="result-icon-doc">📄</span>
+                <h3>Analysis Result</h3>
+              </div>
+            </div>
+
+            <!-- Original Message (with highlights) -->
+            <div class="original-message-section">
+              <div class="message-section-top">
+                <span class="section-label">Original Message (with highlights)</span>
+                <button id="btnCopyHighlights" class="icon-tool-btn" title="Copy original text with summary" type="button">
+                  📋
+                </button>
+              </div>
+              <div id="highlightedTextBox" class="highlighted-display-box" tabindex="0"></div>
+            </div>
+
+            <!-- Detected Warning Signs -->
+            <div class="warning-signs-section">
+              <div class="warning-signs-heading">
+                <div class="heading-left">
+                  <span class="crown-small">👑</span>
+                  <strong>Detected Warning Signs</strong>
+                  <span class="info-badge" title="Deterministic points awarded by verified heuristic rules">ⓘ</span>
+                </div>
+              </div>
+              <div id="warningSignsMount" class="warning-signs-table"></div>
+            </div>
+
+            <!-- Collapsible Clean Checks Drawer -->
+            <div id="unmatchedMount" class="unmatched-mount-area"></div>
+
+            <!-- Contextual AI Second Opinion Drawer -->
+            <div class="ai-advisory-section">
+              <div class="ai-section-header">
+                <div class="ai-header-left">
+                  <span>✨</span>
+                  <strong>Contextual AI Second Opinion</strong>
+                </div>
+                <button id="btnGetAiOpinion" class="btn-ai-advisory" type="button">
+                  Consult AI
+                </button>
+              </div>
+              <div id="aiOutputBox" class="ai-output-box" style="display: none;"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- Right Column (Risk Score, Why it matters, Safe Next Steps) -->
+        <div class="right-column">
+          <!-- Card 1: Risk Score -->
+          <section class="card-box widget-card risk-score-widget">
+            <div class="widget-header">
+              <div class="widget-title">
+                <span class="widget-icon">🎯</span>
+                <h3>Risk Score</h3>
+              </div>
+              <button id="btnShareScore" class="icon-tool-btn" title="Copy / Share Score" type="button">🔗</button>
+            </div>
+
+            <div class="gauge-presentation-row">
+              <!-- SVG Donut Chart -->
+              <div class="donut-chart-container">
+                <svg class="donut-svg" viewBox="0 0 100 100" aria-hidden="true">
+                  <circle class="donut-track" cx="50" cy="50" r="40" />
+                  <circle id="donutArc" class="donut-meter" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+                </svg>
+                <div class="donut-value-center">
+                  <span id="gaugeScoreNum" class="gauge-big-num">0</span>
+                  <span class="gauge-denom">/100</span>
+                </div>
+              </div>
+
+              <!-- Risk Badge & Summary Text -->
+              <div class="risk-info-column">
+                <div id="riskLevelPill" class="risk-badge-pill low">Low Risk</div>
+                <p id="riskSummaryText" class="risk-summary-copy">
+                  Paste a message and click Analyze to view verified warning signs and score.
+                </p>
+              </div>
+            </div>
+
+            <!-- Low / Medium / High Scale Bar -->
+            <div class="scale-bar-wrapper">
+              <div class="scale-bar-track">
+                <div class="scale-segment low"></div>
+                <div class="scale-segment medium"></div>
+                <div class="scale-segment high"></div>
+              </div>
+              <div class="scale-labels-row">
+                <div class="scale-col">
+                  <strong>Low</strong>
+                  <small>0 – 29</small>
+                </div>
+                <div class="scale-col">
+                  <strong>Medium</strong>
+                  <small>30 – 59</small>
+                </div>
+                <div class="scale-col">
+                  <strong>High</strong>
+                  <small>60 – 100</small>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Card 2: Why it matters -->
+          <section class="card-box widget-card why-matters-widget">
+            <div class="widget-header">
+              <div class="widget-title">
+                <span class="widget-icon">💡</span>
+                <h3>Why it matters</h3>
+              </div>
+            </div>
+            <p id="whyMattersText" class="why-matters-body">
+              Scammers use urgent wording, fake account threats, and suspicious links to create fear and trick you into sharing sensitive information like OTPs or passwords.
+            </p>
+          </section>
+
+          <!-- Card 3: Safe Next Steps -->
+          <section class="card-box widget-card next-steps-widget">
+            <div class="widget-header">
+              <div class="widget-title">
+                <span class="widget-icon">🛡️</span>
+                <h3>Safe Next Steps</h3>
+              </div>
+            </div>
+
+            <div id="safeNextStepsMount" class="safe-steps-stack">
+              <div class="safe-step-item">
+                <span class="step-num-badge">1</span>
+                <div class="step-text">Do not click the link and do not share the OTP.</div>
+              </div>
+              <div class="safe-step-item">
+                <span class="step-num-badge">2</span>
+                <div class="step-text">Contact the bank only through its official app, website or the number printed on your card or passbook.</div>
+              </div>
+              <div class="safe-step-item">
+                <span class="step-num-badge">3</span>
+                <div class="step-text">If an OTP was already shared, contact the bank straight away.</div>
+              </div>
+              <div class="safe-step-item">
+                <span class="step-num-badge">4</span>
+                <div class="step-text">Report scams at cybercrime.gov.in or call 1930 (India).</div>
+              </div>
+            </div>
+
+            <div class="emergency-action-buttons">
+              <a href="tel:1930" class="btn-helpline-dial">📞 Call Helpline: 1930</a>
+              <a href="https://cybercrime.gov.in" target="_blank" rel="noopener" class="btn-portal-link">🌐 cybercrime.gov.in</a>
+            </div>
+          </section>
+        </div>
       </main>
+    </div>
 
-      <!-- Dashboard Modal -->
-      <div id="dashboardModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dashboardModalTitle">
-        <div class="modal-container">
-          <button id="closeDashboardModal" class="modal-close-btn" aria-label="Close modal">×</button>
-          <h3 id="dashboardModalTitle" style="margin-bottom: 8px;">Fraud Intelligence Dashboard</h3>
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
-            Real-time threat analytics derived from client-side scans, recurring scam indicators, and severity distributions.
-          </p>
-          <div id="dashboardMount"></div>
-        </div>
+    <!-- Modals for Platform Features -->
+    <!-- 1. Dashboard Modal -->
+    <div id="dashboardModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dashboardModalTitle">
+      <div class="modal-container">
+        <button id="closeDashboardModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        <h3 id="dashboardModalTitle" style="margin-bottom: 8px;">Fraud Intelligence Dashboard</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+          Real-time threat analytics derived from client-side scans, recurring scam indicators, and severity distributions.
+        </p>
+        <div id="dashboardMount"></div>
       </div>
+    </div>
 
-      <!-- History Modal -->
-      <div id="historyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
-        <div class="modal-container">
-          <button id="closeHistoryModal" class="modal-close-btn" aria-label="Close modal">×</button>
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h3 id="historyModalTitle">Local Scan History</h3>
-            <button id="btnClearHistory" class="btn-secondary" style="min-height: 36px; padding: 6px 12px; font-size: 0.8rem;">
-              Clear All
-            </button>
+    <!-- 2. History Modal -->
+    <div id="historyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
+      <div class="modal-container">
+        <button id="closeHistoryModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+          <h3 id="historyModalTitle">Local Scan History</h3>
+          <button id="btnClearHistory" class="btn-clear-history" type="button">
+            Clear All
+          </button>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+          Stored privately in your browser's local storage (up to 50 scans). Sensitive phone numbers and accounts are masked.
+        </p>
+        <div id="historyListMount"></div>
+      </div>
+    </div>
+
+    <!-- 3. Pricing / Pro Plans Modal -->
+    <div id="pricingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pricingModalTitle">
+      <div class="modal-container">
+        <button id="closePricingModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        <div id="pricingMount"></div>
+      </div>
+    </div>
+
+    <!-- 4. Community Threat Report Modal -->
+    <div id="reportModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
+      <div class="modal-container">
+        <button id="closeReportModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        <h3 id="reportModalTitle" style="margin-bottom: 12px;">Submit Threat Report</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;">
+          Help protect the community by submitting verified phishing domains, fraudulent phone numbers, or fake UPI IDs.
+        </p>
+        <form id="reportForm">
+          <div style="margin-bottom: 14px;">
+            <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600;">Indicator Type</label>
+            <select id="reportType" style="width: 100%; padding: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px;">
+              <option value="DOMAIN">Phishing Web Domain / URL</option>
+              <option value="PHONE">Fraudulent Phone Number (SMS/Call)</option>
+              <option value="UPI_ID">Fraudulent UPI VPA Address</option>
+            </select>
           </div>
-          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
-            Stored privately in your browser's local storage (up to 50 scans). Sensitive phone numbers and accounts are masked.
-          </p>
-          <div id="historyListMount"></div>
+          <div style="margin-bottom: 14px;">
+            <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600;">Target Value</label>
+            <input id="reportValue" type="text" placeholder="e.g. sbi-kyc-verify.xyz or +919876543210" required style="width: 100%; padding: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px;" />
+          </div>
+          <div style="margin-bottom: 18px;">
+            <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600;">Fraud Category</label>
+            <input id="reportCategory" type="text" placeholder="e.g. Bank KYC / Electricity Threat" required style="width: 100%; padding: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px;" />
+          </div>
+          <button type="submit" class="btn-analyze-red" style="width: 100%; justify-content: center;">
+            Submit for Verification
+          </button>
+        </form>
+        <div id="reportSuccess" style="display: none; margin-top: 14px; color: #16a34a; font-size: 0.9rem; font-weight: 600;">
+          ✓ Report successfully recorded for community threat intelligence verification.
         </div>
       </div>
+    </div>
 
-      <!-- Pricing Modal -->
-      <div id="pricingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pricingModalTitle">
-        <div class="modal-container">
-          <button id="closePricingModal" class="modal-close-btn" aria-label="Close modal">×</button>
-          <div id="pricingMount"></div>
-        </div>
-      </div>
-
-      <!-- Report Modal -->
-      <div id="reportModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
-        <div class="modal-container">
-          <button id="closeReportModal" class="modal-close-btn" aria-label="Close modal">×</button>
-          <h3 id="reportModalTitle" style="margin-bottom: 12px;">Submit Threat Report</h3>
-          <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 18px;">
-            Help protect the community by submitting verified phishing domains, fraudulent phone numbers, or fake UPI IDs.
-          </p>
-          <form id="reportForm">
-            <div style="margin-bottom: 14px;">
-              <label style="display: block; font-size: 0.85rem; margin-bottom: 6px;">Indicator Type</label>
-              <select id="reportType" style="width: 100%; padding: 10px; background: #080c14; border: 1px solid var(--border-color); color: #fff; border-radius: 6px;">
-                <option value="DOMAIN">Phishing Web Domain / URL</option>
-                <option value="PHONE">Fraudulent Phone Number (SMS/Call)</option>
-                <option value="UPI_ID">Fraudulent UPI VPA Address</option>
-              </select>
-            </div>
-            <div style="margin-bottom: 14px;">
-              <label style="display: block; font-size: 0.85rem; margin-bottom: 6px;">Target Value</label>
-              <input id="reportValue" type="text" placeholder="e.g. sbi-kyc-verify.xyz or +919876543210" required style="width: 100%; padding: 10px; background: #080c14; border: 1px solid var(--border-color); color: #fff; border-radius: 6px;" />
-            </div>
-            <div style="margin-bottom: 18px;">
-              <label style="display: block; font-size: 0.85rem; margin-bottom: 6px;">Fraud Category</label>
-              <input id="reportCategory" type="text" placeholder="e.g. Bank KYC / Electricity Threat" required style="width: 100%; padding: 10px; background: #080c14; border: 1px solid var(--border-color); color: #fff; border-radius: 6px;" />
-            </div>
-            <button type="submit" class="btn-primary" style="width: 100%; justify-content: center;">
-              Submit for Verification
-            </button>
-          </form>
-          <div id="reportSuccess" style="display: none; margin-top: 14px; color: var(--risk-low); font-size: 0.9rem;">
-            ✓ Report successfully recorded for community threat intelligence verification.
+    <!-- 5. Learn / How It Works Modal -->
+    <div id="learnModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="learnModalTitle">
+      <div class="modal-container">
+        <button id="closeLearnModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        <h3 id="learnModalTitle" style="margin-bottom: 10px;">How Scam Spotter Works</h3>
+        <p style="color: var(--text-muted); font-size: 0.9rem; line-height: 1.6; margin-bottom: 16px;">
+          Scam Spotter runs a deterministic client-side heuristics engine across 16 scam categories. Your messages never leave your browser, ensuring 100% data privacy.
+        </p>
+        <div class="learn-steps-grid">
+          <div class="learn-step-card">
+            <strong>1. Exact Evidence Detection</strong>
+            <p>Every urgency phrase, bank threat, and fake OTP verb is identified with zero hallucination.</p>
+          </div>
+          <div class="learn-step-card">
+            <strong>2. Group Capping</strong>
+            <p>Prevents runaway scores by capping correlated signals to avoid unfair false alarms.</p>
+          </div>
+          <div class="learn-step-card">
+            <strong>3. Floor Rules</strong>
+            <p>Verified phishing URLs and known malware domains lock the minimum score to High (60+) immediately.</p>
           </div>
         </div>
       </div>
