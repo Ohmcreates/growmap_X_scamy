@@ -9,6 +9,7 @@ import { OcrService } from '../services/ocr.js';
 import { IndicatorType, ReportingService, VerifiedIndicator } from '../services/reporting.js';
 import { renderPricingModal, renderUnmatchedChecks } from './cards.js';
 import { renderDashboardHtml } from './dashboard.js';
+import { checkWebsiteUrl } from '../engine/websiteChecker.js';
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
 
 export function initApp() {
@@ -75,6 +76,24 @@ export function initApp() {
   const warningSignsMount = document.getElementById('warningSignsMount') as HTMLElement;
   const unmatchedMount = document.getElementById('unmatchedMount') as HTMLElement;
   const btnCopyHighlights = document.getElementById('btnCopyHighlights') as HTMLButtonElement;
+
+  // Website Inspector Elements (IsThisSpam Reverse Engineered)
+  const websiteInspectorCard = document.getElementById('websiteInspectorCard') as HTMLElement;
+  const webDomainText = document.getElementById('webDomainText') as HTMLElement;
+  const webConfidenceBadge = document.getElementById('webConfidenceBadge') as HTMLElement;
+  const webVerdictBadge = document.getElementById('webVerdictBadge') as HTMLElement;
+  const webSummaryText = document.getElementById('webSummaryText') as HTMLElement;
+  const webMetricAge = document.getElementById('webMetricAge') as HTMLElement;
+  const webMetricTld = document.getElementById('webMetricTld') as HTMLElement;
+  const webMetricSsl = document.getElementById('webMetricSsl') as HTMLElement;
+  const webMetricBlacklist = document.getElementById('webMetricBlacklist') as HTMLElement;
+  const webThreatsList = document.getElementById('webThreatsList') as HTMLElement;
+  const webRecommendationsList = document.getElementById('webRecommendationsList') as HTMLElement;
+
+  const btnUrlSbiPhish = document.getElementById('btnUrlSbiPhish') as HTMLButtonElement;
+  const btnUrlChallanPhish = document.getElementById('btnUrlChallanPhish') as HTMLButtonElement;
+  const btnUrlShortener = document.getElementById('btnUrlShortener') as HTMLButtonElement;
+  const btnUrlOfficialSbi = document.getElementById('btnUrlOfficialSbi') as HTMLButtonElement;
 
   // AI Safety Assistant Elements
   const assistantResponseBox = document.getElementById('assistantResponseBox') as HTMLElement;
@@ -291,6 +310,30 @@ export function initApp() {
     runAnalysis();
   });
 
+  btnUrlSbiPhish?.addEventListener('click', () => {
+    switchTab('LINK');
+    urlInput.value = 'http://sbi-kyc-update.xyz/login';
+    runAnalysis();
+  });
+
+  btnUrlChallanPhish?.addEventListener('click', () => {
+    switchTab('LINK');
+    urlInput.value = 'http://echallan-parivahan-gov.in.xyz';
+    runAnalysis();
+  });
+
+  btnUrlShortener?.addEventListener('click', () => {
+    switchTab('LINK');
+    urlInput.value = 'http://bit.ly/indpst-fee';
+    runAnalysis();
+  });
+
+  btnUrlOfficialSbi?.addEventListener('click', () => {
+    switchTab('LINK');
+    urlInput.value = 'https://sbi.co.in';
+    runAnalysis();
+  });
+
   // --------------------------------------------------------------------------
   // Full-Screen Blinking Alarm System (5–10 Seconds)
   // --------------------------------------------------------------------------
@@ -471,6 +514,71 @@ export function initApp() {
       `;
     } else {
       scamArchetypeBanner.style.display = 'none';
+    }
+
+    // Website & URL Safety Inspector (Reverse Engineered from IsThisSpam)
+    const isUrl =
+      activeTab === 'LINK' ||
+      /^(?:https?:\/\/|\bwww\.|\b[a-z0-9-]+\.(?:com|org|in|net|xyz|top|live|click|gov\.in)\b)/i.test(rawText.trim());
+
+    if (isUrl && websiteInspectorCard) {
+      const webResult = checkWebsiteUrl(rawText);
+      websiteInspectorCard.style.display = 'flex';
+      webDomainText.textContent = webResult.domain;
+      webConfidenceBadge.textContent = `Confidence: ${(webResult.confidence * 100).toFixed(0)}%`;
+
+      if (webResult.classification === 'SCAM_DETECTED') {
+        webVerdictBadge.className = 'web-verdict-pill danger';
+        webVerdictBadge.textContent = '🚨 SCAM WEBSITE';
+      } else if (webResult.classification === 'SUSPICIOUS_DETECTED') {
+        webVerdictBadge.className = 'web-verdict-pill warning';
+        webVerdictBadge.textContent = '⚠️ SUSPICIOUS WEBSITE';
+      } else if (webResult.classification === 'OFFICIAL_DOMAIN_VERIFIED') {
+        webVerdictBadge.className = 'web-verdict-pill success';
+        webVerdictBadge.textContent = '🛡️ OFFICIAL BRAND';
+      } else {
+        webVerdictBadge.className = 'web-verdict-pill success';
+        webVerdictBadge.textContent = '✅ NO KNOWN THREATS';
+      }
+
+      webSummaryText.textContent = webResult.summary;
+      webMetricAge.textContent = webResult.metrics.domainAgeEstimate;
+      webMetricTld.textContent =
+        webResult.metrics.tldRisk === 'HIGH'
+          ? `High-Risk Disposable (.${webResult.tld})`
+          : `Standard / Trusted (.${webResult.tld})`;
+      webMetricSsl.textContent = webResult.metrics.sslStatus;
+      webMetricBlacklist.textContent = webResult.metrics.threatDbListed
+        ? '⚠️ Blacklisted in Community DB'
+        : 'Clean (No Threat Feed Flags)';
+
+      if (webResult.threats.length > 0) {
+        webThreatsList.innerHTML = webResult.threats
+          .map(
+            (t) => `
+            <div class="web-threat-item">
+              <span class="web-threat-badge">${t.severity}</span>
+              <div class="web-threat-text">
+                <strong>${t.title}</strong>
+                <p>${t.detail}</p>
+              </div>
+            </div>
+          `
+          )
+          .join('');
+      } else {
+        webThreatsList.innerHTML = `
+          <div style="font-size: 0.85rem; color: #16a34a; padding: 6px 0;">
+            ✓ No suspicious domain signals found. Verified safe infrastructure.
+          </div>
+        `;
+      }
+
+      webRecommendationsList.innerHTML = webResult.recommendations
+        .map((rec) => `<li>${rec}</li>`)
+        .join('');
+    } else if (websiteInspectorCard) {
+      websiteInspectorCard.style.display = 'none';
     }
 
     // Evidence Highlighting

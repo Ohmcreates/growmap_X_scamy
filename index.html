@@ -197,6 +197,13 @@
                     placeholder="https://sbi-kyc-update.xyz/login or bit.ly/promo"
                   />
                 </div>
+                <div class="url-chips-row">
+                  <span class="chips-intro">Test URL samples:</span>
+                  <button id="btnUrlSbiPhish" class="chip-item" type="button">⚠️ sbi-kyc-update.xyz</button>
+                  <button id="btnUrlChallanPhish" class="chip-item" type="button">⚠️ echallan.parivahan.in.xyz</button>
+                  <button id="btnUrlShortener" class="chip-item" type="button">🔗 bit.ly/indpst-fee</button>
+                  <button id="btnUrlOfficialSbi" class="chip-item chip-lang" type="button">🛡️ sbi.co.in (Official)</button>
+                </div>
               </div>
 
               <!-- Upload Image / QR Code Panel -->
@@ -258,6 +265,64 @@
                 </div>
               </div>
               <div id="archetypeAdvice" class="archetype-mitigation-box"></div>
+            </div>
+
+            <!-- Website & URL Safety Inspector Card (Reverse Engineered from IsThisSpam) -->
+            <div id="websiteInspectorCard" class="website-inspector-card" style="display: none;">
+              <div class="web-inspector-header">
+                <div class="web-domain-pill">
+                  <span class="web-globe-icon">🌐</span>
+                  <span id="webDomainText" class="web-domain-name">example.com</span>
+                </div>
+                <div class="web-verdict-cluster">
+                  <span id="webConfidenceBadge" class="web-confidence-pill">Confidence: 96%</span>
+                  <span id="webVerdictBadge" class="web-verdict-pill danger">🚨 SCAM WEBSITE</span>
+                </div>
+              </div>
+              <div class="web-summary-banner">
+                <p id="webSummaryText" class="web-summary-desc"></p>
+              </div>
+
+              <!-- Domain Diagnostics & Security Signals Grid -->
+              <div class="web-metrics-grid">
+                <div class="web-metric-cell">
+                  <span class="metric-label">Domain Age & Registration</span>
+                  <strong id="webMetricAge" class="metric-val">&lt; 30 Days (Disposable Risk)</strong>
+                </div>
+                <div class="web-metric-cell">
+                  <span class="metric-label">TLD Extension Risk</span>
+                  <strong id="webMetricTld" class="metric-val">High-Risk Disposable (.xyz)</strong>
+                </div>
+                <div class="web-metric-cell">
+                  <span class="metric-label">SSL Padlock Status</span>
+                  <strong id="webMetricSsl" class="metric-val">Active Free TLS (Let's Encrypt)</strong>
+                </div>
+                <div class="web-metric-cell">
+                  <span class="metric-label">Hosting & Blacklist DB</span>
+                  <strong id="webMetricBlacklist" class="metric-val">Flagged in Threat Intel Feed</strong>
+                </div>
+              </div>
+
+              <!-- Key Warning on HTTPS / Padlock -->
+              <div id="webSslNotice" class="web-ssl-notice-box">
+                <span class="ssl-notice-icon">🔒</span>
+                <div>
+                  <strong>The HTTPS Padlock Fallacy:</strong>
+                  <span>A padlock icon only means traffic is encrypted — it says NOTHING about whether the website owner is honest. Scammers acquire free automated SSL certificates in under 5 minutes.</span>
+                </div>
+              </div>
+
+              <!-- Detected Domain Threat Signals -->
+              <div id="webThreatsContainer" class="web-threats-container">
+                <h4 class="web-threats-title">Detected Domain Threat Signals</h4>
+                <div id="webThreatsList" class="web-threats-list"></div>
+              </div>
+
+              <!-- Recommendations -->
+              <div id="webRecommendationsContainer" class="web-recommendations-container">
+                <h4 class="web-threats-title">🛡️ Consumer Safety Protocol & Next Steps</h4>
+                <ul id="webRecommendationsList" class="web-recs-list"></ul>
+              </div>
             </div>
 
             <!-- Original Message (with highlights) -->
