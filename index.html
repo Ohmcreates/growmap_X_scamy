@@ -19,6 +19,9 @@
           <h1>Scam Spotter</h1>
         </div>
         <nav class="nav-actions" aria-label="Main Navigation">
+          <button id="navDashboardBtn" class="nav-btn" aria-haspopup="dialog">
+            <span>📊</span> Dashboard
+          </button>
           <button id="navHistoryBtn" class="nav-btn" aria-haspopup="dialog">
             <span>📜</span> History
           </button>
@@ -42,7 +45,7 @@
       <!-- Message Input Area -->
       <section class="input-section" aria-label="Message Input">
         <div class="input-header">
-          <label for="messageInput" class="input-label">Paste Message Text</label>
+          <label for="messageInput" class="input-label">Paste Message Text or Screenshot</label>
           <div id="charCounter" class="char-counter">0 / 5,000</div>
         </div>
 
@@ -50,7 +53,7 @@
           id="messageInput"
           class="message-textarea"
           rows="5"
-          placeholder="Paste the SMS, WhatsApp, or email message you received..."
+          placeholder="Paste the SMS, WhatsApp, or email message you received, or click 'Scan Image' to extract from a screenshot..."
           aria-describedby="privacyNotice"
           maxlength="5000"
         ></textarea>
@@ -59,9 +62,15 @@
           Please paste or type a message first before running analysis.
         </div>
 
-        <!-- Example Chips -->
+        <div id="ocrStatusNotice" class="ocr-status-notice" style="display: none;"></div>
+
+        <!-- Example Chips & OCR Input -->
         <div class="example-chips-row">
-          <span class="chips-label">Try Examples:</span>
+          <button id="btnOcrUpload" class="chip-btn ocr-chip" type="button">
+            📸 Scan Screenshot (OCR)
+          </button>
+          <input type="file" id="ocrFileInput" accept="image/png, image/jpeg, image/webp" style="display: none;" />
+          <span class="chips-label" style="margin-left: 8px;">Try Examples:</span>
           <button id="btnExampleSbi" class="chip-btn" type="button">
             🚨 SBI KYC Scam (High)
           </button>
@@ -147,6 +156,18 @@
           <div id="aiOutputBox" class="ai-output-box"></div>
         </section>
       </main>
+
+      <!-- Dashboard Modal -->
+      <div id="dashboardModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="dashboardModalTitle">
+        <div class="modal-container">
+          <button id="closeDashboardModal" class="modal-close-btn" aria-label="Close modal">×</button>
+          <h3 id="dashboardModalTitle" style="margin-bottom: 8px;">Fraud Intelligence Dashboard</h3>
+          <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 20px;">
+            Real-time threat analytics derived from client-side scans, recurring scam indicators, and severity distributions.
+          </p>
+          <div id="dashboardMount"></div>
+        </div>
+      </div>
 
       <!-- History Modal -->
       <div id="historyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">

@@ -2,6 +2,7 @@ import { analyzeMessage } from '../engine/scorer.js';
 import { ScanResult } from '../engine/types.js';
 import { AiAdvisorService } from '../services/aiAdvisor.js';
 import { HistoryService } from '../services/history.js';
+import { OcrService } from '../services/ocr.js';
 import { IndicatorType, ReportingService } from '../services/reporting.js';
 import {
   renderBreakdownCards,
@@ -10,6 +11,7 @@ import {
   renderScoreGauge,
   renderUnmatchedChecks,
 } from './cards.js';
+import { renderDashboardHtml } from './dashboard.js';
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
 
 export function initApp() {
@@ -35,19 +37,28 @@ export function initApp() {
   const btnExampleDelivery = document.getElementById('btnExampleDelivery') as HTMLButtonElement;
   const btnExampleUpi = document.getElementById('btnExampleUpi') as HTMLButtonElement;
 
+  // OCR Elements
+  const btnOcrUpload = document.getElementById('btnOcrUpload') as HTMLButtonElement;
+  const ocrFileInput = document.getElementById('ocrFileInput') as HTMLInputElement;
+  const ocrStatusNotice = document.getElementById('ocrStatusNotice') as HTMLElement;
+
   // Modals
+  const dashboardModal = document.getElementById('dashboardModal') as HTMLElement;
   const historyModal = document.getElementById('historyModal') as HTMLElement;
   const pricingModal = document.getElementById('pricingModal') as HTMLElement;
   const reportModal = document.getElementById('reportModal') as HTMLElement;
 
+  const navDashboardBtn = document.getElementById('navDashboardBtn') as HTMLButtonElement;
   const navHistoryBtn = document.getElementById('navHistoryBtn') as HTMLButtonElement;
   const navPricingBtn = document.getElementById('navPricingBtn') as HTMLButtonElement;
   const navReportBtn = document.getElementById('navReportBtn') as HTMLButtonElement;
 
+  const closeDashboardModal = document.getElementById('closeDashboardModal') as HTMLButtonElement;
   const closeHistoryModal = document.getElementById('closeHistoryModal') as HTMLButtonElement;
   const closePricingModal = document.getElementById('closePricingModal') as HTMLButtonElement;
   const closeReportModal = document.getElementById('closeReportModal') as HTMLButtonElement;
 
+  const dashboardMount = document.getElementById('dashboardMount') as HTMLElement;
   const historyListMount = document.getElementById('historyListMount') as HTMLElement;
   const btnClearHistory = document.getElementById('btnClearHistory') as HTMLButtonElement;
   const pricingMount = document.getElementById('pricingMount') as HTMLElement;
@@ -228,6 +239,12 @@ export function initApp() {
   });
 
   // Modals management
+  navDashboardBtn.addEventListener('click', () => {
+    dashboardMount.innerHTML = renderDashboardHtml();
+    dashboardModal.classList.add('open');
+  });
+  closeDashboardModal.addEventListener('click', () => dashboardModal.classList.remove('open'));
+
   navHistoryBtn.addEventListener('click', () => {
     renderHistoryList();
     historyModal.classList.add('open');
@@ -248,10 +265,64 @@ export function initApp() {
   closeReportModal.addEventListener('click', () => reportModal.classList.remove('open'));
 
   // Close modals on background backdrop click
-  [historyModal, pricingModal, reportModal].forEach((modal) => {
+  [dashboardModal, historyModal, pricingModal, reportModal].forEach((modal) => {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.remove('open');
     });
+  });
+
+  // OCR Processing flow
+  async function handleOcrImageFile(file: File | Blob) {
+    ocrStatusNotice.style.display = 'block';
+    ocrStatusNotice.className = 'ocr-status-notice ocr-loading';
+    ocrStatusNotice.innerHTML = '⏳ Preprocessing screenshot and extracting text...';
+
+    try {
+      const ocrResult = await OcrService.extractTextFromImage(file, (progress, status) => {
+        ocrStatusNotice.innerHTML = `⏳ ${status} (${progress}%)`;
+      });
+
+      textarea.value = ocrResult.text;
+      updateCharCount();
+
+      if (ocrResult.lowConfidence && ocrResult.notice) {
+        ocrStatusNotice.className = 'ocr-status-notice ocr-warning';
+        ocrStatusNotice.innerHTML = `⚠️ ${ocrResult.notice}`;
+      } else {
+        ocrStatusNotice.className = 'ocr-status-notice ocr-success';
+        ocrStatusNotice.innerHTML = `✓ Text extracted (${Math.round(ocrResult.confidence)}% confidence). Please review and click Analyze.`;
+      }
+    } catch (err) {
+      console.error('OCR failed:', err);
+      ocrStatusNotice.className = 'ocr-status-notice ocr-error';
+      ocrStatusNotice.innerHTML = '❌ Could not extract text from this image. Please paste text directly.';
+    }
+  }
+
+  btnOcrUpload.addEventListener('click', () => {
+    ocrFileInput.click();
+  });
+
+  ocrFileInput.addEventListener('change', () => {
+    if (ocrFileInput.files && ocrFileInput.files[0]) {
+      handleOcrImageFile(ocrFileInput.files[0]);
+    }
+  });
+
+  // Also support pasting images directly from clipboard (e.g. Cmd+V screenshot)
+  textarea.addEventListener('paste', (e: ClipboardEvent) => {
+    if (e.clipboardData && e.clipboardData.items) {
+      for (const item of Array.from(e.clipboardData.items)) {
+        if (item.type.startsWith('image/')) {
+          e.preventDefault();
+          const file = item.getAsFile();
+          if (file) {
+            handleOcrImageFile(file);
+          }
+          break;
+        }
+      }
+    }
   });
 
   function renderHistoryList() {
