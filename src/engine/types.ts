@@ -75,6 +75,7 @@ export interface ScanResult {
     name: string;
     description: string;
     keySignals: string[];
+    advicePayload?: string[];
   };
   metadata: {
     characterCount: number;

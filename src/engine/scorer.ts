@@ -166,6 +166,7 @@ export function analyzeMessage(
           name: scamProfile.name,
           description: scamProfile.description,
           keySignals: scamProfile.keySignals,
+          advicePayload: scamProfile.advicePayload,
         }
       : undefined,
     metadata: {

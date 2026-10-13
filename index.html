@@ -47,10 +47,10 @@
 
       <nav class="nav-center" aria-label="Main Navigation">
         <a href="#" class="nav-link active">Home</a>
+        <a href="#" id="navThreatDb" class="nav-link">Threat DB</a>
+        <a href="#" id="navEvaluation" class="nav-link">Model Benchmark</a>
         <a href="#" id="navHowItWorks" class="nav-link">How it works</a>
-        <a href="#" id="navResources" class="nav-link">Resources</a>
         <a href="#" id="navPricing" class="nav-link">Pricing</a>
-        <a href="#" id="navAbout" class="nav-link">About</a>
       </nav>
 
       <div class="nav-right">
@@ -75,7 +75,15 @@
           </button>
           <button id="menuScanImage" class="sidebar-item" type="button">
             <span class="sidebar-icon">🖼️</span>
-            <span class="sidebar-label">Scan Image</span>
+            <span class="sidebar-label">Scan Image / QR</span>
+          </button>
+          <button id="menuThreatDb" class="sidebar-item" type="button">
+            <span class="sidebar-icon">🛡️</span>
+            <span class="sidebar-label">Threat Database</span>
+          </button>
+          <button id="menuEvaluation" class="sidebar-item" type="button">
+            <span class="sidebar-icon">📊</span>
+            <span class="sidebar-label">Model Evaluation</span>
           </button>
           <button id="menuHistory" class="sidebar-item" type="button">
             <span class="sidebar-icon">🕒</span>
@@ -142,17 +150,24 @@
 
           <!-- Input Card -->
           <section class="card-box input-card" aria-label="Input Section">
-            <!-- Tabs -->
-            <div class="input-tabs-bar" role="tablist">
-              <button id="tabTextMessage" class="tab-button active" role="tab" aria-selected="true" type="button">
-                <span>💬</span> Text Message
-              </button>
-              <button id="tabScanLink" class="tab-button" role="tab" aria-selected="false" type="button">
-                <span>🔗</span> URL / Link
-              </button>
-              <button id="tabUploadImage" class="tab-button" role="tab" aria-selected="false" type="button">
-                <span>🖼️</span> Upload Image
-              </button>
+            <!-- Tabs & Language Script Pill -->
+            <div class="input-header-row">
+              <div class="input-tabs-bar" role="tablist">
+                <button id="tabTextMessage" class="tab-button active" role="tab" aria-selected="true" type="button">
+                  <span>💬</span> Text Message
+                </button>
+                <button id="tabScanLink" class="tab-button" role="tab" aria-selected="false" type="button">
+                  <span>🔗</span> URL / Link
+                </button>
+                <button id="tabUploadImage" class="tab-button" role="tab" aria-selected="false" type="button">
+                  <span>🖼️</span> Upload Image / QR
+                </button>
+              </div>
+
+              <!-- Multilingual Script Detector Pill -->
+              <div id="langScriptPill" class="lang-script-badge" title="Real-time script detection">
+                🌐 Script: Latin (English)
+              </div>
             </div>
 
             <!-- Tab Panels -->
@@ -163,7 +178,7 @@
                   <textarea
                     id="messageInput"
                     class="main-textarea"
-                    placeholder="Paste the suspicious message here..."
+                    placeholder="Paste the suspicious message here (Supports English, हिन्दी, and Hinglish)..."
                     maxlength="5000"
                     rows="4"
                   ></textarea>
@@ -205,11 +220,14 @@
               <!-- Bottom Action Row: Examples & Analyze Button -->
               <div class="input-actions-row">
                 <div class="example-chips-cluster">
-                  <span class="chips-intro">Try an example:</span>
-                  <button id="btnExampleSbi" class="chip-item" type="button">SBI KYC Scam</button>
-                  <button id="btnExampleDelivery" class="chip-item" type="button">Delivery Scam</button>
-                  <button id="btnExampleInvestment" class="chip-item" type="button">Investment Scam</button>
-                  <button id="btnExampleJob" class="chip-item" type="button">Job Scam</button>
+                  <span class="chips-intro">Try examples:</span>
+                  <button id="btnExampleSbi" class="chip-item" type="button">SBI KYC</button>
+                  <button id="btnExampleDelivery" class="chip-item" type="button">Delivery</button>
+                  <button id="btnExampleInvestment" class="chip-item" type="button">Investment</button>
+                  <button id="btnExampleJob" class="chip-item" type="button">Job Task</button>
+                  <button id="btnExampleDigitalArrest" class="chip-item" type="button">🚨 Digital Arrest</button>
+                  <button id="btnExampleHinglish" class="chip-item chip-lang" type="button">🇮🇳 Hinglish KYC</button>
+                  <button id="btnExampleHindi" class="chip-item chip-lang" type="button">🇮🇳 हिन्दी बिजली</button>
                 </div>
                 <div class="action-submit-group">
                   <button id="btnClearInput" class="btn-clear-text" type="button" title="Clear text">Clear</button>
@@ -228,6 +246,18 @@
                 <span class="result-icon-doc">📄</span>
                 <h3>Analysis Result</h3>
               </div>
+            </div>
+
+            <!-- Specialized Scam Archetype Classifier Banner (Phase 5) -->
+            <div id="scamArchetypeBanner" class="scam-archetype-card" style="display: none;">
+              <div class="archetype-header">
+                <span id="archetypeIcon" class="archetype-icon">🚨</span>
+                <div>
+                  <h4 id="archetypeName" class="archetype-title">Identified Scam Pattern</h4>
+                  <p id="archetypeDesc" class="archetype-desc"></p>
+                </div>
+              </div>
+              <div id="archetypeAdvice" class="archetype-mitigation-box"></div>
             </div>
 
             <!-- Original Message (with highlights) -->
@@ -256,18 +286,51 @@
             <!-- Collapsible Clean Checks Drawer -->
             <div id="unmatchedMount" class="unmatched-mount-area"></div>
 
-            <!-- Contextual AI Second Opinion Drawer -->
-            <div class="ai-advisory-section">
-              <div class="ai-section-header">
-                <div class="ai-header-left">
-                  <span>✨</span>
-                  <strong>Contextual AI Second Opinion</strong>
+            <!-- Interactive AI Safety Assistant (Conversational Q&A + Prompt-Injection Proof Advice) -->
+            <div class="ai-safety-assistant-card">
+              <div class="assistant-header">
+                <div class="assistant-title-group">
+                  <span class="assistant-badge">AI Safety Assistant</span>
+                  <h4>Ask Questions About This Scam</h4>
                 </div>
-                <button id="btnGetAiOpinion" class="btn-ai-advisory" type="button">
-                  Consult AI
+                <span class="privacy-badge">🔒 PII Masked & Offline Verified</span>
+              </div>
+              <p class="assistant-intro">Get instant, safe guidance on emergency response, reporting, and law enforcement protocols:</p>
+              
+              <!-- Quick Safety Prompts -->
+              <div class="quick-prompts-row">
+                <button class="prompt-chip" data-q="Should I answer their Skype or video call?" type="button">
+                  📹 Should I answer their video call?
+                </button>
+                <button class="prompt-chip" data-q="Can I get my money back if already paid?" type="button">
+                  💸 Can I get my money back?
+                </button>
+                <button class="prompt-chip" data-q="How do I report this number to the police?" type="button">
+                  👮 How do I report to police?
+                </button>
+                <button class="prompt-chip" data-q="Is it safe to click if I didn't enter OTP?" type="button">
+                  🔗 Is it safe if I only clicked?
                 </button>
               </div>
-              <div id="aiOutputBox" class="ai-output-box" style="display: none;"></div>
+
+              <!-- Assistant Q&A Box -->
+              <div id="assistantResponseBox" class="assistant-response-area" style="display: none;"></div>
+
+              <div class="assistant-input-row">
+                <input id="assistantQueryInput" type="text" placeholder="Ask custom safety question..." class="assistant-text-input" />
+                <button id="btnSendAssistantQuery" class="btn-send-assistant" type="button">Ask Assistant</button>
+              </div>
+            </div>
+
+            <!-- Model Evaluation & Feedback Bar -->
+            <div class="model-feedback-bar">
+              <span class="feedback-label">Was this detection accurate?</span>
+              <div class="feedback-buttons">
+                <button id="btnFeedbackYes" class="btn-feedback" type="button">👍 Accurate</button>
+                <button id="btnFeedbackNo" class="btn-feedback" type="button">👎 False Alarm / Issue</button>
+                <button id="btnOpenModelEval" class="btn-feedback-eval" type="button">📊 View Benchmark Accuracy</button>
+              </div>
+              <div id="feedbackNotice" class="feedback-status-msg" style="display: none;"></div>
             </div>
           </section>
         </div>
@@ -393,7 +456,34 @@
       </div>
     </div>
 
-    <!-- 2. History Modal -->
+    <!-- 2. Threat Database & Verified Indicators Modal (Phase 7) -->
+    <div id="threatDbModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="threatDbModalTitle">
+      <div class="modal-container" style="max-width: 780px;">
+        <button id="closeThreatDbModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        <h3 id="threatDbModalTitle" style="margin-bottom: 8px;">Verified Scam Indicator Database</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+          Search official blacklisted phishing domains, fraudulent call-center numbers, and malicious UPI VPAs.
+        </p>
+        <div class="threat-db-search-bar">
+          <input id="threatDbSearchInput" type="text" placeholder="Search indicator (e.g. sbi-kyc, 9876543210, refund-desk)..." class="threat-search-field" />
+        </div>
+        <div id="threatDbResultsMount" class="threat-indicators-list"></div>
+      </div>
+    </div>
+
+    <!-- 3. Model Benchmark & Evaluation Modal (Phase 8) -->
+    <div id="evalModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="evalModalTitle">
+      <div class="modal-container" style="max-width: 820px;">
+        <button id="closeEvalModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        <h3 id="evalModalTitle" style="margin-bottom: 8px;">Model Benchmark & Confusion Matrix</h3>
+        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
+          Evaluated against the standardized 100-message benchmark suite (50 Scams, 50 Benign Controls).
+        </p>
+        <div id="evalMetricsMount"></div>
+      </div>
+    </div>
+
+    <!-- 4. History Modal -->
     <div id="historyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
       <div class="modal-container">
         <button id="closeHistoryModal" class="modal-close-btn" aria-label="Close modal">×</button>
@@ -410,7 +500,7 @@
       </div>
     </div>
 
-    <!-- 3. Pricing / Pro Plans Modal -->
+    <!-- 5. Pricing / Pro Plans Modal -->
     <div id="pricingModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="pricingModalTitle">
       <div class="modal-container">
         <button id="closePricingModal" class="modal-close-btn" aria-label="Close modal">×</button>
@@ -418,7 +508,7 @@
       </div>
     </div>
 
-    <!-- 4. Community Threat Report Modal -->
+    <!-- 6. Community Threat Report Modal -->
     <div id="reportModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="reportModalTitle">
       <div class="modal-container">
         <button id="closeReportModal" class="modal-close-btn" aria-label="Close modal">×</button>
@@ -453,7 +543,7 @@
       </div>
     </div>
 
-    <!-- 5. Learn / How It Works Modal -->
+    <!-- 7. Learn / How It Works Modal -->
     <div id="learnModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="learnModalTitle">
       <div class="modal-container">
         <button id="closeLearnModal" class="modal-close-btn" aria-label="Close modal">×</button>

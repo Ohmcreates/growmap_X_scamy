@@ -735,3 +735,64 @@ export const BENCHMARK_CORPUS: TestCase[] = [
     description: 'Agile software development daily sync',
   },
 ];
+
+export interface BenchmarkMetrics {
+  totalSamples: number;
+  totalScams: number;
+  totalBenign: number;
+  tp: number;
+  fn: number;
+  tn: number;
+  fp: number;
+  precision: number;
+  recall: number;
+  fpr: number;
+  highFalsePositives: number;
+}
+
+export function computeBenchmarkMetrics(
+  analyzeFn: (text: string) => { riskLevel: string }
+): BenchmarkMetrics {
+  let tp = 0;
+  let fn = 0;
+  let tn = 0;
+  let fp = 0;
+  let highFalsePositives = 0;
+
+  const totalScams = BENCHMARK_CORPUS.filter((c) => c.category === 'SCAM').length;
+  const totalBenign = BENCHMARK_CORPUS.filter((c) => c.category === 'BENIGN').length;
+
+  for (const testCase of BENCHMARK_CORPUS) {
+    const result = analyzeFn(testCase.text);
+    const isFlagged = result.riskLevel === 'MEDIUM' || result.riskLevel === 'HIGH';
+
+    if (testCase.category === 'SCAM') {
+      if (isFlagged) tp++;
+      else fn++;
+    } else {
+      if (!isFlagged) tn++;
+      else {
+        fp++;
+        if (result.riskLevel === 'HIGH') highFalsePositives++;
+      }
+    }
+  }
+
+  const precision = Math.round((tp / (tp + fp)) * 1000) / 10;
+  const recall = Math.round((tp / (tp + fn)) * 1000) / 10;
+  const fpr = Math.round((fp / (fp + tn)) * 1000) / 10;
+
+  return {
+    totalSamples: BENCHMARK_CORPUS.length,
+    totalScams,
+    totalBenign,
+    tp,
+    fn,
+    tn,
+    fp,
+    precision,
+    recall,
+    fpr,
+    highFalsePositives,
+  };
+}

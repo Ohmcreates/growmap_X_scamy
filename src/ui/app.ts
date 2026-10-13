@@ -1,10 +1,12 @@
+import { BENCHMARK_CORPUS, computeBenchmarkMetrics } from '../engine/benchmarks.js';
+import { detectScript } from '../engine/multilingual.js';
 import { generateSafeNextSteps } from '../engine/safeSteps.js';
 import { analyzeMessage } from '../engine/scorer.js';
 import { ScanResult } from '../engine/types.js';
 import { AiAdvisorService } from '../services/aiAdvisor.js';
 import { HistoryService } from '../services/history.js';
 import { OcrService } from '../services/ocr.js';
-import { IndicatorType, ReportingService } from '../services/reporting.js';
+import { IndicatorType, ReportingService, VerifiedIndicator } from '../services/reporting.js';
 import { renderPricingModal, renderUnmatchedChecks } from './cards.js';
 import { renderDashboardHtml } from './dashboard.js';
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
@@ -15,11 +17,15 @@ export function initApp() {
   const btnSearchNav = document.getElementById('btnSearchNav') as HTMLButtonElement;
   const navHowItWorks = document.getElementById('navHowItWorks') as HTMLAnchorElement;
   const navPricing = document.getElementById('navPricing') as HTMLAnchorElement;
+  const navThreatDb = document.getElementById('navThreatDb') as HTMLAnchorElement;
+  const navEvaluation = document.getElementById('navEvaluation') as HTMLAnchorElement;
 
   // Sidebar Elements
   const menuScanMessage = document.getElementById('menuScanMessage') as HTMLButtonElement;
   const menuScanLink = document.getElementById('menuScanLink') as HTMLButtonElement;
   const menuScanImage = document.getElementById('menuScanImage') as HTMLButtonElement;
+  const menuThreatDb = document.getElementById('menuThreatDb') as HTMLButtonElement;
+  const menuEvaluation = document.getElementById('menuEvaluation') as HTMLButtonElement;
   const menuHistory = document.getElementById('menuHistory') as HTMLButtonElement;
   const menuLearn = document.getElementById('menuLearn') as HTMLButtonElement;
   const menuReport = document.getElementById('menuReport') as HTMLButtonElement;
@@ -39,16 +45,20 @@ export function initApp() {
   const charCounter = document.getElementById('charCounter') as HTMLElement;
   const inlineError = document.getElementById('inlineError') as HTMLElement;
   const ocrStatusNotice = document.getElementById('ocrStatusNotice') as HTMLElement;
+  const langScriptPill = document.getElementById('langScriptPill') as HTMLElement;
 
   const dropZone = document.getElementById('dropZone') as HTMLElement;
   const btnBrowseOcr = document.getElementById('btnBrowseOcr') as HTMLButtonElement;
   const ocrFileInput = document.getElementById('ocrFileInput') as HTMLInputElement;
 
-  // Example Buttons
+  // Example Buttons (English + Multilingual Hinglish & Hindi)
   const btnExampleSbi = document.getElementById('btnExampleSbi') as HTMLButtonElement;
   const btnExampleDelivery = document.getElementById('btnExampleDelivery') as HTMLButtonElement;
   const btnExampleInvestment = document.getElementById('btnExampleInvestment') as HTMLButtonElement;
   const btnExampleJob = document.getElementById('btnExampleJob') as HTMLButtonElement;
+  const btnExampleDigitalArrest = document.getElementById('btnExampleDigitalArrest') as HTMLButtonElement;
+  const btnExampleHinglish = document.getElementById('btnExampleHinglish') as HTMLButtonElement;
+  const btnExampleHindi = document.getElementById('btnExampleHindi') as HTMLButtonElement;
 
   // Submit & Clear
   const btnAnalyze = document.getElementById('btnAnalyze') as HTMLButtonElement;
@@ -56,14 +66,26 @@ export function initApp() {
 
   // Results Section
   const analysisResultCard = document.getElementById('analysisResultCard') as HTMLElement;
+  const scamArchetypeBanner = document.getElementById('scamArchetypeBanner') as HTMLElement;
+  const archetypeName = document.getElementById('archetypeName') as HTMLElement;
+  const archetypeDesc = document.getElementById('archetypeDesc') as HTMLElement;
+  const archetypeAdvice = document.getElementById('archetypeAdvice') as HTMLElement;
+
   const highlightedTextBox = document.getElementById('highlightedTextBox') as HTMLElement;
   const warningSignsMount = document.getElementById('warningSignsMount') as HTMLElement;
   const unmatchedMount = document.getElementById('unmatchedMount') as HTMLElement;
   const btnCopyHighlights = document.getElementById('btnCopyHighlights') as HTMLButtonElement;
 
-  // AI Opinion
-  const btnGetAiOpinion = document.getElementById('btnGetAiOpinion') as HTMLButtonElement;
-  const aiOutputBox = document.getElementById('aiOutputBox') as HTMLElement;
+  // AI Safety Assistant Elements
+  const assistantResponseBox = document.getElementById('assistantResponseBox') as HTMLElement;
+  const assistantQueryInput = document.getElementById('assistantQueryInput') as HTMLInputElement;
+  const btnSendAssistantQuery = document.getElementById('btnSendAssistantQuery') as HTMLButtonElement;
+
+  // Model Feedback Bar
+  const btnFeedbackYes = document.getElementById('btnFeedbackYes') as HTMLButtonElement;
+  const btnFeedbackNo = document.getElementById('btnFeedbackNo') as HTMLButtonElement;
+  const btnOpenModelEval = document.getElementById('btnOpenModelEval') as HTMLButtonElement;
+  const feedbackNotice = document.getElementById('feedbackNotice') as HTMLElement;
 
   // Right Column Widgets
   const donutArc = document.getElementById('donutArc') as unknown as SVGCircleElement;
@@ -83,18 +105,25 @@ export function initApp() {
 
   // Modals
   const dashboardModal = document.getElementById('dashboardModal') as HTMLElement;
+  const threatDbModal = document.getElementById('threatDbModal') as HTMLElement;
+  const evalModal = document.getElementById('evalModal') as HTMLElement;
   const historyModal = document.getElementById('historyModal') as HTMLElement;
   const pricingModal = document.getElementById('pricingModal') as HTMLElement;
   const reportModal = document.getElementById('reportModal') as HTMLElement;
   const learnModal = document.getElementById('learnModal') as HTMLElement;
 
   const closeDashboardModal = document.getElementById('closeDashboardModal') as HTMLButtonElement;
+  const closeThreatDbModal = document.getElementById('closeThreatDbModal') as HTMLButtonElement;
+  const closeEvalModal = document.getElementById('closeEvalModal') as HTMLButtonElement;
   const closeHistoryModal = document.getElementById('closeHistoryModal') as HTMLButtonElement;
   const closePricingModal = document.getElementById('closePricingModal') as HTMLButtonElement;
   const closeReportModal = document.getElementById('closeReportModal') as HTMLButtonElement;
   const closeLearnModal = document.getElementById('closeLearnModal') as HTMLButtonElement;
 
   const dashboardMount = document.getElementById('dashboardMount') as HTMLElement;
+  const threatDbSearchInput = document.getElementById('threatDbSearchInput') as HTMLInputElement;
+  const threatDbResultsMount = document.getElementById('threatDbResultsMount') as HTMLElement;
+  const evalMetricsMount = document.getElementById('evalMetricsMount') as HTMLElement;
   const historyListMount = document.getElementById('historyListMount') as HTMLElement;
   const btnClearHistory = document.getElementById('btnClearHistory') as HTMLButtonElement;
   const pricingMount = document.getElementById('pricingMount') as HTMLElement;
@@ -158,19 +187,34 @@ export function initApp() {
   menuScanImage?.addEventListener('click', () => switchTab('IMAGE'));
 
   // --------------------------------------------------------------------------
-  // Character Counter
+  // Multilingual Script Detection & Character Counter
   // --------------------------------------------------------------------------
-  function updateCharCount() {
-    const len = textarea.value.length;
+  function updateInputMetrics() {
+    const text = textarea.value;
+    const len = text.length;
     charCounter.textContent = `${len.toLocaleString()}/2000`;
+
+    if (text.trim().length > 0) {
+      const scriptInfo = detectScript(text);
+      if (scriptInfo.script === 'DEVANAGARI') {
+        langScriptPill.textContent = '🌐 Script: Devanagari (हिन्दी)';
+      } else if (scriptInfo.isHinglishCandidate) {
+        langScriptPill.textContent = '🌐 Script: Hinglish (Transliteration)';
+      } else if (scriptInfo.script === 'MIXED') {
+        langScriptPill.textContent = '🌐 Script: Mixed Multilingual';
+      } else {
+        langScriptPill.textContent = '🌐 Script: Latin (English)';
+      }
+    } else {
+      langScriptPill.textContent = '🌐 Script: Latin (English)';
+    }
   }
 
   textarea.addEventListener('input', () => {
-    updateCharCount();
+    updateInputMetrics();
     inlineError.style.display = 'none';
   });
 
-  // Cmd / Ctrl + Enter keyboard shortcut
   textarea.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
       e.preventDefault();
@@ -181,7 +225,7 @@ export function initApp() {
   btnClearInput?.addEventListener('click', () => {
     textarea.value = '';
     urlInput.value = '';
-    updateCharCount();
+    updateInputMetrics();
     inlineError.style.display = 'none';
     ocrStatusNotice.style.display = 'none';
     analysisResultCard.style.display = 'none';
@@ -189,13 +233,13 @@ export function initApp() {
   });
 
   // --------------------------------------------------------------------------
-  // Example Buttons (Matching Mockup)
+  // Example Buttons (English + Multilingual)
   // --------------------------------------------------------------------------
   btnExampleSbi?.addEventListener('click', () => {
     switchTab('TEXT');
     textarea.value =
       'SBI ALERT: Your KYC is incomplete and your account will be blocked today. Update immediately at http://sbi-kyc-update.example/verify and share the OTP you receive to confirm.';
-    updateCharCount();
+    updateInputMetrics();
     runAnalysis();
   });
 
@@ -203,7 +247,7 @@ export function initApp() {
     switchTab('TEXT');
     textarea.value =
       'Your package delivery has been held at customs due to unpaid duty of Rs 25. Pay immediately within 24 hours at http://india-post-parcel.xyz/pay to avoid cancellation.';
-    updateCharCount();
+    updateInputMetrics();
     runAnalysis();
   });
 
@@ -211,7 +255,7 @@ export function initApp() {
     switchTab('TEXT');
     textarea.value =
       'Exclusive invitation: Guaranteed 300% returns in 7 days! Join VIP Telegram crypto trading group for daily profits. Transfer Rs 5,000 to initiate automated trading robot.';
-    updateCharCount();
+    updateInputMetrics();
     runAnalysis();
   });
 
@@ -219,19 +263,38 @@ export function initApp() {
     switchTab('TEXT');
     textarea.value =
       'Part-time work from home opportunity! Earn Rs 3,500 daily just by liking YouTube videos and rating hotels on Telegram. Contact manager immediately to receive bonus.';
-    updateCharCount();
+    updateInputMetrics();
+    runAnalysis();
+  });
+
+  btnExampleDigitalArrest?.addEventListener('click', () => {
+    switchTab('TEXT');
+    textarea.value =
+      'URGENT NOTICE: CBI and Cyber Crime Branch issued a Digital Arrest warrant against your Aadhaar card for illegal narcotics parcel. You must stay on Skype video call statement immediately or police will arrive.';
+    updateInputMetrics();
+    runAnalysis();
+  });
+
+  btnExampleHinglish?.addEventListener('click', () => {
+    switchTab('TEXT');
+    textarea.value =
+      'Aapka SBI bank account aaj block ho jayega KYC update na hone par. Turant link kholein http://sbi-kyc-update.example/login aur OTP share karein.';
+    updateInputMetrics();
+    runAnalysis();
+  });
+
+  btnExampleHindi?.addEventListener('click', () => {
+    switchTab('TEXT');
+    textarea.value =
+      'प्रिय ग्राहक, आपका बिजली बिल बकाया है। आज रात 9:30 बजे बिजली का कनेक्शन काट दिया जाएगा। तुरंत बिजली अधिकारी को 9876543210 पर कॉल करें।';
+    updateInputMetrics();
     runAnalysis();
   });
 
   // --------------------------------------------------------------------------
-  // FULL-SCREEN DYNAMIC BLINKING ALARM SYSTEM (5–10 SECONDS)
-  // User Requirement:
-  // "dont use red yellow and green in th website if the score is 60+ then therd will apper to blink in the website for 5 to 10 sc
-  // if middle then yrllow woll be binking full screen for 5 to 10 sec
-  // and saqme for the green"
+  // Full-Screen Blinking Alarm System (5–10 Seconds)
   // --------------------------------------------------------------------------
   function triggerScreenAlarm(level: 'RED' | 'YELLOW' | 'GREEN', score: number, durationSeconds: number = 7) {
-    // Clear any previous active alarms
     dismissScreenAlarm();
 
     screenAlarmOverlay.className = 'screen-alarm-overlay';
@@ -324,10 +387,13 @@ export function initApp() {
     // 4. Update Right Column Widgets
     updateScoreWidgets(result);
 
-    // 5. Update Analysis Result Card
+    // 5. Update Analysis Result Card & Specialized Classifiers
     updateAnalysisCard(rawText, result);
 
-    // 6. Smooth scroll to view results
+    // 6. Reset Feedback bar
+    feedbackNotice.style.display = 'none';
+
+    // 7. Reveal results and smooth scroll
     analysisResultCard.style.display = 'flex';
     analysisResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }
@@ -342,8 +408,6 @@ export function initApp() {
   }
 
   function updateScoreWidgets(result: ScanResult) {
-    // Score Donut Arc Calculation
-    // Circumference for r=40 is 2 * PI * 40 = 251.32
     const totalCircumference = 251.2;
     const progressOffset = totalCircumference - (totalCircumference * result.score) / 100;
     donutArc.style.strokeDashoffset = `${Math.max(0, progressOffset)}`;
@@ -379,7 +443,6 @@ export function initApp() {
         'Legitimate bank and service messages never ask for OTPs, CVVs, or immediate transfers over unsolicited links.';
     }
 
-    // Safe Next Steps Stack
     const firedIds = new Set(result.breakdown.map((b) => b.ruleId));
     const steps = generateSafeNextSteps(firedIds, result.riskLevel);
     safeNextStepsMount.innerHTML = steps
@@ -395,7 +458,22 @@ export function initApp() {
   }
 
   function updateAnalysisCard(rawText: string, result: ScanResult) {
-    // 1. Render Highlighted DOM
+    // Feature 3: Specialized Scam Classifiers Attribution
+    if (result.scamProfile) {
+      scamArchetypeBanner.style.display = 'flex';
+      archetypeName.textContent = result.scamProfile.name;
+      archetypeDesc.textContent = result.scamProfile.description;
+      archetypeAdvice.innerHTML = `
+        <strong>🛡️ Tailored Protocol for this Scam Pattern:</strong>
+        <ul>
+          ${(result.scamProfile.advicePayload || []).map((a: string) => `<li>${a}</li>`).join('')}
+        </ul>
+      `;
+    } else {
+      scamArchetypeBanner.style.display = 'none';
+    }
+
+    // Evidence Highlighting
     const mergedSpans = mergeHighlightSpans(rawText, result.activeEvidence);
     highlightedTextBox.innerHTML = '';
     const highlightedDom = renderHighlightedDom(rawText, mergedSpans, (ruleId) => {
@@ -410,7 +488,7 @@ export function initApp() {
     });
     highlightedTextBox.appendChild(highlightedDom);
 
-    // 2. Render Detected Warning Signs List (Matching Mockup Table)
+    // Warning Signs List
     if (result.breakdown.length === 0) {
       warningSignsMount.innerHTML = `
         <div style="padding: 14px; text-align: center; color: var(--text-muted); font-size: 0.88rem;">
@@ -442,11 +520,11 @@ export function initApp() {
         .join('');
     }
 
-    // 3. Unmatched Checks Drawer
+    // Unmatched Checks Drawer
     unmatchedMount.innerHTML = renderUnmatchedChecks(result.unmatchedRules);
 
-    // Reset AI Box
-    aiOutputBox.style.display = 'none';
+    // Reset Assistant Output
+    assistantResponseBox.style.display = 'none';
   }
 
   function getRuleIcon(ruleId: string): string {
@@ -458,6 +536,274 @@ export function initApp() {
     if (ruleId.includes('BAIT') || ruleId.includes('REWARD') || ruleId.includes('JOB')) return '🎁';
     return '⚠️';
   }
+
+  // --------------------------------------------------------------------------
+  // Feature 4: Interactive AI Safety Assistant
+  // --------------------------------------------------------------------------
+  function answerSafetyAssistant(question: string) {
+    assistantResponseBox.style.display = 'block';
+    assistantResponseBox.innerHTML = '⏳ <em>Consulting safety guidelines with PII masking...</em>';
+
+    // Mask sensitive details
+    const sanitizedQuery = AiAdvisorService.maskPii(question);
+    const qLower = sanitizedQuery.toLowerCase();
+
+    setTimeout(() => {
+      let advice = '';
+
+      if (qLower.includes('video') || qLower.includes('skype') || qLower.includes('call') || qLower.includes('arrest')) {
+        advice = `
+          <strong>🛑 Do NOT answer or continue any video call.</strong><br>
+          Indian law enforcement agencies (CBI, ED, Cyber Police) <strong>never</strong> interrogate citizens or issue 'Digital Arrest' orders over Skype or WhatsApp video calls. Hang up immediately, block the caller, and report to <strong>1930</strong>.
+        `;
+      } else if (qLower.includes('money') || qLower.includes('paid') || qLower.includes('transfer') || qLower.includes('refund')) {
+        advice = `
+          <strong>⏱️ Act within the Golden Hour (2–4 hours):</strong><br>
+          Dial <strong>1930</strong> (National Cyber Crime Helpline) immediately. The helpline coordinates with bank nodal officers to issue an emergency freeze on the recipient account/UPI VPA before the fraudster can cash out.
+        `;
+      } else if (qLower.includes('police') || qLower.includes('report') || qLower.includes('complain')) {
+        advice = `
+          <strong>📢 Official Reporting Channels:</strong><br>
+          1. File a cyber complaint at <a href="https://cybercrime.gov.in" target="_blank" style="color: var(--accent-red); font-weight: bold;">cybercrime.gov.in</a> with SMS/call screenshots.<br>
+          2. Report the fraud mobile number on the Government of India Sanchar Saathi portal (<a href="https://sancharsaathi.gov.in" target="_blank" style="color: var(--accent-red);">sancharsaathi.gov.in</a>) to revoke the fraudster's SIM card.
+        `;
+      } else if (qLower.includes('click') || qLower.includes('link') || qLower.includes('open')) {
+        advice = `
+          <strong>⚠️ Do NOT click or open the link.</strong><br>
+          Phishing links can silently trigger malware APK downloads or steal session cookies. If you already opened the link, clear your browser cookies, disconnect mobile data/Wi-Fi temporarily, and do not enter any credentials.
+        `;
+      } else {
+        advice = `
+          <strong>🛡️ Safety Assessment:</strong><br>
+          This message triggered <strong>${currentResult?.breakdown.length || 0} warning signals</strong>. As a primary rule: never share OTPs, PINs, or bank account numbers. Contact the institution only through verified phone numbers printed on the physical card or official website.
+        `;
+      }
+
+      assistantResponseBox.innerHTML = `
+        <div style="margin-bottom: 6px;"><strong>Question:</strong> <em>"${escapeHtml(sanitizedQuery)}"</em></div>
+        <div>${advice}</div>
+      `;
+    }, 450);
+  }
+
+  // Quick Prompt Chips
+  document.querySelectorAll('.prompt-chip').forEach((chip) => {
+    chip.addEventListener('click', (e) => {
+      const q = (e.currentTarget as HTMLElement).getAttribute('data-q');
+      if (q) {
+        answerSafetyAssistant(q);
+      }
+    });
+  });
+
+  btnSendAssistantQuery?.addEventListener('click', () => {
+    const q = assistantQueryInput.value.trim();
+    if (q) {
+      answerSafetyAssistant(q);
+      assistantQueryInput.value = '';
+    }
+  });
+
+  assistantQueryInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      const q = assistantQueryInput.value.trim();
+      if (q) {
+        answerSafetyAssistant(q);
+        assistantQueryInput.value = '';
+      }
+    }
+  });
+
+  // --------------------------------------------------------------------------
+  // Feature 5: Model Evaluation & User Feedback
+  // --------------------------------------------------------------------------
+  btnFeedbackYes?.addEventListener('click', () => {
+    feedbackNotice.style.display = 'block';
+    feedbackNotice.textContent = '✓ Thank you! Detection confirmed as accurate.';
+    try {
+      localStorage.setItem(`feedback_${Date.now()}`, 'ACCURATE');
+    } catch {}
+  });
+
+  btnFeedbackNo?.addEventListener('click', () => {
+    feedbackNotice.style.display = 'block';
+    feedbackNotice.textContent = '✓ Feedback recorded. Flagged for heuristic calibration review.';
+    try {
+      localStorage.setItem(`feedback_${Date.now()}`, 'FALSE_ALARM');
+    } catch {}
+  });
+
+  function openModelEvaluationModal() {
+    const metrics = computeBenchmarkMetrics((text) => analyzeMessage(text));
+
+    evalMetricsMount.innerHTML = `
+      <div class="eval-stats-grid">
+        <div class="eval-stat-card">
+          <div class="eval-stat-num" style="color: #16a34a;">${metrics.precision}%</div>
+          <div class="eval-stat-label">Precision (Target ≥98%)</div>
+        </div>
+        <div class="eval-stat-card">
+          <div class="eval-stat-num" style="color: #16a34a;">${metrics.recall}%</div>
+          <div class="eval-stat-label">Recall (Target ≥95%)</div>
+        </div>
+        <div class="eval-stat-card">
+          <div class="eval-stat-num" style="color: #0f172a;">${metrics.fpr}%</div>
+          <div class="eval-stat-label">False Positive Rate</div>
+        </div>
+        <div class="eval-stat-card">
+          <div class="eval-stat-num" style="color: #0f172a;">${metrics.totalSamples}</div>
+          <div class="eval-stat-label">Benchmark Corpus</div>
+        </div>
+      </div>
+
+      <div class="confusion-matrix-box">
+        <strong>Confusion Matrix (100 Samples: 50 Scams, 50 Benign Controls):</strong>
+        <table class="cm-table">
+          <thead>
+            <tr>
+              <th></th>
+              <th>Predicted Scam (Med/High)</th>
+              <th>Predicted Benign (Low)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th>Actual Scam (50)</th>
+              <td style="color: #16a34a; font-weight: bold;">True Positives: ${metrics.tp}</td>
+              <td style="color: #dc2626;">False Negatives: ${metrics.fn}</td>
+            </tr>
+            <tr>
+              <th>Actual Benign (50)</th>
+              <td style="color: #dc2626;">False Positives: ${metrics.fp} (High FP: ${metrics.highFalsePositives})</td>
+              <td style="color: #16a34a; font-weight: bold;">True Negatives: ${metrics.tn}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div>
+        <h4 style="margin-bottom: 8px;">Standardized Test Corpus Explorer:</h4>
+        <div class="benchmark-table-wrap">
+          <table class="benchmark-samples-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Category</th>
+                <th>Sample Message</th>
+                <th>Expected Risk</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${BENCHMARK_CORPUS.slice(0, 30)
+                .map(
+                  (c) => `
+                <tr>
+                  <td><code>${c.id}</code></td>
+                  <td><strong>${c.category}</strong></td>
+                  <td>${escapeHtml(c.text.slice(0, 85))}...</td>
+                  <td><span class="threat-badge-pill ${c.category === 'SCAM' ? 'verified' : 'review'}">${c.expectedMinRisk || c.expectedMaxRisk || 'LOW'}</span></td>
+                </tr>
+              `
+                )
+                .join('')}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    `;
+
+    evalModal.classList.add('open');
+  }
+
+  btnOpenModelEval?.addEventListener('click', openModelEvaluationModal);
+  menuEvaluation?.addEventListener('click', openModelEvaluationModal);
+  navEvaluation?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openModelEvaluationModal();
+  });
+  closeEvalModal?.addEventListener('click', () => evalModal.classList.remove('open'));
+
+  // --------------------------------------------------------------------------
+  // Feature 1: Scam Reporting & Verified Indicator Database
+  // --------------------------------------------------------------------------
+  function renderThreatDatabase(filterQuery = '') {
+    const defaultBad = ReportingService.getKnownBadIndicators();
+    let storedReports: VerifiedIndicator[] = [];
+    try {
+      const stored = localStorage.getItem('scam_spotter_reports_v1');
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        storedReports = parsed.map((r: { type: IndicatorType; normalizedValue: string; category: string; reportedAt: string }) => ({
+          type: r.type,
+          normalizedValue: r.normalizedValue,
+          status: 'UNDER_REVIEW',
+          threatLevel: 'HIGH',
+          source: `Community Report (${r.category})`,
+          verifiedAt: r.reportedAt,
+        }));
+      }
+    } catch {}
+
+    const allIndicators = [...defaultBad, ...storedReports];
+    const q = filterQuery.toLowerCase().trim();
+
+    const filtered = allIndicators.filter(
+      (ind) =>
+        ind.normalizedValue.toLowerCase().includes(q) ||
+        ind.type.toLowerCase().includes(q) ||
+        ind.source.toLowerCase().includes(q)
+    );
+
+    if (filtered.length === 0) {
+      threatDbResultsMount.innerHTML = `
+        <div style="padding: 20px; text-align: center; color: var(--text-muted);">
+          No matching indicators found for "${escapeHtml(filterQuery)}".
+        </div>
+      `;
+      return;
+    }
+
+    threatDbResultsMount.innerHTML = filtered
+      .map(
+        (ind) => `
+      <div class="threat-indicator-row">
+        <div>
+          <span class="threat-val-mono">${escapeHtml(ind.normalizedValue)}</span>
+          <div style="font-size: 0.72rem; color: var(--text-muted); margin-top: 2px;">
+            ${ind.type} • Source: ${escapeHtml(ind.source)} • Verified: ${new Date(ind.verifiedAt).toLocaleDateString()}
+          </div>
+        </div>
+        <div style="display: flex; gap: 6px; align-items: center;">
+          <span class="threat-badge-pill ${ind.status === 'VERIFIED' ? 'verified' : 'review'}">
+            ${ind.status}
+          </span>
+          <span class="threat-badge-pill verified">
+            ${ind.threatLevel}
+          </span>
+        </div>
+      </div>
+    `
+      )
+      .join('');
+  }
+
+  function openThreatDatabaseModal() {
+    threatDbSearchInput.value = '';
+    renderThreatDatabase('');
+    threatDbModal.classList.add('open');
+  }
+
+  threatDbSearchInput?.addEventListener('input', () => {
+    renderThreatDatabase(threatDbSearchInput.value);
+  });
+
+  menuThreatDb?.addEventListener('click', openThreatDatabaseModal);
+  navThreatDb?.addEventListener('click', (e) => {
+    e.preventDefault();
+    openThreatDatabaseModal();
+  });
+  closeThreatDbModal?.addEventListener('click', () => threatDbModal.classList.remove('open'));
 
   // --------------------------------------------------------------------------
   // Copy Buttons
@@ -499,54 +845,6 @@ export function initApp() {
   });
 
   // --------------------------------------------------------------------------
-  // AI Second Opinion Handler
-  // --------------------------------------------------------------------------
-  btnGetAiOpinion?.addEventListener('click', async () => {
-    if (!currentResult || !textarea.value.trim()) return;
-
-    btnGetAiOpinion.disabled = true;
-    btnGetAiOpinion.textContent = '⏳ Analyzing...';
-    aiOutputBox.style.display = 'block';
-    aiOutputBox.innerHTML =
-      '<p style="color: var(--text-muted);">Consulting contextual model with PII protection...</p>';
-
-    try {
-      const aiResult = await AiAdvisorService.getSecondOpinion(
-        textarea.value.trim(),
-        currentResult.score
-      );
-
-      const signalsList = aiResult.signals
-        .map(
-          (s) => `
-        <li style="margin-bottom: 4px;">
-          <code>"${s.phrase}"</code>: ${s.reason}
-        </li>
-      `
-        )
-        .join('');
-
-      aiOutputBox.innerHTML = `
-        <div style="font-size: 0.88rem; margin-bottom: 8px;">
-          <strong>Contextual Reasoner:</strong> ${aiResult.summary}
-        </div>
-        ${
-          aiResult.signals.length > 0
-            ? `<ul style="margin-left: 20px; font-size: 0.82rem;">${signalsList}</ul>`
-            : ''
-        }
-        <small style="color: var(--text-muted); display: block; margin-top: 6px;">${aiResult.note}</small>
-      `;
-    } catch {
-      aiOutputBox.innerHTML =
-        '<p style="color: var(--accent-red);">AI Advisory service unavailable. Deterministic rule analysis remains active.</p>';
-    } finally {
-      btnGetAiOpinion.disabled = false;
-      btnGetAiOpinion.textContent = 'Consult AI';
-    }
-  });
-
-  // --------------------------------------------------------------------------
   // OCR & QR Code Flow
   // --------------------------------------------------------------------------
   async function handleOcrFile(file: File | Blob) {
@@ -561,7 +859,7 @@ export function initApp() {
 
       switchTab('TEXT');
       textarea.value = ocrResult.text;
-      updateCharCount();
+      updateInputMetrics();
 
       if (ocrResult.qrPayload) {
         ocrStatusNotice.className = 'ocr-status-notice ocr-success';
@@ -603,7 +901,6 @@ export function initApp() {
     }
   });
 
-  // Clipboard paste support (Cmd+V screenshot directly into textarea)
   textarea.addEventListener('paste', (e: ClipboardEvent) => {
     if (e.clipboardData && e.clipboardData.items) {
       for (const item of Array.from(e.clipboardData.items)) {
@@ -682,7 +979,7 @@ export function initApp() {
   closeLearnModal?.addEventListener('click', () => learnModal.classList.remove('open'));
 
   // Close modals on backdrop click
-  [dashboardModal, historyModal, pricingModal, reportModal, learnModal].forEach((m) => {
+  [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal].forEach((m) => {
     m?.addEventListener('click', (e) => {
       if (e.target === m) m.classList.remove('open');
     });
@@ -692,7 +989,7 @@ export function initApp() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       dismissScreenAlarm();
-      [dashboardModal, historyModal, pricingModal, reportModal, learnModal].forEach((m) =>
+      [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal].forEach((m) =>
         m?.classList.remove('open')
       );
     }
@@ -742,7 +1039,7 @@ export function initApp() {
       if (item) {
         switchTab('TEXT');
         textarea.value = item.preview;
-        updateCharCount();
+        updateInputMetrics();
         historyModal.classList.remove('open');
         runAnalysis();
       }
