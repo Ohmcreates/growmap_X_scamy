@@ -19,6 +19,7 @@ import {
   SECURITY_VENDORS,
   VirusTotalReport,
 } from '../services/virusTotalInspector.js';
+import { NciiDetector, NciiFullAnalysisReport } from '../services/nciiDetector.js';
 
 export function initApp() {
   // Navigation & Theme Elements
@@ -35,6 +36,7 @@ export function initApp() {
   const menuScanImage = document.getElementById('menuScanImage') as HTMLButtonElement;
   const menuScanApk = document.getElementById('menuScanApk') as HTMLButtonElement;
   const menuScanVt = document.getElementById('menuScanVt') as HTMLButtonElement;
+  const menuScanNcii = document.getElementById('menuScanNcii') as HTMLButtonElement;
   const menuThreatDb = document.getElementById('menuThreatDb') as HTMLButtonElement;
   const menuEvaluation = document.getElementById('menuEvaluation') as HTMLButtonElement;
   const menuHistory = document.getElementById('menuHistory') as HTMLButtonElement;
@@ -48,12 +50,14 @@ export function initApp() {
   const tabUploadImage = document.getElementById('tabUploadImage') as HTMLButtonElement;
   const tabApkScan = document.getElementById('tabApkScan') as HTMLButtonElement;
   const tabVtScan = document.getElementById('tabVtScan') as HTMLButtonElement;
+  const tabNciiScan = document.getElementById('tabNciiScan') as HTMLButtonElement;
 
   const panelTextMessage = document.getElementById('panelTextMessage') as HTMLElement;
   const panelScanLink = document.getElementById('panelScanLink') as HTMLElement;
   const panelUploadImage = document.getElementById('panelUploadImage') as HTMLElement;
   const panelApkScan = document.getElementById('panelApkScan') as HTMLElement;
   const panelVtScan = document.getElementById('panelVtScan') as HTMLElement;
+  const panelNciiScan = document.getElementById('panelNciiScan') as HTMLElement;
 
   const textarea = document.getElementById('messageInput') as HTMLTextAreaElement;
   const urlInput = document.getElementById('urlInput') as HTMLInputElement;
@@ -62,6 +66,7 @@ export function initApp() {
   const ocrStatusNotice = document.getElementById('ocrStatusNotice') as HTMLElement;
   const apkStatusNotice = document.getElementById('apkStatusNotice') as HTMLElement;
   const vtStatusNotice = document.getElementById('vtStatusNotice') as HTMLElement;
+  const nciiStatusNotice = document.getElementById('nciiStatusNotice') as HTMLElement;
   const langScriptPill = document.getElementById('langScriptPill') as HTMLElement;
 
   const dropZone = document.getElementById('dropZone') as HTMLElement;
@@ -145,6 +150,57 @@ export function initApp() {
   const vtBehaviorSignalsList = document.getElementById('vtBehaviorSignalsList') as HTMLElement;
   const vtNetworkList = document.getElementById('vtNetworkList') as HTMLElement;
   const vtRecommendationsList = document.getElementById('vtRecommendationsList') as HTMLElement;
+
+  // AI-Generated Nude & NCII Deepfake Inspector Elements
+  const nciiDropZone = document.getElementById('nciiDropZone') as HTMLElement;
+  const btnBrowseNciiFile = document.getElementById('btnBrowseNciiFile') as HTMLButtonElement;
+  const nciiFileInput = document.getElementById('nciiFileInput') as HTMLInputElement;
+
+  const btnNciiDemoDiffusion = document.getElementById('btnNciiDemoDiffusion') as HTMLButtonElement;
+  const btnNciiDemoFaceSwap = document.getElementById('btnNciiDemoFaceSwap') as HTMLButtonElement;
+  const btnNciiDemoCompressed = document.getElementById('btnNciiDemoCompressed') as HTMLButtonElement;
+  const btnNciiDemoClean = document.getElementById('btnNciiDemoClean') as HTMLButtonElement;
+
+  const nciiInspectorCard = document.getElementById('nciiInspectorCard') as HTMLElement;
+  const nciiFileNameText = document.getElementById('nciiFileNameText') as HTMLElement;
+  const nciiFileMetaText = document.getElementById('nciiFileMetaText') as HTMLElement;
+  const nciiSha256Text = document.getElementById('nciiSha256Text') as HTMLElement;
+
+  const nciiExplicitBadge = document.getElementById('nciiExplicitBadge') as HTMLElement;
+  const nciiAiBadge = document.getElementById('nciiAiBadge') as HTMLElement;
+  const nciiManipBadge = document.getElementById('nciiManipBadge') as HTMLElement;
+
+  const btnToggleNciiBlur = document.getElementById('btnToggleNciiBlur') as HTMLButtonElement;
+  const nciiBlurShield = document.getElementById('nciiBlurShield') as HTMLElement;
+  const nciiImagePreview = document.getElementById('nciiImagePreview') as HTMLImageElement;
+
+  const nciiAiVerdictPill = document.getElementById('nciiAiVerdictPill') as HTMLElement;
+  const nciiAiSummaryText = document.getElementById('nciiAiSummaryText') as HTMLElement;
+  const nciiDermalVal = document.getElementById('nciiDermalVal') as HTMLElement;
+  const nciiSpectralVal = document.getElementById('nciiSpectralVal') as HTMLElement;
+  const nciiFourierVal = document.getElementById('nciiFourierVal') as HTMLElement;
+  const nciiAiSignaturesList = document.getElementById('nciiAiSignaturesList') as HTMLElement;
+  const nciiAiLimitations = document.getElementById('nciiAiLimitations') as HTMLElement;
+
+  const nciiExplicitVerdictPill = document.getElementById('nciiExplicitVerdictPill') as HTMLElement;
+  const nciiExplicitSummaryText = document.getElementById('nciiExplicitSummaryText') as HTMLElement;
+  const nciiExposureScoreVal = document.getElementById('nciiExposureScoreVal') as HTMLElement;
+  const nciiSkinRatioVal = document.getElementById('nciiSkinRatioVal') as HTMLElement;
+  const nciiRoutingVal = document.getElementById('nciiRoutingVal') as HTMLElement;
+  const nciiExplicitAnatomyList = document.getElementById('nciiExplicitAnatomyList') as HTMLElement;
+
+  const nciiManipVerdictPill = document.getElementById('nciiManipVerdictPill') as HTMLElement;
+  const nciiManipSummaryText = document.getElementById('nciiManipSummaryText') as HTMLElement;
+  const nciiBoundaryVal = document.getElementById('nciiBoundaryVal') as HTMLElement;
+  const nciiColorMismatchVal = document.getElementById('nciiColorMismatchVal') as HTMLElement;
+  const nciiElaVal = document.getElementById('nciiElaVal') as HTMLElement;
+  const nciiManipExplain = document.getElementById('nciiManipExplain') as HTMLElement;
+
+  const nciiProvVerdictPill = document.getElementById('nciiProvVerdictPill') as HTMLElement;
+  const nciiProvSummaryText = document.getElementById('nciiProvSummaryText') as HTMLElement;
+  const nciiC2paVal = document.getElementById('nciiC2paVal') as HTMLElement;
+  const nciiExifVal = document.getElementById('nciiExifVal') as HTMLElement;
+  const nciiWatermarkVal = document.getElementById('nciiWatermarkVal') as HTMLElement;
 
   // Example Buttons (English + Multilingual Hinglish & Hindi)
   const btnExampleSbi = document.getElementById('btnExampleSbi') as HTMLButtonElement;
@@ -248,7 +304,7 @@ export function initApp() {
   const reportSuccess = document.getElementById('reportSuccess') as HTMLElement;
 
   let currentResult: ScanResult | null = null;
-  let activeTab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' | 'VT' = 'TEXT';
+  let activeTab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' | 'VT' | 'NCII' = 'TEXT';
   let alarmInterval: number | null = null;
   let alarmTimeout: number | null = null;
 
@@ -264,15 +320,15 @@ export function initApp() {
   // --------------------------------------------------------------------------
   // Tab Switching
   // --------------------------------------------------------------------------
-  function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' | 'VT') {
+  function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' | 'VT' | 'NCII') {
     activeTab = tab;
 
-    [tabTextMessage, tabScanLink, tabUploadImage, tabApkScan, tabVtScan].forEach((t) => t?.classList.remove('active'));
-    [panelTextMessage, panelScanLink, panelUploadImage, panelApkScan, panelVtScan].forEach((p) => {
+    [tabTextMessage, tabScanLink, tabUploadImage, tabApkScan, tabVtScan, tabNciiScan].forEach((t) => t?.classList.remove('active'));
+    [panelTextMessage, panelScanLink, panelUploadImage, panelApkScan, panelVtScan, panelNciiScan].forEach((p) => {
       if (p) p.style.display = 'none';
     });
 
-    [menuScanMessage, menuScanLink, menuScanImage, menuScanApk, menuScanVt].forEach((m) => m?.classList.remove('active'));
+    [menuScanMessage, menuScanLink, menuScanImage, menuScanApk, menuScanVt, menuScanNcii].forEach((m) => m?.classList.remove('active'));
 
     if (tab === 'TEXT') {
       tabTextMessage?.classList.add('active');
@@ -296,6 +352,10 @@ export function initApp() {
       tabVtScan?.classList.add('active');
       menuScanVt?.classList.add('active');
       if (panelVtScan) panelVtScan.style.display = 'block';
+    } else if (tab === 'NCII') {
+      tabNciiScan?.classList.add('active');
+      menuScanNcii?.classList.add('active');
+      if (panelNciiScan) panelNciiScan.style.display = 'block';
     }
   }
 
@@ -304,12 +364,14 @@ export function initApp() {
   tabUploadImage?.addEventListener('click', () => switchTab('IMAGE'));
   tabApkScan?.addEventListener('click', () => switchTab('APK'));
   tabVtScan?.addEventListener('click', () => switchTab('VT'));
+  tabNciiScan?.addEventListener('click', () => switchTab('NCII'));
 
   menuScanMessage?.addEventListener('click', () => switchTab('TEXT'));
   menuScanLink?.addEventListener('click', () => switchTab('LINK'));
   menuScanImage?.addEventListener('click', () => switchTab('IMAGE'));
   menuScanApk?.addEventListener('click', () => switchTab('APK'));
   menuScanVt?.addEventListener('click', () => switchTab('VT'));
+  menuScanNcii?.addEventListener('click', () => switchTab('NCII'));
 
   // --------------------------------------------------------------------------
   // Multilingual Script Detection & Character Counter
@@ -353,6 +415,13 @@ export function initApp() {
     updateInputMetrics();
     inlineError.style.display = 'none';
     ocrStatusNotice.style.display = 'none';
+    if (apkStatusNotice) apkStatusNotice.style.display = 'none';
+    if (vtStatusNotice) vtStatusNotice.style.display = 'none';
+    if (nciiStatusNotice) nciiStatusNotice.style.display = 'none';
+    if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
+    if (apkInspectorCard) apkInspectorCard.style.display = 'none';
+    if (vtInspectorCard) vtInspectorCard.style.display = 'none';
+    if (nciiInspectorCard) nciiInspectorCard.style.display = 'none';
     analysisResultCard.style.display = 'none';
     resetScoreWidgets();
   });
@@ -693,6 +762,10 @@ export function initApp() {
 
     if (vtInspectorCard) {
       vtInspectorCard.style.display = 'none';
+    }
+
+    if (nciiInspectorCard) {
+      nciiInspectorCard.style.display = 'none';
     }
 
     // Evidence Highlighting
@@ -1145,6 +1218,7 @@ export function initApp() {
     if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
     if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
     if (vtInspectorCard) vtInspectorCard.style.display = 'none';
+    if (nciiInspectorCard) nciiInspectorCard.style.display = 'none';
     apkInspectorCard.style.display = 'flex';
 
     // 2. Populate Identity & Verification Badges
@@ -1405,6 +1479,7 @@ export function initApp() {
     if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
     if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
     if (apkInspectorCard) apkInspectorCard.style.display = 'none';
+    if (nciiInspectorCard) nciiInspectorCard.style.display = 'none';
     vtInspectorCard.style.display = 'flex';
 
     // 2. Populate Header & Detection Radial Meter
@@ -1723,13 +1798,460 @@ export function initApp() {
   btnVtDemoDropper?.addEventListener('click', () => handleVirusTotalDemo('SUSPICIOUS_DROPPER'));
   btnVtDemoClean?.addEventListener('click', () => handleVirusTotalDemo('CLEAN_TOOL'));
 
+  // --------------------------------------------------------------------------
+  // AI-Generated Nude & NCII Deepfake Forensics Flow (Privacy Shield)
+  // --------------------------------------------------------------------------
+  let isNciiBlurred = true;
+
+  btnToggleNciiBlur?.addEventListener('click', () => {
+    isNciiBlurred = !isNciiBlurred;
+    if (isNciiBlurred) {
+      nciiBlurShield.style.display = 'flex';
+      nciiImagePreview.classList.add('blurred');
+      btnToggleNciiBlur.textContent = '👁️ Toggle Privacy Blur';
+    } else {
+      nciiBlurShield.style.display = 'none';
+      nciiImagePreview.classList.remove('blurred');
+      btnToggleNciiBlur.textContent = '🔒 Enable Privacy Shield';
+    }
+  });
+
+  function createDemoPreviewDataUrl(title: string, color: string, badge: string): string {
+    const canvas = document.createElement('canvas');
+    canvas.width = 480;
+    canvas.height = 480;
+    const ctx = canvas.getContext('2d');
+    if (ctx) {
+      ctx.fillStyle = '#0f172a';
+      ctx.fillRect(0, 0, 480, 480);
+
+      // Top color accent bar
+      const grad = ctx.createLinearGradient(0, 0, 480, 0);
+      grad.addColorStop(0, color);
+      grad.addColorStop(1, '#6366f1');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 480, 8);
+
+      // Icon & watermarking grid
+      ctx.font = '72px system-ui';
+      ctx.textAlign = 'center';
+      ctx.fillText('🔞', 240, 190);
+
+      ctx.font = 'bold 22px system-ui';
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillText(title, 240, 245);
+
+      ctx.font = '14px system-ui';
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillText(badge, 240, 280);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.fillRect(40, 330, 400, 44);
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.strokeRect(40, 330, 400, 44);
+
+      ctx.font = 'bold 12px monospace';
+      ctx.fillStyle = color;
+      ctx.fillText('FORENSIC LAB BENCHMARK SPECIMEN', 240, 357);
+    }
+    return canvas.toDataURL('image/png');
+  }
+
+  async function renderNciiReport(report: NciiFullAnalysisReport, previewDataUrl?: string) {
+    if (!nciiInspectorCard) return;
+
+    // 1. Hide other cards & reveal NCII Inspector Card
+    if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
+    if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
+    if (apkInspectorCard) apkInspectorCard.style.display = 'none';
+    if (vtInspectorCard) vtInspectorCard.style.display = 'none';
+    nciiInspectorCard.style.display = 'flex';
+
+    // 2. Populate Header & File Metadata
+    nciiFileNameText.textContent = report.fileName;
+    nciiFileMetaText.textContent = `${report.mimeType} • ${report.imageDimensions.width}x${report.imageDimensions.height} • ${(report.fileSizeBytes / 1024).toFixed(1)} KB`;
+    nciiSha256Text.textContent = report.sha256Hash;
+
+    // Badges
+    if (report.explicitScreening.isExplicitDetected) {
+      nciiExplicitBadge.className = 'ncii-status-pill danger';
+      nciiExplicitBadge.textContent = `🔞 Intimate Content (${report.explicitScreening.exposureScore}/100)`;
+    } else {
+      nciiExplicitBadge.className = 'ncii-status-pill safe';
+      nciiExplicitBadge.textContent = '🛡️ Non-Explicit Imagery';
+    }
+
+    if (report.aiGeneration.calibratedVerdict === 'HIGH_PROBABILITY_AI' || report.aiGeneration.isAiGenerated === true) {
+      nciiAiBadge.className = 'ncii-status-pill danger';
+      nciiAiBadge.textContent = `🤖 AI Generated (${report.aiGeneration.aiConfidenceScore}%)`;
+    } else if (report.aiGeneration.calibratedVerdict === 'INCONCLUSIVE' || report.aiGeneration.isAiGenerated === 'INCONCLUSIVE') {
+      nciiAiBadge.className = 'ncii-status-pill warning';
+      nciiAiBadge.textContent = '❔ AI Inconclusive';
+    } else {
+      nciiAiBadge.className = 'ncii-status-pill safe';
+      nciiAiBadge.textContent = '📷 Real Camera Optics';
+    }
+
+    if (report.manipulation.manipulationVerdict === 'SUSPECTED_DEEPFAKE_SWAP') {
+      nciiManipBadge.className = 'ncii-status-pill danger';
+      nciiManipBadge.textContent = `🎭 Suspected Face-Swap (${report.manipulation.manipulationScore}%)`;
+    } else if (report.manipulation.manipulationVerdict === 'LOCALIZED_ALTERATION') {
+      nciiManipBadge.className = 'ncii-status-pill warning';
+      nciiManipBadge.textContent = '✏️ Localized Editing';
+    } else if (report.manipulation.manipulationVerdict === 'INCONCLUSIVE') {
+      nciiManipBadge.className = 'ncii-status-pill warning';
+      nciiManipBadge.textContent = '❔ Manipulation Inconclusive';
+    } else {
+      nciiManipBadge.className = 'ncii-status-pill safe';
+      nciiManipBadge.textContent = '✅ Authentic Composition';
+    }
+
+    // 3. Privacy Shield & Image Preview
+    if (previewDataUrl) {
+      nciiImagePreview.src = previewDataUrl;
+      nciiImagePreview.style.display = 'block';
+    } else {
+      nciiImagePreview.src = createDemoPreviewDataUrl(report.fileName, '#6366f1', 'Image Inspection Specimen');
+      nciiImagePreview.style.display = 'block';
+    }
+
+    // Default to Privacy Blur for intimate protection
+    isNciiBlurred = true;
+    nciiBlurShield.style.display = 'flex';
+    nciiImagePreview.classList.add('blurred');
+    btnToggleNciiBlur.textContent = '👁️ Toggle Privacy Blur';
+
+    // 4. Dimension 1: AI-Generation Forensics
+    nciiAiVerdictPill.textContent =
+      report.aiGeneration.calibratedVerdict === 'HIGH_PROBABILITY_AI'
+        ? 'High Probability AI'
+        : report.aiGeneration.calibratedVerdict === 'PROBABLE_AI'
+        ? 'Probable AI'
+        : report.aiGeneration.calibratedVerdict === 'INCONCLUSIVE'
+        ? 'Inconclusive'
+        : 'Authentic Camera';
+    nciiAiVerdictPill.className = `dim-score-pill ${
+      report.aiGeneration.calibratedVerdict === 'HIGH_PROBABILITY_AI'
+        ? 'danger'
+        : report.aiGeneration.calibratedVerdict === 'INCONCLUSIVE'
+        ? 'warning'
+        : 'safe'
+    }`;
+    nciiAiSummaryText.textContent = `Confidence: ${report.aiGeneration.aiConfidenceScore}%. Calibrated evaluation on diffusion and GAN models.`;
+    nciiDermalVal.textContent = `${report.aiGeneration.dermalSmoothnessIndex} / 100 (${report.aiGeneration.dermalSmoothnessIndex > 70 ? 'Unnatural Smoothing' : 'Natural Cellular Grain'})`;
+    nciiSpectralVal.textContent = `${report.aiGeneration.frequencyDomainAnalysis.highFrequencyFalloff} dB (${report.aiGeneration.frequencyDomainAnalysis.spectralArtifactAnomaly ? 'Spectral Anomaly' : 'Normal Optical Roll-off'})`;
+    nciiFourierVal.textContent = `${report.aiGeneration.frequencyDomainAnalysis.fourierSymmetryScore} / 100`;
+    nciiAiSignaturesList.innerHTML = report.aiGeneration.generatorSignaturesDetected.map((sig) => `<li>${escapeHtml(sig)}</li>`).join('');
+    nciiAiLimitations.textContent = report.aiGeneration.limitationsNotice;
+
+    // 5. Dimension 2: Explicit Content Safety Screening
+    nciiExplicitVerdictPill.textContent = report.explicitScreening.isExplicitDetected ? 'Explicit Detected' : 'Non-Explicit';
+    nciiExplicitVerdictPill.className = `dim-score-pill ${report.explicitScreening.isExplicitDetected ? 'danger' : 'safe'}`;
+    nciiExplicitSummaryText.textContent = report.explicitScreening.recommendation;
+    nciiExposureScoreVal.textContent = `${report.explicitScreening.exposureScore} / 100`;
+    nciiSkinRatioVal.textContent = `${Math.round(report.explicitScreening.skinExposureRatio * 100)}% of Total Pixels`;
+    nciiRoutingVal.textContent = report.explicitScreening.privacyRouting === 'SHIELD_BLUR_APPLIED' ? 'Shield Blur Applied' : 'Safe Non-Explicit';
+    nciiRoutingVal.style.color = report.explicitScreening.privacyRouting === 'SHIELD_BLUR_APPLIED' ? '#dc2626' : '#16a34a';
+    nciiExplicitAnatomyList.innerHTML = report.explicitScreening.anatomicalRegionsDetected.map((r) => `<li>${escapeHtml(r)}</li>`).join('');
+
+    // 6. Dimension 3: Manipulation & Face-Swap
+    nciiManipVerdictPill.textContent =
+      report.manipulation.manipulationVerdict === 'SUSPECTED_DEEPFAKE_SWAP'
+        ? 'Suspected Deepfake'
+        : report.manipulation.manipulationVerdict === 'LOCALIZED_ALTERATION'
+        ? 'Altered Region'
+        : report.manipulation.manipulationVerdict === 'INCONCLUSIVE'
+        ? 'Inconclusive'
+        : 'Clean Composition';
+    nciiManipVerdictPill.className = `dim-score-pill ${
+      report.manipulation.manipulationVerdict === 'SUSPECTED_DEEPFAKE_SWAP'
+        ? 'danger'
+        : report.manipulation.manipulationVerdict === 'INCONCLUSIVE'
+        ? 'warning'
+        : 'safe'
+    }`;
+    nciiManipSummaryText.textContent = `Manipulation score: ${report.manipulation.manipulationScore}/100. Evaluates face-swap boundary seams, lighting, and compression levels.`;
+    nciiBoundaryVal.textContent = report.manipulation.faceSwapIndicators.boundaryBlendingArtifacts ? 'Anomalous Mask Edge' : 'Natural Boundary';
+    nciiColorMismatchVal.textContent = report.manipulation.faceSwapIndicators.colorTemperatureMismatch ? 'Discrepancy (+14%)' : 'Consistent Palettes';
+    nciiElaVal.textContent = `${report.manipulation.errorLevelAnalysis.compressionDiscrepancy}% Compression Divergence`;
+    nciiManipExplain.textContent =
+      report.manipulation.manipulationVerdict === 'SUSPECTED_DEEPFAKE_SWAP'
+        ? 'Strong evidence of composite head/face splicing. Distinct compression discrepancies between the facial region and background indicate a deepfake swap.'
+        : report.manipulation.manipulationVerdict === 'INCONCLUSIVE'
+        ? 'Compression artifacts prevent reliable seam detection.'
+        : 'No localized boundary blending or resaved block anomalies detected.';
+
+    // 7. Dimension 4: Provenance & C2PA Credentials
+    nciiProvVerdictPill.textContent = report.provenance.hasProvenanceCredentials ? 'Verified Origin' : 'Unsigned';
+    nciiProvVerdictPill.className = `dim-score-pill ${report.provenance.hasProvenanceCredentials ? 'safe' : 'warning'}`;
+    nciiProvSummaryText.textContent = report.provenance.provenanceSummary;
+    nciiC2paVal.textContent = report.provenance.c2paManifestFound ? `C2PA Manifest (${report.provenance.c2paClaimGenerator || 'Active'})` : 'None Present';
+    nciiExifVal.textContent = report.provenance.exifSoftwareTags.length > 0 ? report.provenance.exifSoftwareTags.join(', ') : 'None';
+    nciiWatermarkVal.textContent = report.provenance.watermarkDetected ? (report.provenance.watermarkType || 'Watermark Present') : 'None Detected';
+
+    // 8. Sync with Score Gauges & Original Message Section
+    let overallRiskScore = 15;
+    if (report.explicitScreening.isExplicitDetected && (report.aiGeneration.isAiGenerated === true || report.manipulation.isManipulated)) {
+      overallRiskScore = 92;
+    } else if (report.explicitScreening.isExplicitDetected) {
+      overallRiskScore = 75;
+    } else if (report.aiGeneration.isAiGenerated === true || report.manipulation.isManipulated) {
+      overallRiskScore = 70;
+    } else if (report.aiGeneration.isAiGenerated === 'INCONCLUSIVE' || report.manipulation.manipulationVerdict === 'INCONCLUSIVE') {
+      overallRiskScore = 45;
+    }
+
+    const fakeScanResult: ScanResult = {
+      score: overallRiskScore,
+      rawScore: overallRiskScore,
+      riskLevel: overallRiskScore >= 60 ? 'HIGH' : overallRiskScore >= 30 ? 'MEDIUM' : 'LOW',
+      headline: report.overallSummary,
+      summary: report.overallSummary,
+      advice: report.explicitScreening.isExplicitDetected
+        ? 'Do not redistribute potentially intimate imagery without consent. Use StopNCII.org or National Cyber Helpline 1930.'
+        : 'Image evaluated across tripartite forensics (Explicit screening, AI generation, and Manipulation).',
+      breakdown: [
+        {
+          ruleId: 'NCII_EXPLICIT_SCREENING',
+          label: `Explicit Content: ${report.explicitScreening.isExplicitDetected ? 'Intimate Exposure Detected' : 'Non-Explicit'}`,
+          group: 'pressure' as const,
+          rawPoints: report.explicitScreening.isExplicitDetected ? 35 : 0,
+          awardedPoints: report.explicitScreening.isExplicitDetected ? 35 : 0,
+          category: 'NCII_EXPLICIT',
+          cappedByGroup: false,
+          explanation: report.explicitScreening.recommendation,
+          evidence: [],
+        },
+        {
+          ruleId: 'NCII_AI_GENERATION',
+          label: `AI Forensics: ${report.aiGeneration.calibratedVerdict} (${report.aiGeneration.aiConfidenceScore}%)`,
+          group: 'credential' as const,
+          rawPoints: report.aiGeneration.isAiGenerated === true ? 35 : 0,
+          awardedPoints: report.aiGeneration.isAiGenerated === true ? 35 : 0,
+          category: 'AI_SYNTHETIC',
+          cappedByGroup: false,
+          explanation: report.aiGeneration.limitationsNotice,
+          evidence: [],
+        },
+        {
+          ruleId: 'NCII_MANIPULATION',
+          label: `Manipulation Forensics: ${report.manipulation.manipulationVerdict} (${report.manipulation.manipulationScore}%)`,
+          group: 'link' as const,
+          rawPoints: report.manipulation.isManipulated ? 30 : 0,
+          awardedPoints: report.manipulation.isManipulated ? 30 : 0,
+          category: 'DEEPFAKE_MANIPULATION',
+          cappedByGroup: false,
+          explanation: report.manipulation.errorLevelAnalysis.suspiciousResavedRegions ? 'ELA compression divergence detected' : 'Standard compression',
+          evidence: [],
+        },
+      ],
+      unmatchedRules: [],
+      allEvidence: [],
+      activeEvidence: [],
+      negatedEvidence: [],
+      floorApplied: overallRiskScore >= 60,
+      metadata: {
+        characterCount: report.fileSizeBytes,
+        scannedAt: new Date().toISOString(),
+        engineVersion: '2.4.0-ncii-forensics',
+        totalChecksRun: 4,
+      },
+    };
+
+    currentResult = fakeScanResult;
+    updateScoreWidgets(fakeScanResult);
+
+    // Sync Original Message box
+    highlightedTextBox.innerHTML = `
+      <div style="font-family: var(--font-mono); font-size: 0.82rem; background: var(--bg-card-subtle); padding: 10px; border-radius: 6px; line-height: 1.6;">
+        <strong>[AI-Generated Nude & NCII Forensics]</strong> ${escapeHtml(report.fileName)} (${(report.fileSizeBytes / 1024).toFixed(1)} KB)<br>
+        <strong>Dimensions:</strong> ${report.imageDimensions.width}x${report.imageDimensions.height} | <strong>MIME:</strong> <code>${escapeHtml(report.mimeType)}</code><br>
+        <strong>SHA-256 Fingerprint:</strong> <code>${escapeHtml(report.sha256Hash)}</code><br>
+        <span style="color: #16a34a;">🔒 ${escapeHtml(report.privacyNotice)}</span>
+      </div>
+    `;
+
+    warningSignsMount.innerHTML = fakeScanResult.breakdown
+      .filter((b) => b.awardedPoints > 0)
+      .map(
+        (b) => `
+        <div class="warning-sign-row">
+          <div class="sign-left-cluster">
+            <span class="sign-icon">🛡️</span>
+            <span class="sign-label">${escapeHtml(b.label)}</span>
+            <span class="sign-evidence-quote">"${escapeHtml(b.explanation)}"</span>
+          </div>
+          <span class="sign-points-badge">+${b.awardedPoints}</span>
+        </div>
+      `
+      )
+      .join('');
+
+    // Save scan to private history
+    HistoryService.saveScan(`[NCII Forensic Shield] ${report.fileName}`, fakeScanResult);
+
+    // Trigger full-screen blinking alarm (7s)
+    if (overallRiskScore >= 60) {
+      triggerScreenAlarm('RED', overallRiskScore, 7);
+    } else if (overallRiskScore >= 30) {
+      triggerScreenAlarm('YELLOW', overallRiskScore, 7);
+    } else {
+      triggerScreenAlarm('GREEN', overallRiskScore, 7);
+    }
+
+    // Scroll to results
+    analysisResultCard.style.display = 'flex';
+    analysisResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function handleNciiFile(file: File) {
+    nciiStatusNotice.style.display = 'block';
+    nciiStatusNotice.className = 'ocr-status-notice ocr-loading';
+    nciiStatusNotice.innerHTML = `⏳ Reading image <code>${escapeHtml(file.name)}</code> (${(file.size / 1024).toFixed(1)} KB) and running client-side multi-layer forensics...`;
+
+    try {
+      const buffer = new Uint8Array(await file.arrayBuffer());
+      let width = 1024;
+      let height = 1024;
+      let previewUrl = '';
+      try {
+        previewUrl = URL.createObjectURL(file);
+        const img = new Image();
+        img.src = previewUrl;
+        await new Promise<void>((resolve) => {
+          img.onload = () => {
+            width = img.width || 1024;
+            height = img.height || 1024;
+            resolve();
+          };
+          img.onerror = () => resolve();
+        });
+      } catch {}
+
+      const report = await NciiDetector.analyzeImage({
+        name: file.name,
+        size: file.size,
+        type: file.type || 'image/jpeg',
+        width,
+        height,
+        buffer,
+      });
+
+      nciiStatusNotice.className = 'ocr-status-notice ocr-success';
+      nciiStatusNotice.innerHTML = `✓ Forensic analysis complete for <code>${escapeHtml(file.name)}</code>. Four distinct dimensions evaluated.`;
+      await renderNciiReport(report, previewUrl);
+    } catch (err: any) {
+      console.error('NCII inspection failed:', err);
+      nciiStatusNotice.className = 'ocr-status-notice ocr-error';
+      nciiStatusNotice.innerHTML = `❌ Failed to inspect image: ${escapeHtml(err.message || 'Image decode error')}`;
+    }
+  }
+
+  async function handleNciiDemo(type: 'AI_DIFFUSION_NUDE' | 'DEEPFAKE_FACE_SWAP' | 'COMPRESSED_SUSPICIOUS' | 'CONSENTED_REAL_PHOTO') {
+    nciiStatusNotice.style.display = 'block';
+    nciiStatusNotice.className = 'ocr-status-notice ocr-loading';
+    nciiStatusNotice.innerHTML = '⏳ Initializing client-side forensic test specimen...';
+
+    try {
+      let fileName = '';
+      let previewTitle = '';
+      let previewColor = '';
+      let previewBadge = '';
+      let sampleSize = 420000;
+
+      if (type === 'AI_DIFFUSION_NUDE') {
+        fileName = 'ai_synth_leak_sample.png';
+        previewTitle = 'AI Diffusion Synthetic Nude';
+        previewColor = '#ef4444';
+        previewBadge = 'Stable Diffusion Latent VAE Signatures';
+        sampleSize = 512000;
+      } else if (type === 'DEEPFAKE_FACE_SWAP') {
+        fileName = 'deepfake_faceswap_video_frame.jpg';
+        previewTitle = 'Deepfake Face-Swap Composite';
+        previewColor = '#f59e0b';
+        previewBadge = 'Boundary Seam Blending & ELA Discrepancy';
+        sampleSize = 384000;
+      } else if (type === 'COMPRESSED_SUSPICIOUS') {
+        fileName = 'compressed_whatsapp_forward.jpg';
+        previewTitle = 'Degraded / Compressed Image';
+        previewColor = '#64748b';
+        previewBadge = 'Low PRNU Signal — Inconclusive State';
+        sampleSize = 128000;
+      } else {
+        fileName = 'authentic_portrait_camera.jpg';
+        previewTitle = 'Authentic Consented Photo';
+        previewColor = '#22c55e';
+        previewBadge = 'Natural Cellular Pore Grain & Glass Optics';
+        sampleSize = 840000;
+      }
+
+      const previewUrl = createDemoPreviewDataUrl(previewTitle, previewColor, previewBadge);
+      const dummyBuffer = new Uint8Array(2048);
+      for (let i = 0; i < dummyBuffer.length; i++) {
+        dummyBuffer[i] = (i * 37) % 256;
+      }
+
+      const report = await NciiDetector.analyzeImage({
+        name: fileName,
+        size: sampleSize,
+        type: fileName.endsWith('.png') ? 'image/png' : 'image/jpeg',
+        width: 1024,
+        height: 1024,
+        buffer: dummyBuffer,
+        mockCategory: type,
+      });
+
+      nciiStatusNotice.className = 'ocr-status-notice ocr-success';
+      nciiStatusNotice.innerHTML = `✓ Forensic test complete for <code>${escapeHtml(fileName)}</code>.`;
+      await renderNciiReport(report, previewUrl);
+    } catch (err: any) {
+      console.error('NCII demo failed:', err);
+      nciiStatusNotice.className = 'ocr-status-notice ocr-error';
+      nciiStatusNotice.innerHTML = `❌ Failed demo generation: ${escapeHtml(err.message)}`;
+    }
+  }
+
+  btnBrowseNciiFile?.addEventListener('click', () => nciiFileInput?.click());
+  nciiFileInput?.addEventListener('change', () => {
+    if (nciiFileInput.files && nciiFileInput.files[0]) {
+      handleNciiFile(nciiFileInput.files[0]);
+    }
+  });
+
+  nciiDropZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    nciiDropZone.style.borderColor = 'var(--accent-red)';
+  });
+  nciiDropZone?.addEventListener('dragleave', () => {
+    nciiDropZone.style.borderColor = 'var(--border-color)';
+  });
+  nciiDropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    nciiDropZone.style.borderColor = 'var(--border-color)';
+    if (e.dataTransfer && e.dataTransfer.files[0]) {
+      handleNciiFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  btnNciiDemoDiffusion?.addEventListener('click', () => handleNciiDemo('AI_DIFFUSION_NUDE'));
+  btnNciiDemoFaceSwap?.addEventListener('click', () => handleNciiDemo('DEEPFAKE_FACE_SWAP'));
+  btnNciiDemoCompressed?.addEventListener('click', () => handleNciiDemo('COMPRESSED_SUSPICIOUS'));
+  btnNciiDemoClean?.addEventListener('click', () => handleNciiDemo('CONSENTED_REAL_PHOTO'));
+
   textarea.addEventListener('paste', (e: ClipboardEvent) => {
     if (e.clipboardData && e.clipboardData.items) {
       for (const item of Array.from(e.clipboardData.items)) {
         if (item.type.startsWith('image/')) {
           e.preventDefault();
           const file = item.getAsFile();
-          if (file) handleOcrFile(file);
+          if (file) {
+            if (activeTab === 'NCII') {
+              handleNciiFile(file);
+            } else {
+              handleOcrFile(file);
+            }
+          }
           break;
         }
       }

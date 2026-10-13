@@ -2807,5 +2807,440 @@ code, pre, .font-mono {
   background: var(--accent-red-hover);
 }
 
+/* ==========================================================================
+   AI-GENERATED NUDE & INTIMATE IMAGE FORENSICS (NCII SHIELD) STYLES
+   ========================================================================== */
+
+.ncii-inspector-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.ncii-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.ncii-file-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.ncii-shield-icon {
+  font-size: 2.2rem;
+  line-height: 1;
+}
+
+.ncii-file-name {
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: block;
+  word-break: break-all;
+}
+
+.ncii-file-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.ncii-verdict-pills-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ncii-status-pill {
+  font-size: 0.78rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.ncii-status-pill.danger {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+.ncii-status-pill.warning {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+.ncii-status-pill.safe {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.ncii-hash-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  font-size: 0.76rem;
+}
+
+.ncii-privacy-guarantee {
+  color: #166534;
+  font-weight: 700;
+  background: #f0fdf4;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid #bbf7d0;
+}
+
+/* Privacy Blur Shield Curtain */
+.ncii-preview-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  background: #f8fafc;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+}
+
+.ncii-preview-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ncii-preview-title strong {
+  display: block;
+  font-size: 0.88rem;
+  color: var(--text-main);
+}
+
+.ncii-preview-title small {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.btn-toggle-blur {
+  background: #0f172a;
+  color: #ffffff;
+  border: none;
+  padding: 6px 14px;
+  border-radius: var(--radius-pill);
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.btn-toggle-blur:hover {
+  background: #334155;
+}
+
+.ncii-image-shield-box {
+  position: relative;
+  min-height: 120px;
+  max-height: 240px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  border: 1px dashed var(--border-color);
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.privacy-blur-curtain {
+  width: 100%;
+  height: 100%;
+  padding: 24px 16px;
+  text-align: center;
+  background: rgba(241, 245, 249, 0.95);
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.curtain-icon {
+  font-size: 1.8rem;
+  margin-bottom: 2px;
+}
+
+.privacy-blur-curtain strong {
+  font-size: 0.92rem;
+  color: var(--text-main);
+}
+
+.privacy-blur-curtain p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  max-width: 420px;
+  margin: 0;
+}
+
+.ncii-rendered-preview {
+  max-width: 100%;
+  max-height: 240px;
+  object-fit: contain;
+  transition: filter 0.3s ease;
+}
+
+.ncii-rendered-preview.blurred {
+  filter: blur(28px);
+}
+
+/* 4-Dimension Forensic Grid */
+.ncii-four-dimensions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 14px;
+}
+
+.ncii-dim-card {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ncii-dim-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.ncii-dim-icon {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.ncii-dim-title {
+  font-size: 0.88rem;
+  font-weight: 800;
+  display: block;
+  margin-bottom: 3px;
+  color: var(--text-main);
+}
+
+.ncii-dim-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.ncii-submetric-box {
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 8px 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 0.78rem;
+}
+
+.submetric-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+}
+
+.submetric-row span {
+  color: var(--text-muted);
+}
+
+.submetric-row strong {
+  color: var(--text-main);
+  white-space: nowrap;
+}
+
+.ncii-signatures-list {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+.ncii-signatures-list strong {
+  display: block;
+  color: var(--text-main);
+  font-size: 0.78rem;
+  margin-bottom: 3px;
+}
+
+.ncii-signatures-list ul {
+  padding-left: 18px;
+  margin: 0;
+  line-height: 1.45;
+}
+
+.ncii-signatures-list li {
+  margin-bottom: 2px;
+}
+
+.ncii-limitations-notice {
+  font-size: 0.72rem;
+  background: #fffbeb;
+  border: 1px solid #fef3c7;
+  color: #92400e;
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  line-height: 1.35;
+  margin-top: 4px;
+}
+
+/* Emergency NCII Legal & Victim Takedown Section */
+.ncii-emergency-section {
+  background: #ffffff;
+  border: 1.5px solid #ef4444;
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.08);
+}
+
+.ncii-emergency-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.ncii-emergency-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ncii-emergency-title h4 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: #991b1b;
+  margin: 0;
+}
+
+.ncii-emergency-badge {
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  background: #dc2626;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+
+.ncii-action-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 10px;
+}
+
+.ncii-action-card {
+  background: #fef2f2;
+  border: 1px solid #fee2e2;
+  border-radius: var(--radius-sm);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.action-card-head strong {
+  display: block;
+  font-size: 0.85rem;
+  color: #991b1b;
+}
+
+.action-tag {
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: #b91c1c;
+  text-transform: uppercase;
+}
+
+.ncii-action-card p {
+  font-size: 0.76rem;
+  color: #7f1d1d;
+  line-height: 1.4;
+  margin: 0;
+  flex-grow: 1;
+}
+
+.btn-ncii-action {
+  display: inline-block;
+  text-align: center;
+  padding: 6px 10px;
+  background: #dc2626;
+  color: #ffffff;
+  border-radius: var(--radius-sm);
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.2s;
+}
+
+.btn-ncii-action:hover {
+  background: #b91c1c;
+}
+
+.ncii-evidence-box {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 0.78rem;
+}
+
+.ncii-evidence-box strong {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--text-main);
+}
+
+.ncii-evidence-list {
+  padding-left: 18px;
+  margin: 0;
+  line-height: 1.5;
+  color: var(--text-muted);
+}
+
+.ncii-evidence-list li {
+  margin-bottom: 3px;
+}
+
 
 
