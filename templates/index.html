@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Phishing URL Detection — ML Forensic Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-page: #0b0f19;
+      --bg-card: #111827;
+      --bg-card-subtle: #1e293b;
+      --border-color: #334155;
+      --border-hover: #475569;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-red: #ef4444;
+      --accent-red-soft: rgba(239, 68, 68, 0.15);
+      --accent-green: #22c55e;
+      --accent-green-soft: rgba(34, 197, 94, 0.15);
+      --font-body: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-page);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 860px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* Header */
+    .header-card {
+      text-align: center;
+      padding: 32px 24px;
+      background: linear-gradient(180deg, #162032 0%, var(--bg-card) 100%);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(239, 68, 68, 0.12);
+      border: 1px solid rgba(239, 68, 68, 0.35);
+      color: #fca5a5;
+      font-size: 0.78rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+    }
+
+    .header-title {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #ffffff;
+      margin-bottom: 8px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      max-width: 620px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Main Form Card */
+    .main-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.4);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-label {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-main);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .url-input-wrapper {
+      display: flex;
+      gap: 12px;
+      position: relative;
+    }
+
+    .url-input {
+      flex: 1;
+      background: #0f172a;
+      border: 1.5px solid var(--border-color);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-size: 0.95rem;
+      color: #ffffff;
+      font-family: var(--font-mono);
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .url-input:focus {
+      border-color: #ef4444;
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.2);
+      background: #0b1120;
+    }
+
+    .url-input::placeholder {
+      color: #64748b;
+    }
+
+    .btn-analyze {
+      background: #ef4444;
+      color: #ffffff;
+      border: none;
+      border-radius: 10px;
+      padding: 0 28px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      font-family: var(--font-body);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-analyze:hover {
+      background: #dc2626;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+    }
+
+    .btn-analyze:disabled {
+      background: #475569;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* Quick Test Chips */
+    .sample-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-top: 14px;
+    }
+
+    .chip-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .sample-chip {
+      background: var(--bg-card-subtle);
+      border: 1px solid var(--border-color);
+      color: #cbd5e1;
+      padding: 5px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-family: var(--font-mono);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .sample-chip:hover {
+      background: #334155;
+      color: #ffffff;
+      border-color: #64748b;
+    }
+
+    /* Result Display Card */
+    .result-card {
+      display: none;
+      border-radius: 14px;
+      padding: 24px;
+      margin-top: 24px;
+      animation: fadeIn 0.3s ease;
+      border-width: 2px;
+      border-style: solid;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Dynamic styling states */
+    .result-card.phishing {
+      background: rgba(239, 68, 68, 0.08);
+      border-color: #ef4444;
+    }
+
+    .result-card.safe {
+      background: rgba(34, 197, 94, 0.08);
+      border-color: #22c55e;
+    }
+
+    .result-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .verdict-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 1.15rem;
+      font-weight: 800;
+      padding: 8px 16px;
+      border-radius: 8px;
+    }
+
+    .result-card.phishing .verdict-badge {
+      background: #ef4444;
+      color: #ffffff;
+    }
+
+    .result-card.safe .verdict-badge {
+      background: #22c55e;
+      color: #ffffff;
+    }
+
+    .confidence-meter {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      font-family: var(--font-mono);
+    }
+
+    .confidence-val {
+      font-size: 1.8rem;
+      font-weight: 800;
+    }
+
+    .result-card.phishing .confidence-val {
+      color: #f87171;
+    }
+
+    .result-card.safe .confidence-val {
+      color: #4ade80;
+    }
+
+    .confidence-lbl {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .url-tested-row {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: #e2e8f0;
+      word-break: break-all;
+      margin-bottom: 20px;
+    }
+
+    /* Features Inspection Grid */
+    .features-section-title {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+      gap: 10px;
+    }
+
+    .feature-cell {
+      background: #0f172a;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .feature-name {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .feature-value {
+      font-size: 1rem;
+      font-weight: 700;
+      font-family: var(--font-mono);
+      color: #ffffff;
+    }
+
+    .feature-value.highlight-danger {
+      color: #f87171;
+    }
+
+    .feature-value.highlight-safe {
+      color: #4ade80;
+    }
+
+    /* Loading Spinner */
+    .spinner {
+      display: inline-block;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top-color: #ffffff;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Footer */
+    .footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+      margin-top: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <header class="header-card">
+      <div class="header-badge">AI Cyber Defense Pipeline</div>
+      <h1 class="header-title">Phishing URL Detection System</h1>
+      <p class="header-subtitle">
+        End-to-end Machine Learning pipeline utilizing Random Forest classification over lexical, structural, and keyword telemetry to detect zero-day phishing links in real-time.
+      </p>
+    </header>
+
+    <!-- Main Scanner Card -->
+    <main class="main-card">
+      <form id="urlForm" class="form-group" onsubmit="event.preventDefault(); analyzeUrl();">
+        <label class="form-label" for="urlInput">
+          <span>Enter Target URL for ML Forensic Analysis</span>
+          <span style="font-size: 0.78rem; color: var(--text-muted); font-family: var(--font-mono);">10-Feature Vector</span>
+        </label>
+        
+        <div class="url-input-wrapper">
+          <input 
+            type="text" 
+            id="urlInput" 
+            class="url-input" 
+            placeholder="https://example.com or http://192.168.1.1/login..." 
+            autocomplete="off" 
+            spellcheck="false" 
+            required 
+          />
+          <button type="submit" id="btnAnalyze" class="btn-analyze">
+            <span id="btnIcon">⚡</span>
+            <span id="btnText">Analyze</span>
+          </button>
+        </div>
+
+        <!-- Sample Presets -->
+        <div class="sample-chips">
+          <span class="chip-label">Test Samples:</span>
+          <button type="button" class="sample-chip" onclick="fillAndAnalyze('https://www.google.com')">Safe: google.com</button>
+          <button type="button" class="sample-chip" onclick="fillAndAnalyze('https://echallan.parivahan.gov.in')">Safe: echallan.gov.in</button>
+          <button type="button" class="sample-chip" onclick="fillAndAnalyze('http://192.168.1.1/secure-bank-login-verify/account.html')">Phishing: Raw IP + Bank</button>
+          <button type="button" class="sample-chip" onclick="fillAndAnalyze('https://mparivahan.redirectme.net/6/RTO.MoRTH')">Phishing: Dynamic DNS Lookalike</button>
+          <button type="button" class="sample-chip" onclick="fillAndAnalyze('http://sbi-kyc-verification.update-portal.xyz/login.php')">Phishing: KYC Deception</button>
+        </div>
+      </form>
+
+      <!-- Dynamic Result Card -->
+      <section id="resultCard" class="result-card">
+        <div class="result-header">
+          <div id="verdictBadge" class="verdict-badge">
+            <span id="verdictIcon">⚠️</span>
+            <span id="verdictText">PHISHING DETECTED</span>
+          </div>
+
+          <div class="confidence-meter">
+            <span id="confidenceVal" class="confidence-val">98.5%</span>
+            <span class="confidence-lbl">Model Confidence</span>
+          </div>
+        </div>
+
+        <div class="url-tested-row">
+          <strong style="color: var(--text-muted);">Target: </strong>
+          <span id="testedUrlText"></span>
+        </div>
+
+        <div class="features-section-title">
+          <span>Extracted Numerical Cybersecurity Features</span>
+          <span style="font-family: var(--font-mono); font-size: 0.72rem;">scikit-learn vector</span>
+        </div>
+
+        <div id="featuresGrid" class="features-grid">
+          <!-- Dynamically populated -->
+        </div>
+      </section>
+    </main>
+
+    <footer class="footer">
+      RandomForestClassifier (100 Trees) • scikit-learn & tldextract • Client Privacy Preserved
+    </footer>
+  </div>
+
+  <script>
+    function fillAndAnalyze(sampleUrl) {
+      document.getElementById('urlInput').value = sampleUrl;
+      analyzeUrl();
+    }
+
+    async function analyzeUrl() {
+      const urlInput = document.getElementById('urlInput');
+      const btn = document.getElementById('btnAnalyze');
+      const btnText = document.getElementById('btnText');
+      const btnIcon = document.getElementById('btnIcon');
+      const resultCard = document.getElementById('resultCard');
+      const verdictBadge = document.getElementById('verdictBadge');
+      const verdictIcon = document.getElementById('verdictIcon');
+      const verdictText = document.getElementById('verdictText');
+      const confidenceVal = document.getElementById('confidenceVal');
+      const testedUrlText = document.getElementById('testedUrlText');
+      const featuresGrid = document.getElementById('featuresGrid');
+
+      const rawUrl = urlInput.value.trim();
+      if (!rawUrl) return;
+
+      // Loading state
+      btn.disabled = true;
+      btnIcon.innerHTML = '<span class="spinner"></span>';
+      btnText.textContent = 'Processing...';
+
+      try {
+        const response = await fetch('/predict', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ url: rawUrl })
+        });
+
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.error || 'Server error occurred.');
+        }
+
+        const data = await response.json();
+
+        // Render Verdict & Dynamic Styling
+        resultCard.style.display = 'block';
+        testedUrlText.textContent = data.url;
+        confidenceVal.textContent = data.confidence_score + '%';
+
+        if (data.is_phishing) {
+          resultCard.className = 'result-card phishing';
+          verdictIcon.textContent = '🚨';
+          verdictText.textContent = 'PHISHING DETECTED';
+        } else {
+          resultCard.className = 'result-card safe';
+          verdictIcon.textContent = '🛡️';
+          verdictText.textContent = 'LEGITIMATE / SAFE';
+        }
+
+        // Render 10 Extracted Features
+        featuresGrid.innerHTML = '';
+        if (data.features) {
+          const featureDefinitions = [
+            { key: 'url_length', label: 'URL Length' },
+            { key: 'dot_count', label: 'Dot Count' },
+            { key: 'hyphen_count', label: 'Hyphen Count' },
+            { key: 'at_symbol', label: '@ Symbol' },
+            { key: 'double_slash_redirect', label: '// Redirect' },
+            { key: 'has_ip_address', label: 'Raw IP Host' },
+            { key: 'subdomain_count', label: 'Subdomains' },
+            { key: 'domain_length', label: 'Domain Length' },
+            { key: 'https_flag', label: 'HTTPS Scheme' },
+            { key: 'suspicious_words', label: 'Suspicious Words' }
+          ];
+
+          featureDefinitions.forEach(item => {
+            const val = data.features[item.key];
+            const cell = document.createElement('div');
+            cell.className = 'feature-cell';
+
+            let valClass = '';
+            if (['has_ip_address', 'double_slash_redirect', 'suspicious_words', 'at_symbol'].includes(item.key) && val > 0) {
+              valClass = 'highlight-danger';
+            } else if (item.key === 'https_flag' && val === 1) {
+              valClass = 'highlight-safe';
+            }
+
+            cell.innerHTML = `
+              <span class="feature-name">${item.label}</span>
+              <span class="feature-value ${valClass}">${val !== undefined ? val : '-'}</span>
+            `;
+            featuresGrid.appendChild(cell);
+          });
+        }
+
+        // Smooth scroll to result
+        resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+
+      } catch (err) {
+        alert('Error: ' + err.message);
+      } finally {
+        btn.disabled = false;
+        btnIcon.textContent = '⚡';
+        btnText.textContent = 'Analyze';
+      }
+    }
+  </script>
+</body>
+</html>
