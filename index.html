@@ -1008,6 +1008,59 @@
               <div id="archetypeAdvice" class="archetype-mitigation-box"></div>
             </div>
 
+            <!-- Google Gemini AI Cybersecurity Advisory Card (Purpose 1 & 2: Message & URL Checker) -->
+            <div id="geminiAdvisoryCard" class="gemini-advisory-card" style="display: none;">
+              <div class="gemini-advisory-header">
+                <div class="gemini-brand-cluster">
+                  <span class="gemini-sparkle-icon">✨</span>
+                  <div>
+                    <div class="gemini-title-row">
+                      <h4 class="gemini-title">Google Gemini Cybersecurity Advisory</h4>
+                      <span id="geminiModelBadge" class="gemini-model-badge">Gemini 3.5 Flash</span>
+                    </div>
+                    <span class="gemini-subtitle">AI-Powered Fraud, Phishing & Social Engineering Forensics</span>
+                  </div>
+                </div>
+                <div class="gemini-verdict-cluster">
+                  <span id="geminiThreatBadge" class="gemini-threat-badge low">LOW THREAT</span>
+                  <span id="geminiVerdictBadge" class="gemini-verdict-badge safe">SAFE</span>
+                </div>
+              </div>
+
+              <!-- Metrics & Entities Row -->
+              <div class="gemini-metrics-grid">
+                <div class="gemini-metric-cell">
+                  <span class="g-metric-label">Targeted Brand / Entity</span>
+                  <strong id="geminiTargetedBrand" class="g-metric-val">None</strong>
+                </div>
+                <div class="gemini-metric-cell">
+                  <span class="g-metric-label">Scam Category</span>
+                  <strong id="geminiCategory" class="g-metric-val">Legitimate/None</strong>
+                </div>
+                <div class="gemini-metric-cell">
+                  <span class="g-metric-label">Confidence Score</span>
+                  <strong id="geminiConfidenceScore" class="g-metric-val">95%</strong>
+                </div>
+              </div>
+
+              <!-- Risk Indicators List -->
+              <div class="gemini-indicators-container">
+                <span class="gemini-section-tag">DETECTED RED FLAGS & RISK INDICATORS:</span>
+                <ul id="geminiRiskIndicatorsList" class="gemini-indicators-list">
+                  <!-- Populated dynamically -->
+                </ul>
+              </div>
+
+              <!-- User Guidance Advice Box -->
+              <div class="gemini-guidance-box">
+                <span class="gemini-guidance-icon">🛡️</span>
+                <div class="gemini-guidance-content">
+                  <strong>Safe Action Recommendation:</strong>
+                  <p id="geminiUserGuidanceText">No action needed.</p>
+                </div>
+              </div>
+            </div>
+
             <!-- Website & URL Safety Inspector Card (Reverse Engineered from IsThisSpam) -->
             <div id="websiteInspectorCard" class="website-inspector-card" style="display: none;">
               <div class="web-inspector-header">
@@ -1369,6 +1422,56 @@
                     <p>Protected under NCII & deepfake safety protocol. Click "Toggle Privacy Blur" above to inspect if authorized.</p>
                   </div>
                   <img id="nciiImagePreview" class="ncii-rendered-preview" alt="Forensic inspection preview" style="display: none;" />
+                </div>
+              </div>
+
+              <!-- Google Gemini AI Nude & Deepfake Forensics Panel (Purpose 4) -->
+              <div id="geminiNciiCard" class="gemini-ncii-banner" style="display: none;">
+                <div class="gemini-ncii-header">
+                  <div class="gemini-brand-cluster">
+                    <span class="gemini-sparkle-icon">✨</span>
+                    <div>
+                      <div class="gemini-title-row">
+                        <h4 class="gemini-title">Google Gemini NCII & Deepfake Forensics</h4>
+                        <span class="gemini-model-badge">Gemini 3.5 Flash</span>
+                      </div>
+                      <span class="gemini-subtitle">Multimodal Forensic Analysis (Explicit Safety, Diffusion Artifacts & Seam Splicing)</span>
+                    </div>
+                  </div>
+                  <span id="geminiNciiVerdictBadge" class="gemini-verdict-badge safe">AUTHENTIC</span>
+                </div>
+
+                <div class="gemini-ncii-grid">
+                  <div class="gemini-metric-cell">
+                    <span class="g-metric-label">Content Screening</span>
+                    <strong id="geminiNciiExplicitVal" class="g-metric-val">NON_EXPLICIT</strong>
+                  </div>
+                  <div class="gemini-metric-cell">
+                    <span class="g-metric-label">AI Generation</span>
+                    <strong id="geminiNciiAiVal" class="g-metric-val">FALSE</strong>
+                  </div>
+                  <div class="gemini-metric-cell">
+                    <span class="g-metric-label">Manipulation / Swap</span>
+                    <strong id="geminiNciiManipVal" class="g-metric-val">CLEAN</strong>
+                  </div>
+                </div>
+
+                <div class="gemini-indicators-container" id="geminiNciiArtifactsBox" style="display: none;">
+                  <span class="gemini-section-tag">DETECTED AI DIFFUSION ARTIFACTS:</span>
+                  <ul id="geminiNciiArtifactsList" class="gemini-indicators-list"></ul>
+                </div>
+
+                <div class="gemini-indicators-container" id="geminiNciiManipBox" style="display: none;">
+                  <span class="gemini-section-tag">SUSPECTED MANIPULATION TECHNIQUES:</span>
+                  <ul id="geminiNciiManipList" class="gemini-indicators-list"></ul>
+                </div>
+
+                <div class="gemini-guidance-box">
+                  <span class="gemini-guidance-icon">🛡️</span>
+                  <div class="gemini-guidance-content">
+                    <strong id="geminiNciiTripartiteVerdict">Consolidated Forensic Finding</strong>
+                    <p id="geminiNciiSafetyAdvice">Safe guidance recommendation.</p>
+                  </div>
                 </div>
               </div>
 
