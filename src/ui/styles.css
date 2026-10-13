@@ -68,9 +68,32 @@ body {
   font-family: var(--font-body);
   background-color: var(--bg-page);
   color: var(--text-main);
-  line-height: 1.5;
+  line-height: 1.55;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
   min-height: 100vh;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-body);
+  color: var(--text-main);
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+}
+
+p {
+  line-height: 1.55;
+}
+
+button, input, textarea, select {
+  font-family: var(--font-body);
+}
+
+code, pre, .font-mono {
+  font-family: var(--font-mono);
+  letter-spacing: -0.01em;
 }
 
 /* ==========================================================================
@@ -575,37 +598,83 @@ body {
   padding: 20px 20px 16px 20px;
 }
 
+.input-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px 14px;
+  margin-bottom: 16px;
+  width: 100%;
+}
+
 .input-tabs-bar {
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
   gap: 8px;
-  margin-bottom: 16px;
+  margin-bottom: 0;
 }
 
 .tab-button {
-  background: transparent;
-  border: none;
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
   font-family: var(--font-body);
-  font-size: 0.88rem;
+  font-size: 0.84rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--text-muted);
-  padding: 8px 16px;
+  padding: 8px 14px;
   border-radius: var(--radius-pill);
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
-  transition: all 0.2s;
+  gap: 7px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.25;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
 }
 
 .tab-button:hover {
-  background-color: var(--bg-card-subtle);
+  background-color: #ffffff;
   color: var(--text-main);
+  border-color: var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .tab-button.active {
   background-color: var(--accent-red-soft);
   color: var(--accent-red-text);
+  border-color: var(--accent-red-border);
   font-weight: 700;
+  box-shadow: 0 1px 2px rgba(239, 68, 68, 0.08);
+}
+
+.tab-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.lang-script-badge {
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: var(--radius-pill);
+  background-color: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  color: var(--text-muted);
+  font-family: var(--font-body);
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-left: auto;
+  line-height: 1.25;
 }
 
 .textarea-wrapper {
@@ -756,25 +825,32 @@ body {
 
 .chips-intro {
   font-size: 0.8rem;
+  font-weight: 600;
   color: var(--text-muted);
+  white-space: nowrap;
 }
 
 .chip-item {
-  background: #f1f5f9;
+  background: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   padding: 6px 12px;
   border-radius: var(--radius-pill);
   font-family: var(--font-body);
   font-size: 0.78rem;
   font-weight: 600;
+  letter-spacing: -0.01em;
   color: var(--text-main);
   cursor: pointer;
-  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  line-height: 1.25;
+  transition: all 0.2s ease;
 }
 
 .chip-item:hover {
-  background: #e2e8f0;
+  background: #ffffff;
   border-color: var(--border-subtle);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
 }
 
 .action-submit-group {
@@ -789,33 +865,38 @@ body {
   border: 1px solid var(--border-color);
   padding: 10px 16px;
   border-radius: var(--radius-md);
+  font-family: var(--font-body);
   font-size: 0.88rem;
   font-weight: 600;
   color: var(--text-muted);
   cursor: pointer;
-  transition: all 0.2s;
+  white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .btn-clear-text:hover {
   background: var(--bg-card-subtle);
   color: var(--text-main);
+  border-color: var(--border-subtle);
 }
 
 .btn-analyze-red {
   background: var(--accent-red);
   color: #ffffff;
   border: none;
-  padding: 10px 20px;
+  padding: 10px 22px;
   border-radius: var(--radius-md);
   font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 700;
+  letter-spacing: -0.01em;
   cursor: pointer;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
   box-shadow: 0 4px 12px rgba(239, 68, 68, 0.25);
-  transition: all 0.2s;
+  white-space: nowrap;
+  transition: all 0.2s ease;
 }
 
 .btn-analyze-red:hover {
@@ -967,6 +1048,7 @@ body {
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   font-size: 0.88rem;
+  gap: 12px;
 }
 
 .sign-left-cluster {
@@ -974,21 +1056,26 @@ body {
   align-items: center;
   gap: 12px;
   flex-grow: 1;
+  flex-wrap: wrap;
 }
 
 .sign-icon {
   font-size: 1.1rem;
+  flex-shrink: 0;
 }
 
 .sign-label {
   font-weight: 700;
   min-width: 140px;
+  white-space: nowrap;
 }
 
 .sign-evidence-quote {
   color: var(--text-muted);
   font-style: italic;
   font-size: 0.82rem;
+  line-height: 1.4;
+  word-break: break-word;
 }
 
 .sign-points-badge {
@@ -1000,6 +1087,8 @@ body {
   background-color: var(--accent-red-soft);
   color: var(--accent-red-text);
   border: 1px solid var(--accent-red-border);
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
 .sign-points-badge.capped {
@@ -1130,15 +1219,16 @@ body {
 }
 
 .gauge-big-num {
-  font-size: 1.8rem;
+  font-size: 2rem;
   font-weight: 800;
   font-family: var(--font-body);
+  letter-spacing: -0.03em;
   line-height: 1;
 }
 
 .gauge-denom {
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: 0.72rem;
+  font-weight: 700;
   color: var(--text-muted);
 }
 
@@ -1149,12 +1239,17 @@ body {
 }
 
 .risk-badge-pill {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
   align-self: flex-start;
   padding: 4px 12px;
   border-radius: var(--radius-pill);
   font-size: 0.82rem;
-  font-weight: 700;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1.25;
 }
 
 .risk-badge-pill.high {
@@ -1370,6 +1465,7 @@ body {
   font-weight: 700;
   padding: 2px 8px;
   border-radius: var(--radius-pill);
+  white-space: nowrap;
 }
 
 .tier-name {
@@ -1542,27 +1638,7 @@ body {
   }
 }
 
-/* ==========================================================================
-   FEATURE 1 & 2: MULTILINGUAL SCRIPT BADGE & CHIPS
-   ========================================================================== */
-
-.input-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-}
-
-.lang-script-badge {
-  font-size: 0.75rem;
-  font-weight: 700;
-  padding: 4px 10px;
-  border-radius: var(--radius-pill);
-  background-color: var(--bg-card-subtle);
-  border: 1px solid var(--border-color);
-  color: var(--text-muted);
-  font-family: var(--font-body);
-}
+/* Feature 1 & 2: Multilingual Language Chips */
 
 .chip-lang {
   background-color: #f0fdf4 !important;
@@ -1856,6 +1932,7 @@ body {
   padding: 2px 8px;
   border-radius: var(--radius-pill);
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .threat-badge-pill.verified {
@@ -2011,6 +2088,7 @@ body {
   border-radius: var(--radius-pill);
   background: #f1f5f9;
   color: #475569;
+  white-space: nowrap;
 }
 
 .web-verdict-pill {
@@ -2020,6 +2098,7 @@ body {
   border-radius: var(--radius-pill);
   letter-spacing: 0.04em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .web-verdict-pill.danger {
@@ -2284,6 +2363,7 @@ body {
   padding: 2px 8px;
   border-radius: var(--radius-pill);
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .dim-score-pill.danger {
@@ -2376,6 +2456,7 @@ body {
   padding: 2px 6px;
   border-radius: var(--radius-sm);
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .apk-perm-item.critical .apk-perm-badge {
@@ -2521,6 +2602,7 @@ body {
 
 .vt-nav-tabs {
   display: flex;
+  flex-wrap: wrap;
   gap: 6px;
   border-bottom: 2px solid var(--border-color);
   padding-bottom: 2px;
@@ -2536,6 +2618,8 @@ body {
   padding: 8px 14px;
   cursor: pointer;
   border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  white-space: nowrap;
+  flex-shrink: 0;
   transition: all 0.2s;
 }
 
