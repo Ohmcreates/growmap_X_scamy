@@ -1065,3 +1065,87 @@ body {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* Pricing Notice & Active Tier */
+.pricing-notice-box {
+  margin: 14px 0 20px 0;
+  padding: 14px 18px;
+  border-radius: 8px;
+  font-size: 0.92rem;
+  line-height: 1.5;
+  animation: fadeIn 0.3s ease;
+}
+
+.pricing-notice-box.success {
+  background: rgba(34, 197, 94, 0.15);
+  border: 1px solid rgba(34, 197, 94, 0.4);
+  color: var(--risk-low);
+}
+
+.pricing-notice-box.info {
+  background: rgba(59, 130, 246, 0.15);
+  border: 1px solid rgba(59, 130, 246, 0.4);
+  color: #93c5fd;
+}
+
+.pricing-card.current-active {
+  border-color: rgba(34, 197, 94, 0.6);
+  box-shadow: 0 0 15px rgba(34, 197, 94, 0.15);
+}
+
+.tier-btn.btn-active-tier {
+  border-color: rgba(34, 197, 94, 0.8) !important;
+  color: var(--risk-low) !important;
+  background: rgba(34, 197, 94, 0.1) !important;
+}
+
+.tier-badge.active-badge {
+  background: var(--risk-low);
+  color: #000;
+}
+
+/* Gauge Actions & Copy Report */
+.gauge-actions-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.copy-report-btn {
+  min-height: 36px;
+  padding: 6px 14px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.copy-report-btn:hover {
+  border-color: var(--accent-gold);
+  color: var(--accent-gold);
+}
+
+.copy-report-btn.copied {
+  background: rgba(34, 197, 94, 0.2) !important;
+  border-color: var(--risk-low) !important;
+  color: var(--risk-low) !important;
+}
+
+/* History List Enhancement */
+.history-item-row {
+  cursor: pointer;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.history-item-row:hover {
+  border-color: var(--accent-gold);
+  background: #0f172a;
+}
+
+.history-item-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+

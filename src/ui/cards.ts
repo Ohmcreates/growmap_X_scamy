@@ -18,9 +18,14 @@ export function renderScoreGauge(result: ScanResult): string {
           <span class="badge-icon">${icon}</span>
           <span class="badge-text">${result.riskLevel} RISK</span>
         </div>
-        <div class="score-display">
-          <span class="score-value">${result.score}</span>
-          <span class="score-denom">/ 100</span>
+        <div class="gauge-actions-group">
+          <button id="btnCopyReport" class="btn-secondary copy-report-btn" type="button" title="Copy evidence report to clipboard">
+            📋 Copy Report
+          </button>
+          <div class="score-display">
+            <span class="score-value">${result.score}</span>
+            <span class="score-denom">/ 100</span>
+          </div>
         </div>
       </div>
       <h3 class="result-headline">${result.headline}</h3>
@@ -188,11 +193,32 @@ export function renderNextSteps(result: ScanResult): string {
   `;
 }
 
-export function renderPricingModal(): string {
-  const cardsHtml = PRICING_TIERS.map(
-    (tier) => `
-    <div class="pricing-card ${tier.id === 'PREMIUM' ? 'featured' : ''}">
-      ${tier.badge ? `<div class="tier-badge">${tier.badge}</div>` : ''}
+export function renderPricingModal(activeTier: string = 'FREE'): string {
+  const cardsHtml = PRICING_TIERS.map((tier) => {
+    const isCurrent =
+      (activeTier === 'PREMIUM' && tier.id === 'PREMIUM') ||
+      (activeTier === 'FREE' && tier.id === 'FREE');
+
+    let ctaLabel = tier.ctaLabel;
+    if (activeTier === 'PREMIUM') {
+      if (tier.id === 'PREMIUM') ctaLabel = '✓ Active Plan';
+      if (tier.id === 'FREE') ctaLabel = 'Downgrade to Free';
+    } else {
+      if (tier.id === 'FREE') ctaLabel = '✓ Active Plan';
+    }
+
+    const badgeHtml =
+      tier.id === 'PREMIUM'
+        ? `<div class="tier-badge ${activeTier === 'PREMIUM' ? 'active-badge' : ''}">${
+            activeTier === 'PREMIUM' ? 'Active Tier' : 'Most Popular'
+          }</div>`
+        : tier.badge
+        ? `<div class="tier-badge">${tier.badge}</div>`
+        : '';
+
+    return `
+    <div class="pricing-card ${tier.id === 'PREMIUM' ? 'featured' : ''} ${isCurrent ? 'current-active' : ''}">
+      ${badgeHtml}
       <h3 class="tier-name">${tier.name}</h3>
       <div class="tier-price-row">
         <span class="tier-price">${tier.price}</span>
@@ -202,12 +228,16 @@ export function renderPricingModal(): string {
       <ul class="tier-features">
         ${tier.features.map((f) => `<li>✓ ${f}</li>`).join('')}
       </ul>
-      <button class="tier-btn ${tier.id === 'PREMIUM' ? 'primary' : 'secondary'}">
-        ${tier.ctaLabel}
+      <button 
+        class="tier-btn ${tier.id === 'PREMIUM' ? 'primary' : 'secondary'} ${isCurrent ? 'btn-active-tier' : ''}"
+        data-tier="${tier.id}"
+        id="btnTier-${tier.id}"
+        type="button">
+        ${ctaLabel}
       </button>
     </div>
-  `
-  ).join('');
+  `;
+  }).join('');
 
   return `
     <div class="pricing-modal-content">
@@ -215,6 +245,7 @@ export function renderPricingModal(): string {
         <h2>Sustainable Scam Defense Plans</h2>
         <p>Scam Spotter is free for personal awareness, supported by premium family tools and institutional FinTech APIs.</p>
       </div>
+      <div id="pricingNoticeBox" class="pricing-notice-box" style="display: none;"></div>
       <div class="pricing-grid">
         ${cardsHtml}
       </div>

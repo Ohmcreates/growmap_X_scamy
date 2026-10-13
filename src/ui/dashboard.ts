@@ -177,6 +177,12 @@ export function renderDashboardHtml(): string {
 
       <!-- Widget 6: Repeat Indicators -->
       ${repeatsNotice}
+
+      <div class="dashboard-footer-actions" style="margin-top: 20px; display: flex; justify-content: flex-end;">
+        <button id="btnDashNewScan" class="btn-primary" type="button" style="padding: 10px 18px; font-size: 0.88rem;">
+          ⚡ Start New Scan
+        </button>
+      </div>
     </div>
   `;
 }

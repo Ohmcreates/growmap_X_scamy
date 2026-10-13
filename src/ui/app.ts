@@ -153,6 +153,40 @@ export function initApp() {
     // 3. Render Gauge & Headline
     gaugeMount.innerHTML = renderScoreGauge(result);
 
+    const btnCopyReport = document.getElementById('btnCopyReport') as HTMLButtonElement;
+    if (btnCopyReport) {
+      btnCopyReport.addEventListener('click', async () => {
+        const reportLines = [
+          '🛡️ SCAM SPOTTER ANALYSIS REPORT',
+          `Risk Level: ${result.riskLevel} (${result.score}/100)`,
+          `Headline: ${result.headline}`,
+          result.scamProfile ? `Pattern: ${result.scamProfile.name}` : '',
+          'Warning Signs Detected:',
+          ...result.breakdown.map(
+            (b) => `• ${b.label} (+${b.awardedPoints} pts): ${b.explanation}`
+          ),
+          '',
+          'Immediate Safety Action:',
+          '• Never share OTPs, PINs, or click unverified links.',
+          '• Cybercrime Helpline: 1930 (https://cybercrime.gov.in)',
+        ]
+          .filter(Boolean)
+          .join('\n');
+
+        try {
+          await navigator.clipboard.writeText(reportLines);
+          btnCopyReport.textContent = '✓ Copied!';
+          btnCopyReport.classList.add('copied');
+          setTimeout(() => {
+            btnCopyReport.textContent = '📋 Copy Report';
+            btnCopyReport.classList.remove('copied');
+          }, 2500);
+        } catch {
+          alert('Evidence summary ready to copy:\n\n' + reportLines);
+        }
+      });
+    }
+
     // 4. Render Evidence Highlighter
     const mergedSpans = mergeHighlightSpans(rawText, result.activeEvidence);
     highlightedTextBox.innerHTML = '';
@@ -242,6 +276,14 @@ export function initApp() {
   navDashboardBtn.addEventListener('click', () => {
     dashboardMount.innerHTML = renderDashboardHtml();
     dashboardModal.classList.add('open');
+
+    const btnDashNewScan = document.getElementById('btnDashNewScan');
+    if (btnDashNewScan) {
+      btnDashNewScan.addEventListener('click', () => {
+        dashboardModal.classList.remove('open');
+        textarea.focus();
+      });
+    }
   });
   closeDashboardModal.addEventListener('click', () => dashboardModal.classList.remove('open'));
 
@@ -251,10 +293,76 @@ export function initApp() {
   });
   closeHistoryModal.addEventListener('click', () => historyModal.classList.remove('open'));
 
-  navPricingBtn.addEventListener('click', () => {
-    pricingMount.innerHTML = renderPricingModal();
+  function openPricingModal() {
+    const activeTier = localStorage.getItem('scam_spotter_active_tier') || 'FREE';
+    pricingMount.innerHTML = renderPricingModal(activeTier);
     pricingModal.classList.add('open');
-  });
+    attachPricingListeners();
+  }
+
+  function attachPricingListeners() {
+    const noticeBox = document.getElementById('pricingNoticeBox') as HTMLElement;
+    const tierButtons = pricingMount.querySelectorAll('.tier-btn');
+
+    tierButtons.forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const targetBtn = e.currentTarget as HTMLElement;
+        const tierId = targetBtn.getAttribute('data-tier');
+        const currentActive = localStorage.getItem('scam_spotter_active_tier') || 'FREE';
+
+        if (tierId === 'FREE') {
+          if (currentActive === 'PREMIUM') {
+            localStorage.setItem('scam_spotter_active_tier', 'FREE');
+            openPricingModal();
+            const updatedNotice = document.getElementById('pricingNoticeBox');
+            if (updatedNotice) {
+              updatedNotice.style.display = 'block';
+              updatedNotice.className = 'pricing-notice-box info';
+              updatedNotice.innerHTML =
+                'ℹ️ <strong>Switched to Community Free:</strong> You have returned to the free plan. Offline rule scanning remains active.';
+            }
+          } else {
+            if (noticeBox) {
+              noticeBox.style.display = 'block';
+              noticeBox.className = 'pricing-notice-box info';
+              noticeBox.innerHTML =
+                '✓ <strong>Active Plan:</strong> You are currently on Community / Free. Deterministic local scanning is always 100% free with offline privacy.';
+            }
+          }
+        } else if (tierId === 'PREMIUM') {
+          if (currentActive === 'PREMIUM') {
+            if (noticeBox) {
+              noticeBox.style.display = 'block';
+              noticeBox.className = 'pricing-notice-box success';
+              noticeBox.innerHTML =
+                '✓ <strong>Family Guardian Active:</strong> Guarded AI Second Opinion, 50-entry private scan history, and multi-device alerts are unlocked.';
+            }
+          } else {
+            localStorage.setItem('scam_spotter_active_tier', 'PREMIUM');
+            openPricingModal();
+            const updatedNotice = document.getElementById('pricingNoticeBox');
+            if (updatedNotice) {
+              updatedNotice.style.display = 'block';
+              updatedNotice.className = 'pricing-notice-box success';
+              updatedNotice.innerHTML =
+                '🎉 <strong>Welcome to Family Guardian! (₹99/mo)</strong> Upgrade simulated successfully. AI Second Opinion, unlimited scan retention, and priority multi-device fraud protection are now active.';
+            }
+          }
+        } else if (tierId === 'ENTERPRISE') {
+          if (noticeBox) {
+            noticeBox.style.display = 'block';
+            noticeBox.className = 'pricing-notice-box info';
+            noticeBox.innerHTML =
+              '🏢 <strong>FinTech Institutional API:</strong> Contacting enterprise team. You can also reach our team directly at <code>sales@scamspotter.org</code>.';
+          }
+          window.location.href =
+            'mailto:sales@scamspotter.org?subject=Scam%20Spotter%20FinTech%20API%20Inquiry&body=Hi%20Scam%20Spotter%20Team%2C%0A%0AWe%20are%20interested%20in%20high-volume%20fraud%20scoring%20and%20API%20integration.';
+        }
+      });
+    });
+  }
+
+  navPricingBtn.addEventListener('click', openPricingModal);
   closePricingModal.addEventListener('click', () => pricingModal.classList.remove('open'));
 
   navReportBtn.addEventListener('click', () => {
@@ -269,6 +377,15 @@ export function initApp() {
     modal.addEventListener('click', (e) => {
       if (e.target === modal) modal.classList.remove('open');
     });
+  });
+
+  // ESC key to close all modals
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      [dashboardModal, historyModal, pricingModal, reportModal].forEach((m) =>
+        m.classList.remove('open')
+      );
+    }
   });
 
   // OCR Processing flow
@@ -336,8 +453,8 @@ export function initApp() {
     historyListMount.innerHTML = list
       .map(
         (item) => `
-      <div class="history-item-row" data-id="${item.id}">
-        <div>
+      <div class="history-item-row" data-id="${item.id}" title="Click to load this message into scanner">
+        <div style="flex-grow: 1; margin-right: 12px;">
           <div class="history-item-preview">${item.preview}</div>
           <div class="history-item-meta">
             ${new Date(item.createdAt).toLocaleDateString()} ${new Date(item.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} • 
@@ -347,15 +464,46 @@ export function initApp() {
             ${item.scamProfileName ? `• ${item.scamProfileName}` : ''}
           </div>
         </div>
-        <button class="btn-secondary btn-delete-history" data-id="${item.id}" style="min-height: 32px; padding: 4px 8px; font-size: 0.75rem;">
-          Delete
-        </button>
+        <div class="history-item-actions">
+          <button class="btn-primary btn-load-history" data-id="${item.id}" type="button" style="min-height: 32px; padding: 4px 10px; font-size: 0.75rem;">
+            Load
+          </button>
+          <button class="btn-secondary btn-delete-history" data-id="${item.id}" type="button" style="min-height: 32px; padding: 4px 8px; font-size: 0.75rem;">
+            Delete
+          </button>
+        </div>
       </div>
     `
       )
       .join('');
 
-    // Attach delete listeners
+    function loadHistoryItem(id: string | null) {
+      if (!id) return;
+      const item = list.find((x) => x.id === id);
+      if (item) {
+        textarea.value = item.preview;
+        updateCharCount();
+        historyModal.classList.remove('open');
+        runAnalysis();
+      }
+    }
+
+    // Attach load & delete listeners
+    document.querySelectorAll('.btn-load-history').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const id = (btn as HTMLElement).getAttribute('data-id');
+        loadHistoryItem(id);
+      });
+    });
+
+    document.querySelectorAll('.history-item-row').forEach((row) => {
+      row.addEventListener('click', () => {
+        const id = (row as HTMLElement).getAttribute('data-id');
+        loadHistoryItem(id);
+      });
+    });
+
     document.querySelectorAll('.btn-delete-history').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
