@@ -1,8 +1,37 @@
+import jsQR from 'jsqr';
+
+export interface DecodedQrResult {
+  data: string;
+  isUpi: boolean;
+  isUrl: boolean;
+}
+
+export function decodeQrFromImageData(
+  data: Uint8ClampedArray,
+  width: number,
+  height: number
+): DecodedQrResult | null {
+  try {
+    const code = jsQR(data, width, height);
+    if (!code || !code.data) return null;
+
+    const raw = code.data.trim();
+    return {
+      data: raw,
+      isUpi: raw.toLowerCase().startsWith('upi://'),
+      isUrl: /^https?:\/\//i.test(raw),
+    };
+  } catch {
+    return null;
+  }
+}
+
 export interface OcrResult {
   text: string;
   confidence: number;
   lowConfidence: boolean;
   notice?: string;
+  qrPayload?: string;
   words: { text: string; confidence: number }[];
 }
 
@@ -115,9 +144,23 @@ export class OcrService {
       canvas.width = imageSource.width * scale;
       canvas.height = imageSource.height * scale;
 
+      let qrPayload: string | undefined;
+
       const ctx = canvas.getContext('2d');
       if (ctx) {
         ctx.drawImage(imageSource, 0, 0, canvas.width, canvas.height);
+
+        // Attempt QR code decoding prior to destructive thresholding
+        const rawImgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const qrResult = decodeQrFromImageData(
+          rawImgData.data,
+          rawImgData.width,
+          rawImgData.height
+        );
+        if (qrResult) {
+          qrPayload = qrResult.data;
+        }
+
         preprocessCanvas(canvas, { contrast: 1.1, threshold: 130 });
       }
 
@@ -130,7 +173,9 @@ export class OcrService {
 
       const confCheck = evaluateOcrConfidence(cleanedText, avgConfidence);
 
-      const dataWithWords = ret.data as unknown as { words?: { text: string; confidence: number }[] };
+      const dataWithWords = ret.data as unknown as {
+        words?: { text: string; confidence: number }[];
+      };
       const words = (dataWithWords.words || []).map((w) => ({
         text: w.text,
         confidence: w.confidence,
@@ -142,11 +187,26 @@ export class OcrService {
       canvas.width = 0;
       canvas.height = 0;
 
+      let finalText = cleanedText;
+      let finalConfidence = avgConfidence;
+      let finalLowConfidence = confCheck.lowConfidence;
+      let finalNotice = confCheck.notice;
+
+      if (qrPayload) {
+        finalText = `[Decoded QR Code Destination]: ${qrPayload}${
+          cleanedText ? '\n\n' + cleanedText : ''
+        }`;
+        finalConfidence = 99; // Reed-Solomon guaranteed checksum
+        finalLowConfidence = false;
+        finalNotice = undefined;
+      }
+
       return {
-        text: cleanedText,
-        confidence: avgConfidence,
-        lowConfidence: confCheck.lowConfidence,
-        notice: confCheck.notice,
+        text: finalText,
+        confidence: finalConfidence,
+        lowConfidence: finalLowConfidence,
+        notice: finalNotice,
+        qrPayload,
         words,
       };
     } finally {

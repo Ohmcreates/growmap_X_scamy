@@ -402,12 +402,16 @@ export function initApp() {
       textarea.value = ocrResult.text;
       updateCharCount();
 
-      if (ocrResult.lowConfidence && ocrResult.notice) {
+      if (ocrResult.qrPayload) {
+        ocrStatusNotice.className = 'ocr-status-notice ocr-success';
+        ocrStatusNotice.innerHTML = `✓ <strong>QR Code Decoded:</strong> Extracted embedded target. Analyzing for fraud signs...`;
+        runAnalysis();
+      } else if (ocrResult.lowConfidence && ocrResult.notice) {
         ocrStatusNotice.className = 'ocr-status-notice ocr-warning';
         ocrStatusNotice.innerHTML = `⚠️ ${ocrResult.notice}`;
       } else {
         ocrStatusNotice.className = 'ocr-status-notice ocr-success';
-        ocrStatusNotice.innerHTML = `✓ Text extracted (${Math.round(ocrResult.confidence)}% confidence). Please review and click Analyze.`;
+        ocrStatusNotice.innerHTML = `✓ Text extracted (${Math.round(ocrResult.confidence)}% confidence). Click 'Analyze Message' to scan.`;
       }
     } catch (err) {
       console.error('OCR failed:', err);
