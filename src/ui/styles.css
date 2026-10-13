@@ -172,7 +172,6 @@ body.theme-dark .apk-inspector-card,
 body.theme-dark .vt-inspector-card,
 body.theme-dark .ncii-inspector-card,
 body.theme-dark .confusion-matrix-box,
-body.theme-dark .warning-sign-row,
 body.theme-dark .threat-indicator-row,
 body.theme-dark .ncii-emergency-section {
   background-color: #111827;
@@ -182,10 +181,174 @@ body.theme-dark .ncii-emergency-section {
 body.theme-dark .ncii-submetric-box,
 body.theme-dark .vt-vendor-item,
 body.theme-dark .vt-hash-row,
-body.theme-dark .ai-output-box,
-body.theme-dark .assistant-response-area {
+body.theme-dark .ai-output-box {
   background-color: #1e293b;
   border-color: #334155;
+}
+
+/* Original Message & Highlights in Dark Mode */
+body.theme-dark .original-message-section {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+}
+
+body.theme-dark .highlighted-display-box {
+  color: #f8fafc !important;
+}
+
+body.theme-dark .highlight-span.cat-credential {
+  background-color: #581c25 !important;
+  color: #fecdd3 !important;
+  border: 1px solid #9f1239 !important;
+}
+
+body.theme-dark .highlight-span.cat-link,
+body.theme-dark .highlight-span.cat-threat-intel {
+  background-color: #54220b !important;
+  color: #fed7aa !important;
+  border: 1px solid #ea580c !important;
+}
+
+body.theme-dark .highlight-span.cat-pressure {
+  background-color: #4a2808 !important;
+  color: #fef08a !important;
+  border: 1px solid #ca8a04 !important;
+}
+
+body.theme-dark .highlight-span.cat-identity {
+  background-color: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #475569 !important;
+}
+
+/* Warning Signs Table in Dark Mode */
+body.theme-dark .warning-signs-section {
+  border-color: #334155 !important;
+}
+
+body.theme-dark .warning-sign-row {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.theme-dark .sign-label {
+  color: #f8fafc !important;
+}
+
+body.theme-dark .sign-evidence-quote {
+  color: #94a3b8 !important;
+}
+
+body.theme-dark .sign-points-badge {
+  background-color: #45121b !important;
+  color: #fca5a5 !important;
+  border-color: #7f1d1d !important;
+}
+
+body.theme-dark .sign-points-badge.capped {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+  border-color: #334155 !important;
+}
+
+/* Unmatched Checks Drawers in Dark Mode */
+body.theme-dark .unmatched-mount-area details {
+  background-color: #0f172a !important;
+  border-color: #334155 !important;
+  color: #f8fafc !important;
+}
+
+body.theme-dark .unmatched-mount-area summary {
+  color: #94a3b8 !important;
+}
+
+body.theme-dark .unmatched-item {
+  color: #e2e8f0 !important;
+}
+
+body.theme-dark .unmatched-check {
+  color: #22c55e !important;
+}
+
+body.theme-dark .unmatched-category {
+  color: #94a3b8 !important;
+}
+
+/* AI Safety Assistant in Dark Mode */
+body.theme-dark .ai-safety-assistant-card {
+  background-color: #111827 !important;
+  border-color: #1f2937 !important;
+}
+
+body.theme-dark .assistant-response-area {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+body.theme-dark .btn-send-assistant {
+  background-color: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+/* Feedback Bar in Dark Mode */
+body.theme-dark .model-feedback-bar {
+  background-color: #111827 !important;
+  border-color: #334155 !important;
+}
+
+body.theme-dark .feedback-label {
+  color: #94a3b8 !important;
+}
+
+body.theme-dark .btn-feedback {
+  background-color: #1e293b !important;
+  color: #f8fafc !important;
+  border-color: #334155 !important;
+}
+
+body.theme-dark .btn-feedback:hover {
+  background-color: #263345 !important;
+  border-color: #475569 !important;
+}
+
+body.theme-dark .btn-feedback-eval {
+  color: #f87171 !important;
+}
+
+/* Score Donut & Widgets in Dark Mode */
+body.theme-dark .donut-track {
+  stroke: #1f2937 !important;
+}
+
+body.theme-dark .donut-value-center .gauge-big-num {
+  color: #f8fafc !important;
+}
+
+body.theme-dark .donut-value-center .gauge-denom {
+  color: #94a3b8 !important;
+}
+
+body.theme-dark .safe-step-item {
+  color: #e2e8f0 !important;
+}
+
+body.theme-dark .safe-step-item strong {
+  color: #f8fafc !important;
+}
+
+body.theme-dark .why-matters-body {
+  color: #cbd5e1 !important;
+}
+
+body.theme-dark .risk-summary-copy {
+  color: #cbd5e1 !important;
+}
+
+body.theme-dark .section-label,
+body.theme-dark .heading-left {
+  color: #94a3b8 !important;
 }
 
 *, *::before, *::after {
@@ -1081,7 +1244,7 @@ code, pre, .font-mono {
 }
 
 .original-message-section {
-  background-color: #f8fafc;
+  background-color: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 14px 16px;
@@ -1192,7 +1355,8 @@ code, pre, .font-mono {
   align-items: center;
   justify-content: space-between;
   padding: 10px 14px;
-  background-color: #ffffff;
+  background-color: var(--bg-card);
+  color: var(--text-main);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   font-size: 0.88rem;
@@ -1247,11 +1411,12 @@ code, pre, .font-mono {
 
 /* Collapsible Drawers */
 .unmatched-mount-area details {
-  background: #f8fafc;
+  background-color: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 10px 14px;
   font-size: 0.85rem;
+  color: var(--text-main);
 }
 
 .unmatched-mount-area summary {
@@ -1260,8 +1425,34 @@ code, pre, .font-mono {
   color: var(--text-muted);
 }
 
+.unmatched-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.unmatched-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-main);
+}
+
+.unmatched-check {
+  color: #16a34a;
+  font-weight: 700;
+}
+
+.unmatched-category {
+  color: var(--text-muted);
+  font-size: 0.76rem;
+}
+
 .ai-advisory-section {
-  background: #f8fafc;
+  background-color: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 12px 14px;
@@ -1854,7 +2045,7 @@ code, pre, .font-mono {
    ========================================================================== */
 
 .ai-safety-assistant-card {
-  background: #f8fafc;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: 18px;
@@ -1873,6 +2064,7 @@ code, pre, .font-mono {
   font-size: 0.98rem;
   font-weight: 700;
   margin-top: 2px;
+  color: var(--text-main);
 }
 
 .assistant-badge {
@@ -1903,7 +2095,7 @@ code, pre, .font-mono {
 }
 
 .prompt-chip {
-  background: #ffffff;
+  background: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   padding: 6px 12px;
   border-radius: var(--radius-pill);
@@ -1921,7 +2113,7 @@ code, pre, .font-mono {
 }
 
 .assistant-response-area {
-  background: #ffffff;
+  background: var(--bg-card-subtle);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 14px;
@@ -1938,12 +2130,13 @@ code, pre, .font-mono {
 
 .assistant-text-input {
   flex-grow: 1;
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   padding: 8px 12px;
   font-size: 0.85rem;
   font-family: var(--font-body);
+  color: var(--text-main);
 }
 
 .assistant-text-input:focus {
@@ -1978,7 +2171,7 @@ code, pre, .font-mono {
   flex-wrap: wrap;
   gap: 10px;
   padding: 12px 14px;
-  background: #ffffff;
+  background: var(--bg-card);
   border: 1px dashed var(--border-color);
   border-radius: var(--radius-md);
 }
