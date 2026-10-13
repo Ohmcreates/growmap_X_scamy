@@ -311,10 +311,19 @@ export function initApp() {
   // --------------------------------------------------------------------------
   // Theme Toggle (Light / Dark)
   // --------------------------------------------------------------------------
+  const savedTheme = localStorage.getItem('scamy_theme');
+  if (savedTheme === 'dark') {
+    document.body.classList.add('theme-dark');
+    if (btnThemeToggle) btnThemeToggle.textContent = '🌙';
+  }
+
   btnThemeToggle?.addEventListener('click', () => {
     document.body.classList.toggle('theme-dark');
     const isDark = document.body.classList.contains('theme-dark');
     btnThemeToggle.textContent = isDark ? '🌙' : '☀️';
+    try {
+      localStorage.setItem('scamy_theme', isDark ? 'dark' : 'light');
+    } catch {}
   });
 
   // --------------------------------------------------------------------------
@@ -677,7 +686,7 @@ export function initApp() {
 
   function updateAnalysisCard(rawText: string, result: ScanResult) {
     // Feature 3: Specialized Scam Classifiers Attribution
-    if (result.scamProfile) {
+    if (result.scamProfile && result.score > 0) {
       scamArchetypeBanner.style.display = 'flex';
       archetypeName.textContent = result.scamProfile.name;
       archetypeDesc.textContent = result.scamProfile.description;

@@ -93,7 +93,7 @@ export const SCAM_PROFILES: ScamProfile[] = [
     description: 'Phishing attempts mimicking reputable banks claiming account blockage unless KYC is completed via an unverified link.',
     keySignals: ['KYC expired', 'Account will be blocked', 'Share OTP for verification'],
     patterns: [
-      /\b(?:kyc\s+expired|account\s+will\s+be\s+blocked|update\s+kyc|sbi|hdfc|icici|pan\s+card\s+link)\b/i,
+      /\b(?:kyc\s+expired|account\s+will\s+be\s+blocked|update\s+kyc|pan\s+card\s+link|(?:sbi|hdfc|icici|pnb|axis|bank)[\s\S]{0,40}(?:kyc|blocked|block|suspend|pan\s*link))\b/i,
     ],
     advicePayload: [
       'Banks will never send SMS links to update KYC. Visit your official bank branch or use the verified app.',
@@ -106,6 +106,10 @@ export function identifyScamProfile(
   text: string,
   firedRuleIds: Set<string>
 ): ScamProfile | undefined {
+  if (firedRuleIds.size === 0) {
+    return undefined;
+  }
+
   let bestProfile: ScamProfile | undefined;
   let maxMatches = 0;
 
