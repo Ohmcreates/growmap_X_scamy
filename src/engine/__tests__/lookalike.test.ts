@@ -46,16 +46,16 @@ describe('Scam Spotter — Phase 3 URL & Lookalike Threat Intelligence', () => {
     expect(urls.every((u) => !u.isSuspicious)).toBe(true);
   });
 
-  it('enforces floor rule (min 60 / High) when forced floor option is passed', () => {
-    // Normal message with only a suspicious link would score 25 (Low)
+  it('enforces floor rule (min 45 / High) when forced floor option is passed', () => {
+    // Normal message with only a suspicious link scores 25 (Medium in 21-44 zone)
     const text = 'Check this link: http://sbi-kyc.xyz';
     const normalResult = analyzeMessage(text);
     expect(normalResult.score).toBe(25);
-    expect(normalResult.riskLevel).toBe('LOW');
+    expect(normalResult.riskLevel).toBe('MEDIUM');
 
     // With floor rule active (verified threat feed indicator match):
     const floorResult = analyzeMessage(text, DEFAULT_CONFIG, { forceFloorHigh: true });
-    expect(floorResult.score).toBe(60);
+    expect(floorResult.score).toBe(45);
     expect(floorResult.riskLevel).toBe('HIGH');
     expect(floorResult.floorApplied).toBe(true);
   });

@@ -16,30 +16,14 @@
   </head>
   <body class="theme-light">
     <!-- ==========================================================================
-         SIGNATURE INTERACTIVE MAGNIFYING LENS OVERLAY (METIC.STUDIO INSPIRED)
-         ========================================================================== -->
-    <div id="meticLensOverlayRoot" class="metic-lens-overlay-root" aria-hidden="true">
-      <canvas id="meticLensCanvas" class="metic-lens-inspection-canvas"></canvas>
-      <div id="meticLensCircle" class="metic-lens-circle"></div>
-      <div id="meticLensHudTag" class="metic-lens-hud-tag">
-        <span class="hud-tag-el">&lt;INSPECT&gt;</span>
-        <span>0 × 0px</span>
-      </div>
-    </div>
-
-    <!-- Floating Technical Inspector Hint / Shortcut -->
-    <div id="meticFloatingInspectHint" class="metic-floating-inspect-hint" role="button" tabindex="0" title="Click or press [I] to toggle technical inspection layer">
-      <span>Hold pointer to inspect</span>
-      <span class="metic-hint-key">[I]</span>
-    </div>
-
-    <!-- ==========================================================================
          DRAGGABLE PHYSICAL MAGNIFYING GLASS & MALWARE X-RAY (USER ASSET)
+         Always-on draggable forensic lens with optical zoom & dynamic tri-color glow
          ========================================================================== -->
     <div id="draggableMagnifier" class="draggable-magnifier" role="region" aria-label="Draggable Malware Magnifying Glass">
       <div id="magnifierDragHint" class="magnifier-drag-hint">✋ Drag glass to scan for malware</div>
       <div id="magnifierLensViewport" class="magnifier-viewport">
-        <div id="magnifierHudContent"></div>
+        <div id="magnifierGlowRing" class="magnifier-glow-ring glow-red"></div>
+        <div id="magnifierHudContent" class="magnifier-hud-content"></div>
       </div>
       <img src="/assets/magnifying_glass.png" alt="Forensic Magnifying Glass" class="magnifier-frame-image" draggable="false" />
     </div>
@@ -53,6 +37,7 @@
       <button id="btnGlideToHero" class="dock-btn active" type="button" title="Glide glass over Hero scam sample">📍 Scan Hero</button>
       <button id="btnGlideToDemo" class="dock-btn" type="button" title="Glide glass over Live Demo">📍 Scan Demo</button>
       <button id="btnGlideToLinks" class="dock-btn" type="button" title="Glide glass over Link Security">📍 Scan Links</button>
+      <button id="btnGlideToWorkspace" class="dock-btn" type="button" title="Glide glass over Scanner Workspace">💻 Scan Workspace</button>
       <button id="btnToggleMagnifier" class="dock-btn" type="button" title="Hide or show the magnifying glass">👁️ Toggle Glass</button>
     </div>
 
@@ -85,10 +70,6 @@
             </nav>
 
             <div class="metic-header-actions">
-              <button id="btnToggleInspect" class="metic-inspect-toggle" type="button" title="Toggle technical layout inspection overlay">
-                <span class="inspect-dot"></span>
-                <span>Inspect [I]</span>
-              </button>
               <a href="#login" class="metic-btn-ghost" data-route-to="login">Sign In</a>
               <a href="#login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
               <button class="metic-menu-toggle" type="button" aria-label="Toggle Navigation Menu">☰</button>
@@ -329,7 +310,7 @@
                 <p class="feature-description">
                   Rule breakdowns with exact point weights (+20, +15, +40), group caps, and safety floors. No proprietary black boxes; every point is audited and traceable.
                 </p>
-                <div class="feature-meta">RANGE: 0 TO 100 // FLOORS: VERIFIED THREAT 60+</div>
+                <div class="feature-meta">RANGE: 0 TO 100 // FLOORS: VERIFIED THREAT 45+</div>
               </div>
 
               <!-- Feature 6 -->
@@ -1846,7 +1827,7 @@
           </div>
           <div class="learn-step-card">
             <strong>3. Floor Rules</strong>
-            <p>Verified phishing URLs and known malware domains lock the minimum score to High (60+) immediately.</p>
+            <p>Verified phishing URLs and known malware domains lock the minimum score to High (45+) immediately.</p>
           </div>
         </div>
       </div>

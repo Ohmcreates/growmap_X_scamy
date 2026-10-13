@@ -619,9 +619,9 @@ export function initApp() {
     HistoryService.saveScan(rawText, result);
 
     // 3. Trigger 5-10 Second Full-Screen Blinking Alarm
-    if (result.score >= 60) {
+    if (result.score >= 45) {
       triggerScreenAlarm('RED', result.score, 7);
-    } else if (result.score >= 30) {
+    } else if (result.score >= 21) {
       triggerScreenAlarm('YELLOW', result.score, 7);
     } else {
       triggerScreenAlarm('GREEN', result.score, 7);
@@ -1467,9 +1467,9 @@ export function initApp() {
     HistoryService.saveScan(`[APK Scan] ${report.appName} (${report.fileName})`, fakeScanResult);
 
     // 9. Trigger Full-Screen Blinking Alarm (5–10s, 7s default)
-    if (report.overallScore >= 60) {
+    if (report.overallScore >= 45) {
       triggerScreenAlarm('RED', report.overallScore, 7);
-    } else if (report.overallScore >= 30) {
+    } else if (report.overallScore >= 21) {
       triggerScreenAlarm('YELLOW', report.overallScore, 7);
     } else {
       triggerScreenAlarm('GREEN', report.overallScore, 7);
@@ -1734,7 +1734,7 @@ export function initApp() {
       allEvidence: [],
       activeEvidence: [],
       negatedEvidence: [],
-      floorApplied: calculatedScore >= 60,
+      floorApplied: calculatedScore >= 45,
       metadata: {
         characterCount: report.fileSizeBytes,
         scannedAt: new Date().toISOString(),
@@ -1750,9 +1750,9 @@ export function initApp() {
     HistoryService.saveScan(`[VirusTotal] ${report.fileName}`, fakeScanResult);
 
     // Trigger Blinking Alarm Overlay (7s)
-    if (calculatedScore >= 60) {
+    if (calculatedScore >= 45) {
       triggerScreenAlarm('RED', calculatedScore, 7);
-    } else if (calculatedScore >= 30) {
+    } else if (calculatedScore >= 21) {
       triggerScreenAlarm('YELLOW', calculatedScore, 7);
     } else {
       triggerScreenAlarm('GREEN', calculatedScore, 7);
@@ -2104,7 +2104,7 @@ export function initApp() {
     const fakeScanResult: ScanResult = {
       score: overallRiskScore,
       rawScore: overallRiskScore,
-      riskLevel: overallRiskScore >= 60 ? 'HIGH' : overallRiskScore >= 30 ? 'MEDIUM' : 'LOW',
+      riskLevel: overallRiskScore >= 45 ? 'HIGH' : overallRiskScore >= 21 ? 'MEDIUM' : 'LOW',
       headline: report.overallSummary,
       summary: report.overallSummary,
       advice: report.explicitScreening.isExplicitDetected
@@ -2149,7 +2149,7 @@ export function initApp() {
       allEvidence: [],
       activeEvidence: [],
       negatedEvidence: [],
-      floorApplied: overallRiskScore >= 60,
+      floorApplied: overallRiskScore >= 45,
       metadata: {
         characterCount: report.fileSizeBytes,
         scannedAt: new Date().toISOString(),
@@ -2191,9 +2191,9 @@ export function initApp() {
     HistoryService.saveScan(`[NCII Forensic Shield] ${report.fileName}`, fakeScanResult);
 
     // Trigger full-screen blinking alarm (7s)
-    if (overallRiskScore >= 60) {
+    if (overallRiskScore >= 45) {
       triggerScreenAlarm('RED', overallRiskScore, 7);
-    } else if (overallRiskScore >= 30) {
+    } else if (overallRiskScore >= 21) {
       triggerScreenAlarm('YELLOW', overallRiskScore, 7);
     } else {
       triggerScreenAlarm('GREEN', overallRiskScore, 7);

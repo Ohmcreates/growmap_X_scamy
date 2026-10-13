@@ -380,12 +380,12 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
   let verdict = 'No Strong Warning Signs Detected';
   let summary = 'This web address does not match known threat signatures, but always exercise caution before entering passwords.';
 
-  if (finalScore >= 60) {
+  if (finalScore >= 45) {
     riskLevel = 'HIGH';
     classification = 'SCAM_DETECTED';
     verdict = 'High-Risk Scam / Phishing Website';
     summary = `Multiple high-severity warning signs found. This domain appears designed to impersonate brands or harvest credentials.`;
-  } else if (finalScore >= 30) {
+  } else if (finalScore >= 21) {
     riskLevel = 'MEDIUM';
     classification = 'SUSPICIOUS_DETECTED';
     verdict = 'Suspicious Web Address';

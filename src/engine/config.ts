@@ -292,9 +292,9 @@ export const DEFAULT_CONFIG: EngineConfig = {
     bait: 15,
   },
   thresholds: {
-    lowMax: 29,
-    mediumMax: 59,
-    highMin: 60,
+    lowMax: 20,
+    mediumMax: 44,
+    highMin: 45,
   },
   officialDomainAllowlist: DEFAULT_OFFICIAL_DOMAINS,
   maxScore: 100,

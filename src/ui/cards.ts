@@ -44,7 +44,7 @@ export function renderScoreGauge(result: ScanResult): string {
         result.floorApplied
           ? `
         <div class="floor-rule-notice">
-          <strong>⚠️ Floor Rule Applied:</strong> Verified malicious indicator detected. Minimum score locked to 60 (High Risk).
+          <strong>⚠️ Floor Rule Applied:</strong> Verified malicious indicator detected. Minimum score locked to 45 (High Risk).
         </div>
       `
           : ''

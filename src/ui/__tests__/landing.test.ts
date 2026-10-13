@@ -42,4 +42,54 @@ describe('Scam Spotter — Editorial Landing Page & Components', () => {
     expect(result.score).toBeLessThan(30);
     expect(result.riskLevel).toBe('LOW');
   });
+
+  describe('Draggable Forensic Magnifier — Tri-Color Glow & Optical Zoom', () => {
+    it('evaluates High Risk SBI KYC scam text and triggers RED GLOW classification', async () => {
+      const { evaluateLensThreat } = await import('../magnifier.js');
+      const analysis = evaluateLensThreat(DEMO_SAMPLES.sbiKyc, true);
+
+      expect(analysis.riskLevel).toBe('HIGH');
+      expect(analysis.score).toBeGreaterThanOrEqual(90);
+      expect(analysis.signature).toContain('TROJAN.BANKER');
+      expect(analysis.c2Server).toContain('UNAPPROVED_C2');
+      expect(analysis.breakdown.length).toBeGreaterThan(0);
+    });
+
+    it('evaluates E-Challan fine spoof and triggers RED GLOW with spoof signature', async () => {
+      const { evaluateLensThreat } = await import('../magnifier.js');
+      const analysis = evaluateLensThreat('URGENT: Traffic Police Challan pending! Pay immediately at http://echallan.redirectme.net');
+
+      expect(analysis.riskLevel).toBe('HIGH');
+      expect(analysis.signature).toBe('EXPLOIT.MPARIVAHAN.SPOOF');
+      expect(analysis.c2Server).toContain('echallan.redirectme.net');
+    });
+
+    it('evaluates unverified links / medium patterns and triggers YELLOW GLOW', async () => {
+      const { evaluateLensThreat } = await import('../magnifier.js');
+      const analysis = evaluateLensThreat('Please update and verify your profile at external website', true);
+
+      expect(analysis.riskLevel).toBe('MEDIUM');
+      expect(analysis.signature).toBe('HEURISTIC.LOOKALIKE.UNVERIFIED');
+    });
+
+    it('evaluates benign official notifications and triggers GREEN GLOW', async () => {
+      const { evaluateLensThreat } = await import('../magnifier.js');
+      const analysis = evaluateLensThreat(DEMO_SAMPLES.legitimate, false);
+
+      expect(analysis.riskLevel).toBe('LOW');
+      expect(analysis.hasThreat).toBe(false);
+      expect(analysis.signature).toBe('0 / 16 MALWARE VECTORS FIRED');
+    });
+
+    it('generates optical zoom snippet with highlighted scam marks', async () => {
+      const { generateZoomSnippet } = await import('../magnifier.js');
+      const highSnippet = generateZoomSnippet('Your SBI account blocked today! Click http://sbi-update.xyz', 'HIGH');
+
+      expect(highSnippet).toContain('zoom-mark-red');
+      expect(highSnippet).toContain('blocked today');
+
+      const cleanSnippet = generateZoomSnippet('Official and safe transaction verified', 'LOW');
+      expect(cleanSnippet).toContain('zoom-mark-green');
+    });
+  });
 });

@@ -89,9 +89,9 @@ export interface EngineConfig {
   rules: PatternRule[];
   groupCaps: Partial<Record<RuleGroup, number>>;
   thresholds: {
-    lowMax: number;    // default 29
-    mediumMax: number; // default 59
-    highMin: number;   // default 60
+    lowMax: number;    // default 20
+    mediumMax: number; // default 44
+    highMin: number;   // default 45
   };
   officialDomainAllowlist: string[];
   maxScore: number;    // 100

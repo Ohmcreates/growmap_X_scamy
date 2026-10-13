@@ -460,7 +460,7 @@ code, pre, .font-mono {
   background: rgba(255, 255, 255, 0.4);
 }
 
-/* High Risk: Full Screen Red Blinking (60+) */
+/* High Risk: Full Screen Red Blinking (45+) */
 .screen-alarm-overlay.alarm-red {
   animation: fullScreenBlinkRed 0.85s infinite ease-in-out;
 }
@@ -470,7 +470,7 @@ code, pre, .font-mono {
   border: 2px solid #fca5a5;
 }
 
-/* Medium Risk: Full Screen Yellow Blinking (30–59) */
+/* Medium Risk: Full Screen Yellow Blinking (21–44) */
 .screen-alarm-overlay.alarm-yellow {
   animation: fullScreenBlinkYellow 0.85s infinite ease-in-out;
 }
@@ -480,7 +480,7 @@ code, pre, .font-mono {
   border: 2px solid #fde68a;
 }
 
-/* Low Risk: Full Screen Green Blinking (0–29) */
+/* Low Risk: Full Screen Green Blinking (0–20) */
 .screen-alarm-overlay.alarm-green {
   animation: fullScreenBlinkGreen 0.85s infinite ease-in-out;
 }

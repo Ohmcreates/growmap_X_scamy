@@ -1,5 +1,4 @@
 import { draggableMagnifier } from './ui/magnifier.js';
-import { meticLens } from './ui/lens.js';
 import { liveDemo } from './ui/liveDemo.js';
 import { progressiveBuild } from './ui/progressiveBuild.js';
 import { router } from './ui/router.js';
@@ -11,9 +10,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // 2. Initialize Draggable Physical Magnifier & Malware X-Ray
   draggableMagnifier.init();
-
-  // 3. Initialize signature technical inspection lens (keyboard [I] & fallback)
-  meticLens.init();
 
   // 3. Initialize progressive page construction section
   progressiveBuild.init();

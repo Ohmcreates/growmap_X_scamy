@@ -76,9 +76,9 @@ export class AiAdvisorService {
     const verifiedSignals = this.verifySubstrings(originalText, signals);
 
     let summary = '';
-    if (existingScore >= 60) {
+    if (existingScore >= 45) {
       summary = 'High probability of social engineering. The syntax mirrors established financial phishing templates.';
-    } else if (existingScore >= 30) {
+    } else if (existingScore >= 21) {
       summary = 'Contains ambiguous coercive phrasing. Induces emotional urgency rather than formal administrative correspondence.';
     } else {
       summary = 'No strong coercion patterns observed in context. Tone aligns with standard transactional communication.';

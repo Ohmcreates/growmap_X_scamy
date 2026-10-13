@@ -3,9 +3,9 @@
  *
  * Implements a transparent magnifying glass with real-time 1.6x optical zoom.
  * The circular lens glow adapts dynamically to the threat level underneath:
- *  - RED GLOW: High Risk Malware & Phishing Coercion (100/100)
- *  - YELLOW GLOW: Medium Risk Warning & Unverified Links (20-49/100)
- *  - GREEN GLOW: Verified Clean / Benign Content (0-19/100)
+ *  - RED GLOW: High Risk Malware & Phishing Coercion (45-100/100)
+ *  - YELLOW GLOW: Medium Risk Warning & Unverified Links (21-44/100)
+ *  - GREEN GLOW: Verified Clean / Benign Content (0-20/100)
  *
  * Works everywhere across the application: Landing Page, Auth View, and Scanner Workspace.
  */
@@ -32,7 +32,6 @@ export class DraggableMagnifier {
   private container: HTMLElement | null = null;
   private viewportEl: HTMLElement | null = null;
   private glowRingEl: HTMLElement | null = null;
-  private zoomMirrorEl: HTMLElement | null = null;
   private hudContentEl: HTMLElement | null = null;
   private hintPill: HTMLElement | null = null;
 
@@ -57,7 +56,6 @@ export class DraggableMagnifier {
     this.container = document.getElementById('draggableMagnifier');
     this.viewportEl = document.getElementById('magnifierLensViewport');
     this.glowRingEl = document.getElementById('magnifierGlowRing');
-    this.zoomMirrorEl = document.getElementById('magnifierZoomMirror');
     this.hudContentEl = document.getElementById('magnifierHudContent');
     this.hintPill = document.getElementById('magnifierDragHint');
 
@@ -292,85 +290,7 @@ export class DraggableMagnifier {
   ): ThreatAnalysisState {
     const trimmed = text.trim();
     const hasLink = el.closest('a') !== null || /https?:\/\/|[a-z0-9-]+\.(xyz|top|ru|live|link)/i.test(trimmed);
-
-    // If text has significant length, analyze with Scam Spotter rules
-    let scanResult: ScanResult | null = null;
-    if (trimmed.length > 8) {
-      scanResult = analyzeMessage(trimmed);
-    }
-
-    const score = scanResult ? scanResult.score : 0;
-
-    // Tier 1: HIGH RISK -> RED GLOW
-    const isHighThreat = score >= 50 || /kyc|otp|blocked|urgent|challan|delivery failed|pay immediately/i.test(trimmed);
-
-    if (isHighThreat) {
-      let signature = 'TROJAN.BANKER / CREDENTIAL_STEALER';
-      let c2Server = '185.220.101.4:8443 (UNAPPROVED_C2)';
-      let payload = 'POST /api/exfiltrate?token=otp_session';
-
-      if (/challan|traffic|police/i.test(trimmed)) {
-        signature = 'EXPLOIT.MPARIVAHAN.SPOOF';
-        c2Server = 'echallan.redirectme.net (DYNAMIC_DNS)';
-        payload = 'GET /pay?fake_fine=2000';
-      } else if (/delivery|package|post/i.test(trimmed)) {
-        signature = 'SMISHING.POSTAL_BAIT.APKVIRUS';
-        c2Server = 'bit.ly/indpst-fee -> cdn.malware.apk';
-        payload = 'INSTALL /system/app/Stealer.apk';
-      }
-
-      const breakdown = scanResult
-        ? scanResult.breakdown.map((b) => `${b.label} (+${b.awardedPoints})`)
-        : ['Fake Urgency (+20)', 'Account Coercion (+15)', 'Suspicious Link (+25)', 'OTP Request (+40)'];
-
-      return {
-        hasThreat: true,
-        score: Math.max(score, 90),
-        riskLevel: 'HIGH',
-        title: 'CRITICAL MALWARE & FRAUD DETECTED',
-        signature,
-        c2Server,
-        payload,
-        breakdown,
-        rawText: trimmed.substring(0, 110),
-        elementTag: `<${tag}>`,
-        dimensions,
-      };
-    }
-
-    // Tier 2: MEDIUM RISK -> YELLOW GLOW
-    const isMediumThreat = (score >= 20 && score < 50) || hasLink || /verify|update|warning|unpaid|action required/i.test(trimmed);
-
-    if (isMediumThreat) {
-      return {
-        hasThreat: true,
-        score: Math.max(score, 35),
-        riskLevel: 'MEDIUM',
-        title: 'SUSPICIOUS PATTERN / UNVERIFIED LINK',
-        signature: 'HEURISTIC.LOOKALIKE.UNVERIFIED',
-        c2Server: 'EXTERNAL_UNVERIFIED_REDIRECTOR',
-        payload: 'UNTRUSTED_PROTOCOL_HANDSHAKE',
-        breakdown: ['Unverified Domain / Shortener', 'External Redirect Pattern'],
-        rawText: trimmed.substring(0, 90),
-        elementTag: `<${tag}>`,
-        dimensions,
-      };
-    }
-
-    // Tier 3: LOW RISK -> GREEN GLOW
-    return {
-      hasThreat: false,
-      score: score,
-      riskLevel: 'LOW',
-      title: 'INTEGRITY VERIFIED: SAFE',
-      signature: '0 / 16 MALWARE VECTORS FIRED',
-      c2Server: 'NONE // CLIENT-SIDE SANDBOX',
-      payload: 'ZERO DATA EXFILTRATION DETECTED',
-      breakdown: ['Zero Pressure Tactics', 'Zero Credential Traps', 'Clean Protocol'],
-      rawText: trimmed.substring(0, 80),
-      elementTag: `<${tag}>`,
-      dimensions,
-    };
+    return evaluateLensThreat(trimmed, hasLink, tag, dimensions);
   }
 
   private hasStateChanged(next: ThreatAnalysisState): boolean {
@@ -521,30 +441,123 @@ export class DraggableMagnifier {
   }
 
   private generateZoomSnippet(raw: string, riskLevel: 'HIGH' | 'MEDIUM' | 'LOW'): string {
-    if (!raw) return '<em>Hovering over empty layout...</em>';
+    return generateZoomSnippet(raw, riskLevel);
+  }
+}
 
-    let snippet = escapeHtml(raw.slice(0, 95));
+export function evaluateLensThreat(
+  text: string,
+  hasLink: boolean = false,
+  tag: string = 'div',
+  dimensions: string = '300 × 120px'
+): ThreatAnalysisState {
+  const trimmed = text.trim();
+  const detectedLink = hasLink || /https?:\/\/|[a-z0-9-]+\.(xyz|top|ru|live|link)/i.test(trimmed);
 
-    if (riskLevel === 'HIGH') {
-      // Highlight scam words in red
-      snippet = snippet.replace(
-        /(blocked today|incomplete KYC|KYC|immediately|enter OTP|OTP|http:\/\/[^\s]+|sbi-kyc-update\.xyz|traffic fine|challan|delivery failed|arrest|power cut)/gi,
-        '<mark class="zoom-mark-red">$1</mark>'
-      );
-    } else if (riskLevel === 'MEDIUM') {
-      snippet = snippet.replace(
-        /(http:\/\/[^\s]+|https:\/\/[^\s]+|verify|update|warning|bit\.ly[^\s]*)/gi,
-        '<mark class="zoom-mark-yellow">$1</mark>'
-      );
-    } else {
-      snippet = snippet.replace(
-        /(official|verified|safe|debited|SBI|protect|privacy)/gi,
-        '<mark class="zoom-mark-green">$1</mark>'
-      );
+  // If text has significant length, analyze with Scam Spotter rules
+  let scanResult: ScanResult | null = null;
+  if (trimmed.length > 8) {
+    scanResult = analyzeMessage(trimmed);
+  }
+
+  const score = scanResult ? scanResult.score : 0;
+
+  // Tier 1: HIGH RISK -> RED GLOW
+  const isHighThreat = score >= 50 || /kyc|otp|blocked|urgent|challan|delivery failed|pay immediately/i.test(trimmed);
+
+  if (isHighThreat) {
+    let signature = 'TROJAN.BANKER / CREDENTIAL_STEALER';
+    let c2Server = '185.220.101.4:8443 (UNAPPROVED_C2)';
+    let payload = 'POST /api/exfiltrate?token=otp_session';
+
+    if (/challan|traffic|police/i.test(trimmed)) {
+      signature = 'EXPLOIT.MPARIVAHAN.SPOOF';
+      c2Server = 'echallan.redirectme.net (DYNAMIC_DNS)';
+      payload = 'GET /pay?fake_fine=2000';
+    } else if (/delivery|package|post/i.test(trimmed)) {
+      signature = 'SMISHING.POSTAL_BAIT.APKVIRUS';
+      c2Server = 'bit.ly/indpst-fee -> cdn.malware.apk';
+      payload = 'INSTALL /system/app/Stealer.apk';
     }
 
-    return snippet;
+    const breakdown = scanResult
+      ? scanResult.breakdown.map((b) => `${b.label} (+${b.awardedPoints})`)
+      : ['Fake Urgency (+20)', 'Account Coercion (+15)', 'Suspicious Link (+25)', 'OTP Request (+40)'];
+
+    return {
+      hasThreat: true,
+      score: Math.max(score, 90),
+      riskLevel: 'HIGH',
+      title: 'CRITICAL MALWARE & FRAUD DETECTED',
+      signature,
+      c2Server,
+      payload,
+      breakdown,
+      rawText: trimmed.substring(0, 110),
+      elementTag: `<${tag}>`,
+      dimensions,
+    };
   }
+
+  // Tier 2: MEDIUM RISK -> YELLOW GLOW
+  const isMediumThreat = (score >= 20 && score < 50) || detectedLink || /verify|update|warning|unpaid|action required/i.test(trimmed);
+
+  if (isMediumThreat) {
+    return {
+      hasThreat: true,
+      score: Math.max(score, 35),
+      riskLevel: 'MEDIUM',
+      title: 'SUSPICIOUS PATTERN / UNVERIFIED LINK',
+      signature: 'HEURISTIC.LOOKALIKE.UNVERIFIED',
+      c2Server: 'EXTERNAL_UNVERIFIED_REDIRECTOR',
+      payload: 'UNTRUSTED_PROTOCOL_HANDSHAKE',
+      breakdown: ['Unverified Domain / Shortener', 'External Redirect Pattern'],
+      rawText: trimmed.substring(0, 90),
+      elementTag: `<${tag}>`,
+      dimensions,
+    };
+  }
+
+  // Tier 3: LOW RISK -> GREEN GLOW
+  return {
+    hasThreat: false,
+    score: score,
+    riskLevel: 'LOW',
+    title: 'INTEGRITY VERIFIED: SAFE',
+    signature: '0 / 16 MALWARE VECTORS FIRED',
+    c2Server: 'NONE // CLIENT-SIDE SANDBOX',
+    payload: 'ZERO DATA EXFILTRATION DETECTED',
+    breakdown: ['Zero Pressure Tactics', 'Zero Credential Traps', 'Clean Protocol'],
+    rawText: trimmed.substring(0, 80),
+    elementTag: `<${tag}>`,
+    dimensions,
+  };
+}
+
+export function generateZoomSnippet(raw: string, riskLevel: 'HIGH' | 'MEDIUM' | 'LOW'): string {
+  if (!raw) return '<em>Hovering over empty layout...</em>';
+
+  let snippet = escapeHtml(raw.slice(0, 95));
+
+  if (riskLevel === 'HIGH') {
+    // Highlight scam words in red
+    snippet = snippet.replace(
+      /(blocked today|incomplete KYC|KYC|immediately|enter OTP|OTP|http:\/\/[^\s]+|sbi-kyc-update\.xyz|traffic fine|challan|delivery failed|arrest|power cut)/gi,
+      '<mark class="zoom-mark-red">$1</mark>'
+    );
+  } else if (riskLevel === 'MEDIUM') {
+    snippet = snippet.replace(
+      /(http:\/\/[^\s]+|https:\/\/[^\s]+|verify|update|warning|bit\.ly[^\s]*)/gi,
+      '<mark class="zoom-mark-yellow">$1</mark>'
+    );
+  } else {
+    snippet = snippet.replace(
+      /(official|verified|safe|debited|SBI|protect|privacy)/gi,
+      '<mark class="zoom-mark-green">$1</mark>'
+    );
+  }
+
+  return snippet;
 }
 
 function escapeHtml(str: string): string {

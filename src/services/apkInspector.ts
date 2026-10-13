@@ -389,12 +389,12 @@ export async function inspectApkFile(
   let verdict: ApkSecurityReport['verdict'] = 'CLEAN_APPLICATION';
   let summary = 'No high-risk trojan or permission hijacking behaviors identified in this APK.';
 
-  if (overallScore >= 67) {
+  if (overallScore >= 45) {
     riskLevel = 'HIGH';
     verdict = 'CRITICAL_MALWARE_RISK';
     summary =
       'CRITICAL THREAT: This APK displays high-severity characteristics of an Android Banking Trojan, RAT, or OTP Interceptor.';
-  } else if (overallScore >= 34) {
+  } else if (overallScore >= 21) {
     riskLevel = 'MEDIUM';
     verdict = 'SUSPICIOUS_RISK';
     summary =
