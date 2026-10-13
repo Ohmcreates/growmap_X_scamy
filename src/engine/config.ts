@@ -38,7 +38,7 @@ export const MASTER_RULES: PatternRule[] = [
     points: 20,
     category: 'Pressure Tactics',
     patterns: [
-      /\b(?:immediately|immediate(?:\s+action|\s+arrest)?|urgent(?:ly)?|within\s+24\s+hours?|within\s+\d+\s+hours?|act\s+now|(?:will\s+)?expires?\s+today|last\s+chance|right\s+now|without\s+delay|tonight)\b/i,
+      /\b(?:immediately|immediate(?:\s+action|\s+arrest)?|urgent(?:ly)?|within\s+24\s+hours?|within\s+\d+\s+hours?|act\s+now|(?:will\s+)?expires?\s+today|last\s+chance|right\s+now|without\s+delay|tonight|legal\s+action|fail(?:ed)?\s+to\s+deliver|package\s+delivery\s+failed)\b/i,
       /\b(?:turant|jaldi|aaj\s+hi|24\s+ghante\s+ke\s+andar|fauran)\b/i,
       /(?:तुरंत|जल्दी|तत्काल|आज\s+ही|२४\s+घंटे|अति\s*शीघ्र)/u,
     ],
@@ -53,7 +53,7 @@ export const MASTER_RULES: PatternRule[] = [
     points: 15,
     category: 'Pressure Tactics',
     patterns: [
-      /\b(?:account\s+will\s+be\s+(?:blocked|suspended|closed|terminated|frozen|deactivated)|kyc\s+(?:has\s+)?expired|kyc\s+pending|sim\s+will\s+be\s+deactivated|illegal\s+sims?|arrest\s+warrant|legal\s+action|electricity\s+power\s+will\s+be\s+disconnected|services?\s+stopped|(?:power|electricity|bijli|gas|connection)\s+(?:cut|disconnected|band))\b/i,
+      /\b(?:account\s+will\s+be\s+(?:blocked|suspended|closed|terminated|frozen|deactivated)|kyc\s+(?:has\s+)?expired|kyc\s+pending|sim\s+will\s+be\s+deactivated|illegal\s+sims?|arrest\s+warrant|electricity\s+power\s+will\s+be\s+disconnected|services?\s+stopped|(?:power|electricity|bijli|gas|connection)\s+(?:cut|disconnected|band))\b/i,
       /\b(?:account\s+(?:band|block|deactivate)\s+ho\s+jayega|sim\s+band\s+hogi|police\s+karwai|(?:bijli|gas|power)\s+(?:connection\s+)?cut\s+ho\s+jayega)\b/i,
       /(?:खाता\s+(?:बंद|ब्लॉक|निलंबित)\s+कर\s+दिया\s+जाएगा)/u,
     ],
@@ -190,6 +190,23 @@ export const MASTER_RULES: PatternRule[] = [
     phase: 2,
   },
   {
+    id: 'CREDENTIAL_OR_FINANCIAL_DEMAND',
+    label: 'Direct Request for Credentials or Financials',
+    group: 'credential',
+    points: 40,
+    category: 'Credential Theft',
+    patterns: [
+      /\b(?:unpaid\s+customs\s+fee|customs\s+fee|shipping\s+fee|redelivery\s+fee|clear\s+dues|refund\s+processing)\b/i,
+      /\b(?:pay|pay\s+within\s+\d+\s+hours?)\b[^\n\r.!?]{0,40}\b(?:customs\s+fee|fee\s+of\s+(?:rs\.?|₹)\s*\d+|₹\s*\d+|rs\.?\s*\d+)\b/i,
+      /\b(?:download\s+app\s+to\s+verify|update\s+kyc|kyc\s+update|verify\s+cvv)\b/i,
+      /\b(?:click\s+to\s+(?:share\s+otp|enter\s+pin|verify\s+cvv|pay\s+fee|customs\s+fee|clear\s+dues|refund\s+processing))\b/i,
+      /\b(?:download\s+apk|install\s+app|anydesk|teamviewer|quicksupport)\b/i,
+    ],
+    explanation: 'Legitimate banks and delivery services will never ask you to share an OTP or PIN, nor will they ask for random small payments via SMS links.',
+    advice: 'Official couriers and banks do not request ad-hoc fee payments or OTPs through text messages.',
+    phase: 1,
+  },
+  {
     id: 'MONEY_REQUEST',
     label: 'Direct Money Transfer Request',
     group: 'payment',
@@ -205,16 +222,22 @@ export const MASTER_RULES: PatternRule[] = [
   },
   {
     id: 'AUTHORITY_IMPERSONATION',
-    label: 'Authority Impersonation',
+    label: 'High-Authority Impersonation',
     group: 'identity',
     points: 15,
     category: 'Identity Verification',
     patterns: [
-      /\b(?:cbi|crime\s+branch|customs\s+department|delhi\s+police|mumbai\s+police|trai(?:\s+alert)?|rbi|income\s+tax\s+department|interpol)\b/i,
+      /\b(?:cbi|crime\s+branch|customs(?:\s+department|\s+office)?|delhi\s+police|mumbai\s+police|traffic\s+police|police|e[\s-]challan|trai(?:\s+alert)?|rbi|income\s+tax(?:\s+department)?|interpol)\b/i,
+      /\b(?:india\s+post|fedex|bluedart|delhivery)\s*:/i,
+      /\b(?:traffic\s+police|delhi\s+police|mumbai\s+police|income\s+tax)\s*:/i,
+      /\b(?:india\s+post|fedex|bluedart|delhivery)\b[^\n\r.!?]{0,30}\b(?:package|parcel|delivery)\b/i,
+      /\b(?:hdfc|sbi|icici|axis\s+bank|pnb)\s+bank\s+account\b/i,
+      /\b(?:sbi|hdfc|icici|axis\s+bank|pnb|amazon|flipkart|airtel|jio|vi)\s+(?:alert|notice|warning|support)\b/i,
+      /\b(?:electricity\s+office|electricity\s+officer|power\s+officer)\b/i,
       /\b(?:digital\s+arrest(?:\s+warrant)?|video\s+call\s+investigation|stay\s+on\s+skype|arrest\s+warrant)\b/i,
     ],
-    explanation: 'Scammers impersonate police, customs, or court officials to intimidate victims into compliance.',
-    advice: 'Government agencies never place citizens under "digital arrest" or conduct interrogations over Skype/WhatsApp.',
+    explanation: 'Scammers pretend to be government agencies or big brands to gain your trust and compliance.',
+    advice: 'Government agencies and brands never demand immediate payments or arrest citizens over SMS links.',
     phase: 1,
   },
   {
@@ -231,6 +254,19 @@ export const MASTER_RULES: PatternRule[] = [
     advice: 'If you did not enter a lottery or apply for a scheme, unexpected winnings are fraudulent.',
     phase: 1,
   },
+  {
+    id: 'CONVERSATIONAL_OPENER',
+    label: 'Unsolicited Conversational Opener',
+    group: 'bait',
+    points: 15,
+    category: 'Bait & Lures',
+    patterns: [
+      /\b(?:hi,?\s+(?:is\s+this|are\s+we\s+still\s+meeting)|are\s+we\s+still\s+meeting|my\s+assistant\s+gave\s+me\s+this\s+number|long\s+time\s+no\s+see|wrong\s+number(?:\s+sorry)?)\b/i,
+    ],
+    explanation: 'Scammers use fake "accidental" texts to start a conversation with you, which eventually leads to investment fraud or manipulation.',
+    advice: 'Ignore the message. Do not reply to correct them, as responding confirms your number is active and opens the door to social engineering.',
+    phase: 1,
+  },
 ];
 
 export const DEFAULT_CONFIG: EngineConfig = {
@@ -240,8 +276,8 @@ export const DEFAULT_CONFIG: EngineConfig = {
     'payment-trick': 30,
     payment: 25,
     link: 40,
-    // Note: 'pressure' is deliberately uncapped (additive) so URGENCY (+20) + ACCOUNT_THREAT (+15)
-    // adds to 35, matching the brief's exact 100/100 SBI KYC demo score!
+    identity: 15,
+    bait: 15,
   },
   thresholds: {
     lowMax: 29,

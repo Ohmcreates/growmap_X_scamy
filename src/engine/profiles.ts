@@ -124,7 +124,17 @@ export function identifyScamProfile(
     if (profile.id === 'KYC_BANKING' && (firedRuleIds.has('ACCOUNT_THREAT') && firedRuleIds.has('OTP_REQUEST'))) {
       score += 4;
     }
-    if (profile.id === 'DIGITAL_ARREST' && firedRuleIds.has('AUTHORITY_IMPERSONATION')) {
+    if (
+      profile.id === 'DIGITAL_ARREST' &&
+      firedRuleIds.has('AUTHORITY_IMPERSONATION') &&
+      /\b(?:digital\s+arrest|cbi|crime\s+branch|customs\s+seizure|narcotics|skype|video\s+call|warrant)\b/i.test(text)
+    ) {
+      score += 5;
+    }
+    if (profile.id === 'UTILITY_DISCONNECTION' && /\b(?:electricity|bijli|power|gas|utility)\b/i.test(text)) {
+      score += 5;
+    }
+    if (profile.id === 'DELIVERY_CUSTOMS' && /\b(?:package|parcel|delivery|courier|fedex|india\s+post|dhl)\b/i.test(text)) {
       score += 5;
     }
 

@@ -1,0 +1,828 @@
+Keyword_Phrase,Category,Risk_Points
+account blocked,Threat/Urgency,20
+account blocked today,Threat/Urgency,20
+account blocked within 24 hours,Threat/Urgency,20
+account blocked immediately,Threat/Urgency,20
+account blocked now,Threat/Urgency,20
+account blocked urgently,Threat/Urgency,20
+account blocked asap,Threat/Urgency,20
+account blocked by tonight,Threat/Urgency,20
+account suspended,Threat/Urgency,20
+account suspended today,Threat/Urgency,20
+account suspended within 24 hours,Threat/Urgency,20
+account suspended immediately,Threat/Urgency,20
+account suspended now,Threat/Urgency,20
+account suspended urgently,Threat/Urgency,20
+account suspended asap,Threat/Urgency,20
+account suspended by tonight,Threat/Urgency,20
+account deactivated,Threat/Urgency,20
+account deactivated today,Threat/Urgency,20
+account deactivated within 24 hours,Threat/Urgency,20
+account deactivated immediately,Threat/Urgency,20
+account deactivated now,Threat/Urgency,20
+account deactivated urgently,Threat/Urgency,20
+account deactivated asap,Threat/Urgency,20
+account deactivated by tonight,Threat/Urgency,20
+account restricted,Threat/Urgency,20
+account restricted today,Threat/Urgency,20
+account restricted within 24 hours,Threat/Urgency,20
+account restricted immediately,Threat/Urgency,20
+account restricted now,Threat/Urgency,20
+account restricted urgently,Threat/Urgency,20
+account restricted asap,Threat/Urgency,20
+account restricted by tonight,Threat/Urgency,20
+account closed,Threat/Urgency,20
+account closed today,Threat/Urgency,20
+account closed within 24 hours,Threat/Urgency,20
+account closed immediately,Threat/Urgency,20
+account closed now,Threat/Urgency,20
+account closed urgently,Threat/Urgency,20
+account closed asap,Threat/Urgency,20
+account closed by tonight,Threat/Urgency,20
+account disabled,Threat/Urgency,20
+account disabled today,Threat/Urgency,20
+account disabled within 24 hours,Threat/Urgency,20
+account disabled immediately,Threat/Urgency,20
+account disabled now,Threat/Urgency,20
+account disabled urgently,Threat/Urgency,20
+account disabled asap,Threat/Urgency,20
+account disabled by tonight,Threat/Urgency,20
+account locked,Threat/Urgency,20
+account locked today,Threat/Urgency,20
+account locked within 24 hours,Threat/Urgency,20
+account locked immediately,Threat/Urgency,20
+account locked now,Threat/Urgency,20
+account locked urgently,Threat/Urgency,20
+account locked asap,Threat/Urgency,20
+account locked by tonight,Threat/Urgency,20
+account expired,Threat/Urgency,20
+account expired today,Threat/Urgency,20
+account expired within 24 hours,Threat/Urgency,20
+account expired immediately,Threat/Urgency,20
+account expired now,Threat/Urgency,20
+account expired urgently,Threat/Urgency,20
+account expired asap,Threat/Urgency,20
+account expired by tonight,Threat/Urgency,20
+card blocked,Threat/Urgency,20
+card blocked today,Threat/Urgency,20
+card blocked within 24 hours,Threat/Urgency,20
+card blocked immediately,Threat/Urgency,20
+card blocked now,Threat/Urgency,20
+card blocked urgently,Threat/Urgency,20
+card blocked asap,Threat/Urgency,20
+card blocked by tonight,Threat/Urgency,20
+card suspended,Threat/Urgency,20
+card suspended today,Threat/Urgency,20
+card suspended within 24 hours,Threat/Urgency,20
+card suspended immediately,Threat/Urgency,20
+card suspended now,Threat/Urgency,20
+card suspended urgently,Threat/Urgency,20
+card suspended asap,Threat/Urgency,20
+card suspended by tonight,Threat/Urgency,20
+card deactivated,Threat/Urgency,20
+card deactivated today,Threat/Urgency,20
+card deactivated within 24 hours,Threat/Urgency,20
+card deactivated immediately,Threat/Urgency,20
+card deactivated now,Threat/Urgency,20
+card deactivated urgently,Threat/Urgency,20
+card deactivated asap,Threat/Urgency,20
+card deactivated by tonight,Threat/Urgency,20
+card restricted,Threat/Urgency,20
+card restricted today,Threat/Urgency,20
+card restricted within 24 hours,Threat/Urgency,20
+card restricted immediately,Threat/Urgency,20
+card restricted now,Threat/Urgency,20
+card restricted urgently,Threat/Urgency,20
+card restricted asap,Threat/Urgency,20
+card restricted by tonight,Threat/Urgency,20
+card closed,Threat/Urgency,20
+card closed today,Threat/Urgency,20
+card closed within 24 hours,Threat/Urgency,20
+card closed immediately,Threat/Urgency,20
+card closed now,Threat/Urgency,20
+card closed urgently,Threat/Urgency,20
+card closed asap,Threat/Urgency,20
+card closed by tonight,Threat/Urgency,20
+card disabled,Threat/Urgency,20
+card disabled today,Threat/Urgency,20
+card disabled within 24 hours,Threat/Urgency,20
+card disabled immediately,Threat/Urgency,20
+card disabled now,Threat/Urgency,20
+card disabled urgently,Threat/Urgency,20
+card disabled asap,Threat/Urgency,20
+card disabled by tonight,Threat/Urgency,20
+card locked,Threat/Urgency,20
+card locked today,Threat/Urgency,20
+card locked within 24 hours,Threat/Urgency,20
+card locked immediately,Threat/Urgency,20
+card locked now,Threat/Urgency,20
+card locked urgently,Threat/Urgency,20
+card locked asap,Threat/Urgency,20
+card locked by tonight,Threat/Urgency,20
+card expired,Threat/Urgency,20
+card expired today,Threat/Urgency,20
+card expired within 24 hours,Threat/Urgency,20
+card expired immediately,Threat/Urgency,20
+card expired now,Threat/Urgency,20
+card expired urgently,Threat/Urgency,20
+card expired asap,Threat/Urgency,20
+card expired by tonight,Threat/Urgency,20
+upi blocked,Threat/Urgency,20
+upi blocked today,Threat/Urgency,20
+upi blocked within 24 hours,Threat/Urgency,20
+upi blocked immediately,Threat/Urgency,20
+upi blocked now,Threat/Urgency,20
+upi blocked urgently,Threat/Urgency,20
+upi blocked asap,Threat/Urgency,20
+upi blocked by tonight,Threat/Urgency,20
+upi suspended,Threat/Urgency,20
+upi suspended today,Threat/Urgency,20
+upi suspended within 24 hours,Threat/Urgency,20
+upi suspended immediately,Threat/Urgency,20
+upi suspended now,Threat/Urgency,20
+upi suspended urgently,Threat/Urgency,20
+upi suspended asap,Threat/Urgency,20
+upi suspended by tonight,Threat/Urgency,20
+upi deactivated,Threat/Urgency,20
+upi deactivated today,Threat/Urgency,20
+upi deactivated within 24 hours,Threat/Urgency,20
+upi deactivated immediately,Threat/Urgency,20
+upi deactivated now,Threat/Urgency,20
+upi deactivated urgently,Threat/Urgency,20
+upi deactivated asap,Threat/Urgency,20
+upi deactivated by tonight,Threat/Urgency,20
+upi restricted,Threat/Urgency,20
+upi restricted today,Threat/Urgency,20
+upi restricted within 24 hours,Threat/Urgency,20
+upi restricted immediately,Threat/Urgency,20
+upi restricted now,Threat/Urgency,20
+upi restricted urgently,Threat/Urgency,20
+upi restricted asap,Threat/Urgency,20
+upi restricted by tonight,Threat/Urgency,20
+upi closed,Threat/Urgency,20
+upi closed today,Threat/Urgency,20
+upi closed within 24 hours,Threat/Urgency,20
+upi closed immediately,Threat/Urgency,20
+upi closed now,Threat/Urgency,20
+upi closed urgently,Threat/Urgency,20
+upi closed asap,Threat/Urgency,20
+upi closed by tonight,Threat/Urgency,20
+upi disabled,Threat/Urgency,20
+upi disabled today,Threat/Urgency,20
+upi disabled within 24 hours,Threat/Urgency,20
+upi disabled immediately,Threat/Urgency,20
+upi disabled now,Threat/Urgency,20
+upi disabled urgently,Threat/Urgency,20
+upi disabled asap,Threat/Urgency,20
+upi disabled by tonight,Threat/Urgency,20
+upi locked,Threat/Urgency,20
+upi locked today,Threat/Urgency,20
+upi locked within 24 hours,Threat/Urgency,20
+upi locked immediately,Threat/Urgency,20
+upi locked now,Threat/Urgency,20
+upi locked urgently,Threat/Urgency,20
+upi locked asap,Threat/Urgency,20
+upi locked by tonight,Threat/Urgency,20
+upi expired,Threat/Urgency,20
+upi expired today,Threat/Urgency,20
+upi expired within 24 hours,Threat/Urgency,20
+upi expired immediately,Threat/Urgency,20
+upi expired now,Threat/Urgency,20
+upi expired urgently,Threat/Urgency,20
+upi expired asap,Threat/Urgency,20
+upi expired by tonight,Threat/Urgency,20
+wallet blocked,Threat/Urgency,20
+wallet blocked today,Threat/Urgency,20
+wallet blocked within 24 hours,Threat/Urgency,20
+wallet blocked immediately,Threat/Urgency,20
+wallet blocked now,Threat/Urgency,20
+wallet blocked urgently,Threat/Urgency,20
+wallet blocked asap,Threat/Urgency,20
+wallet blocked by tonight,Threat/Urgency,20
+wallet suspended,Threat/Urgency,20
+wallet suspended today,Threat/Urgency,20
+wallet suspended within 24 hours,Threat/Urgency,20
+wallet suspended immediately,Threat/Urgency,20
+wallet suspended now,Threat/Urgency,20
+wallet suspended urgently,Threat/Urgency,20
+wallet suspended asap,Threat/Urgency,20
+wallet suspended by tonight,Threat/Urgency,20
+wallet deactivated,Threat/Urgency,20
+wallet deactivated today,Threat/Urgency,20
+wallet deactivated within 24 hours,Threat/Urgency,20
+wallet deactivated immediately,Threat/Urgency,20
+wallet deactivated now,Threat/Urgency,20
+wallet deactivated urgently,Threat/Urgency,20
+wallet deactivated asap,Threat/Urgency,20
+wallet deactivated by tonight,Threat/Urgency,20
+wallet restricted,Threat/Urgency,20
+wallet restricted today,Threat/Urgency,20
+wallet restricted within 24 hours,Threat/Urgency,20
+wallet restricted immediately,Threat/Urgency,20
+wallet restricted now,Threat/Urgency,20
+wallet restricted urgently,Threat/Urgency,20
+wallet restricted asap,Threat/Urgency,20
+wallet restricted by tonight,Threat/Urgency,20
+wallet closed,Threat/Urgency,20
+wallet closed today,Threat/Urgency,20
+wallet closed within 24 hours,Threat/Urgency,20
+wallet closed immediately,Threat/Urgency,20
+wallet closed now,Threat/Urgency,20
+wallet closed urgently,Threat/Urgency,20
+wallet closed asap,Threat/Urgency,20
+wallet closed by tonight,Threat/Urgency,20
+wallet disabled,Threat/Urgency,20
+wallet disabled today,Threat/Urgency,20
+wallet disabled within 24 hours,Threat/Urgency,20
+wallet disabled immediately,Threat/Urgency,20
+wallet disabled now,Threat/Urgency,20
+wallet disabled urgently,Threat/Urgency,20
+wallet disabled asap,Threat/Urgency,20
+wallet disabled by tonight,Threat/Urgency,20
+wallet locked,Threat/Urgency,20
+wallet locked today,Threat/Urgency,20
+wallet locked within 24 hours,Threat/Urgency,20
+wallet locked immediately,Threat/Urgency,20
+wallet locked now,Threat/Urgency,20
+wallet locked urgently,Threat/Urgency,20
+wallet locked asap,Threat/Urgency,20
+wallet locked by tonight,Threat/Urgency,20
+wallet expired,Threat/Urgency,20
+wallet expired today,Threat/Urgency,20
+wallet expired within 24 hours,Threat/Urgency,20
+wallet expired immediately,Threat/Urgency,20
+wallet expired now,Threat/Urgency,20
+wallet expired urgently,Threat/Urgency,20
+wallet expired asap,Threat/Urgency,20
+wallet expired by tonight,Threat/Urgency,20
+kyc blocked,Threat/Urgency,20
+kyc blocked today,Threat/Urgency,20
+kyc blocked within 24 hours,Threat/Urgency,20
+kyc blocked immediately,Threat/Urgency,20
+kyc blocked now,Threat/Urgency,20
+kyc blocked urgently,Threat/Urgency,20
+kyc blocked asap,Threat/Urgency,20
+kyc blocked by tonight,Threat/Urgency,20
+kyc suspended,Threat/Urgency,20
+kyc suspended today,Threat/Urgency,20
+kyc suspended within 24 hours,Threat/Urgency,20
+kyc suspended immediately,Threat/Urgency,20
+kyc suspended now,Threat/Urgency,20
+kyc suspended urgently,Threat/Urgency,20
+kyc suspended asap,Threat/Urgency,20
+kyc suspended by tonight,Threat/Urgency,20
+kyc deactivated,Threat/Urgency,20
+kyc deactivated today,Threat/Urgency,20
+kyc deactivated within 24 hours,Threat/Urgency,20
+kyc deactivated immediately,Threat/Urgency,20
+kyc deactivated now,Threat/Urgency,20
+kyc deactivated urgently,Threat/Urgency,20
+kyc deactivated asap,Threat/Urgency,20
+kyc deactivated by tonight,Threat/Urgency,20
+kyc restricted,Threat/Urgency,20
+kyc restricted today,Threat/Urgency,20
+kyc restricted within 24 hours,Threat/Urgency,20
+kyc restricted immediately,Threat/Urgency,20
+kyc restricted now,Threat/Urgency,20
+kyc restricted urgently,Threat/Urgency,20
+kyc restricted asap,Threat/Urgency,20
+kyc restricted by tonight,Threat/Urgency,20
+kyc closed,Threat/Urgency,20
+kyc closed today,Threat/Urgency,20
+kyc closed within 24 hours,Threat/Urgency,20
+kyc closed immediately,Threat/Urgency,20
+kyc closed now,Threat/Urgency,20
+kyc closed urgently,Threat/Urgency,20
+kyc closed asap,Threat/Urgency,20
+kyc closed by tonight,Threat/Urgency,20
+kyc disabled,Threat/Urgency,20
+kyc disabled today,Threat/Urgency,20
+kyc disabled within 24 hours,Threat/Urgency,20
+kyc disabled immediately,Threat/Urgency,20
+kyc disabled now,Threat/Urgency,20
+kyc disabled urgently,Threat/Urgency,20
+kyc disabled asap,Threat/Urgency,20
+kyc disabled by tonight,Threat/Urgency,20
+kyc locked,Threat/Urgency,20
+kyc locked today,Threat/Urgency,20
+kyc locked within 24 hours,Threat/Urgency,20
+kyc locked immediately,Threat/Urgency,20
+kyc locked now,Threat/Urgency,20
+kyc locked urgently,Threat/Urgency,20
+kyc locked asap,Threat/Urgency,20
+kyc locked by tonight,Threat/Urgency,20
+kyc expired,Threat/Urgency,20
+kyc expired today,Threat/Urgency,20
+kyc expired within 24 hours,Threat/Urgency,20
+kyc expired immediately,Threat/Urgency,20
+kyc expired now,Threat/Urgency,20
+kyc expired urgently,Threat/Urgency,20
+kyc expired asap,Threat/Urgency,20
+kyc expired by tonight,Threat/Urgency,20
+pan blocked,Threat/Urgency,20
+pan blocked today,Threat/Urgency,20
+pan blocked within 24 hours,Threat/Urgency,20
+pan blocked immediately,Threat/Urgency,20
+pan blocked now,Threat/Urgency,20
+pan blocked urgently,Threat/Urgency,20
+pan blocked asap,Threat/Urgency,20
+pan blocked by tonight,Threat/Urgency,20
+pan suspended,Threat/Urgency,20
+pan suspended today,Threat/Urgency,20
+pan suspended within 24 hours,Threat/Urgency,20
+pan suspended immediately,Threat/Urgency,20
+pan suspended now,Threat/Urgency,20
+pan suspended urgently,Threat/Urgency,20
+pan suspended asap,Threat/Urgency,20
+pan suspended by tonight,Threat/Urgency,20
+pan deactivated,Threat/Urgency,20
+pan deactivated today,Threat/Urgency,20
+pan deactivated within 24 hours,Threat/Urgency,20
+pan deactivated immediately,Threat/Urgency,20
+pan deactivated now,Threat/Urgency,20
+pan deactivated urgently,Threat/Urgency,20
+pan deactivated asap,Threat/Urgency,20
+pan deactivated by tonight,Threat/Urgency,20
+pan restricted,Threat/Urgency,20
+pan restricted today,Threat/Urgency,20
+pan restricted within 24 hours,Threat/Urgency,20
+pan restricted immediately,Threat/Urgency,20
+pan restricted now,Threat/Urgency,20
+pan restricted urgently,Threat/Urgency,20
+pan restricted asap,Threat/Urgency,20
+pan restricted by tonight,Threat/Urgency,20
+pan closed,Threat/Urgency,20
+pan closed today,Threat/Urgency,20
+pan closed within 24 hours,Threat/Urgency,20
+pan closed immediately,Threat/Urgency,20
+pan closed now,Threat/Urgency,20
+pan closed urgently,Threat/Urgency,20
+pan closed asap,Threat/Urgency,20
+pan closed by tonight,Threat/Urgency,20
+pan disabled,Threat/Urgency,20
+pan disabled today,Threat/Urgency,20
+pan disabled within 24 hours,Threat/Urgency,20
+pan disabled immediately,Threat/Urgency,20
+pan disabled now,Threat/Urgency,20
+pan disabled urgently,Threat/Urgency,20
+pan disabled asap,Threat/Urgency,20
+pan disabled by tonight,Threat/Urgency,20
+pan locked,Threat/Urgency,20
+pan locked today,Threat/Urgency,20
+pan locked within 24 hours,Threat/Urgency,20
+pan locked immediately,Threat/Urgency,20
+pan locked now,Threat/Urgency,20
+pan locked urgently,Threat/Urgency,20
+pan locked asap,Threat/Urgency,20
+pan locked by tonight,Threat/Urgency,20
+pan expired,Threat/Urgency,20
+pan expired today,Threat/Urgency,20
+pan expired within 24 hours,Threat/Urgency,20
+pan expired immediately,Threat/Urgency,20
+pan expired now,Threat/Urgency,20
+pan expired urgently,Threat/Urgency,20
+pan expired asap,Threat/Urgency,20
+pan expired by tonight,Threat/Urgency,20
+aadhaar blocked,Threat/Urgency,20
+aadhaar blocked today,Threat/Urgency,20
+aadhaar blocked within 24 hours,Threat/Urgency,20
+aadhaar blocked immediately,Threat/Urgency,20
+aadhaar blocked now,Threat/Urgency,20
+aadhaar blocked urgently,Threat/Urgency,20
+aadhaar blocked asap,Threat/Urgency,20
+aadhaar blocked by tonight,Threat/Urgency,20
+aadhaar suspended,Threat/Urgency,20
+aadhaar suspended today,Threat/Urgency,20
+aadhaar suspended within 24 hours,Threat/Urgency,20
+aadhaar suspended immediately,Threat/Urgency,20
+aadhaar suspended now,Threat/Urgency,20
+aadhaar suspended urgently,Threat/Urgency,20
+aadhaar suspended asap,Threat/Urgency,20
+aadhaar suspended by tonight,Threat/Urgency,20
+aadhaar deactivated,Threat/Urgency,20
+aadhaar deactivated today,Threat/Urgency,20
+aadhaar deactivated within 24 hours,Threat/Urgency,20
+aadhaar deactivated immediately,Threat/Urgency,20
+aadhaar deactivated now,Threat/Urgency,20
+aadhaar deactivated urgently,Threat/Urgency,20
+aadhaar deactivated asap,Threat/Urgency,20
+aadhaar deactivated by tonight,Threat/Urgency,20
+aadhaar restricted,Threat/Urgency,20
+aadhaar restricted today,Threat/Urgency,20
+aadhaar restricted within 24 hours,Threat/Urgency,20
+aadhaar restricted immediately,Threat/Urgency,20
+aadhaar restricted now,Threat/Urgency,20
+aadhaar restricted urgently,Threat/Urgency,20
+aadhaar restricted asap,Threat/Urgency,20
+aadhaar restricted by tonight,Threat/Urgency,20
+aadhaar closed,Threat/Urgency,20
+aadhaar closed today,Threat/Urgency,20
+aadhaar closed within 24 hours,Threat/Urgency,20
+aadhaar closed immediately,Threat/Urgency,20
+aadhaar closed now,Threat/Urgency,20
+aadhaar closed urgently,Threat/Urgency,20
+aadhaar closed asap,Threat/Urgency,20
+aadhaar closed by tonight,Threat/Urgency,20
+aadhaar disabled,Threat/Urgency,20
+aadhaar disabled today,Threat/Urgency,20
+aadhaar disabled within 24 hours,Threat/Urgency,20
+aadhaar disabled immediately,Threat/Urgency,20
+aadhaar disabled now,Threat/Urgency,20
+aadhaar disabled urgently,Threat/Urgency,20
+aadhaar disabled asap,Threat/Urgency,20
+aadhaar disabled by tonight,Threat/Urgency,20
+aadhaar locked,Threat/Urgency,20
+aadhaar locked today,Threat/Urgency,20
+aadhaar locked within 24 hours,Threat/Urgency,20
+aadhaar locked immediately,Threat/Urgency,20
+aadhaar locked now,Threat/Urgency,20
+aadhaar locked urgently,Threat/Urgency,20
+aadhaar locked asap,Threat/Urgency,20
+aadhaar locked by tonight,Threat/Urgency,20
+aadhaar expired,Threat/Urgency,20
+aadhaar expired today,Threat/Urgency,20
+aadhaar expired within 24 hours,Threat/Urgency,20
+aadhaar expired immediately,Threat/Urgency,20
+aadhaar expired now,Threat/Urgency,20
+aadhaar expired urgently,Threat/Urgency,20
+aadhaar expired asap,Threat/Urgency,20
+aadhaar expired by tonight,Threat/Urgency,20
+sim blocked,Threat/Urgency,20
+sim blocked today,Threat/Urgency,20
+sim blocked within 24 hours,Threat/Urgency,20
+sim blocked immediately,Threat/Urgency,20
+sim blocked now,Threat/Urgency,20
+sim blocked urgently,Threat/Urgency,20
+sim blocked asap,Threat/Urgency,20
+sim blocked by tonight,Threat/Urgency,20
+sim suspended,Threat/Urgency,20
+sim suspended today,Threat/Urgency,20
+sim suspended within 24 hours,Threat/Urgency,20
+sim suspended immediately,Threat/Urgency,20
+sim suspended now,Threat/Urgency,20
+sim suspended urgently,Threat/Urgency,20
+sim suspended asap,Threat/Urgency,20
+sim suspended by tonight,Threat/Urgency,20
+sim deactivated,Threat/Urgency,20
+sim deactivated today,Threat/Urgency,20
+sim deactivated within 24 hours,Threat/Urgency,20
+sim deactivated immediately,Threat/Urgency,20
+sim deactivated now,Threat/Urgency,20
+sim deactivated urgently,Threat/Urgency,20
+sim deactivated asap,Threat/Urgency,20
+sim deactivated by tonight,Threat/Urgency,20
+sim restricted,Threat/Urgency,20
+sim restricted today,Threat/Urgency,20
+sim restricted within 24 hours,Threat/Urgency,20
+sim restricted immediately,Threat/Urgency,20
+sim restricted now,Threat/Urgency,20
+sim restricted urgently,Threat/Urgency,20
+sim restricted asap,Threat/Urgency,20
+sim restricted by tonight,Threat/Urgency,20
+sim closed,Threat/Urgency,20
+sim closed today,Threat/Urgency,20
+sim closed within 24 hours,Threat/Urgency,20
+sim closed immediately,Threat/Urgency,20
+sim closed now,Threat/Urgency,20
+sim closed urgently,Threat/Urgency,20
+sim closed asap,Threat/Urgency,20
+sim closed by tonight,Threat/Urgency,20
+sim disabled,Threat/Urgency,20
+sim disabled today,Threat/Urgency,20
+sim disabled within 24 hours,Threat/Urgency,20
+sim disabled immediately,Threat/Urgency,20
+sim disabled now,Threat/Urgency,20
+sim disabled urgently,Threat/Urgency,20
+sim disabled asap,Threat/Urgency,20
+sim disabled by tonight,Threat/Urgency,20
+sim locked,Threat/Urgency,20
+sim locked today,Threat/Urgency,20
+sim locked within 24 hours,Threat/Urgency,20
+sim locked immediately,Threat/Urgency,20
+sim locked now,Threat/Urgency,20
+sim locked urgently,Threat/Urgency,20
+sim locked asap,Threat/Urgency,20
+sim locked by tonight,Threat/Urgency,20
+sim expired,Threat/Urgency,20
+sim expired today,Threat/Urgency,20
+sim expired within 24 hours,Threat/Urgency,20
+sim expired immediately,Threat/Urgency,20
+sim expired now,Threat/Urgency,20
+sim expired urgently,Threat/Urgency,20
+sim expired asap,Threat/Urgency,20
+sim expired by tonight,Threat/Urgency,20
+netbanking blocked,Threat/Urgency,20
+netbanking blocked today,Threat/Urgency,20
+netbanking blocked within 24 hours,Threat/Urgency,20
+netbanking blocked immediately,Threat/Urgency,20
+netbanking blocked now,Threat/Urgency,20
+netbanking blocked urgently,Threat/Urgency,20
+netbanking blocked asap,Threat/Urgency,20
+netbanking blocked by tonight,Threat/Urgency,20
+netbanking suspended,Threat/Urgency,20
+netbanking suspended today,Threat/Urgency,20
+netbanking suspended within 24 hours,Threat/Urgency,20
+netbanking suspended immediately,Threat/Urgency,20
+netbanking suspended now,Threat/Urgency,20
+netbanking suspended urgently,Threat/Urgency,20
+netbanking suspended asap,Threat/Urgency,20
+netbanking suspended by tonight,Threat/Urgency,20
+netbanking deactivated,Threat/Urgency,20
+netbanking deactivated today,Threat/Urgency,20
+netbanking deactivated within 24 hours,Threat/Urgency,20
+netbanking deactivated immediately,Threat/Urgency,20
+netbanking deactivated now,Threat/Urgency,20
+netbanking deactivated urgently,Threat/Urgency,20
+netbanking deactivated asap,Threat/Urgency,20
+netbanking deactivated by tonight,Threat/Urgency,20
+netbanking restricted,Threat/Urgency,20
+netbanking restricted today,Threat/Urgency,20
+netbanking restricted within 24 hours,Threat/Urgency,20
+netbanking restricted immediately,Threat/Urgency,20
+netbanking restricted now,Threat/Urgency,20
+netbanking restricted urgently,Threat/Urgency,20
+netbanking restricted asap,Threat/Urgency,20
+netbanking restricted by tonight,Threat/Urgency,20
+netbanking closed,Threat/Urgency,20
+netbanking closed today,Threat/Urgency,20
+netbanking closed within 24 hours,Threat/Urgency,20
+netbanking closed immediately,Threat/Urgency,20
+netbanking closed now,Threat/Urgency,20
+netbanking closed urgently,Threat/Urgency,20
+netbanking closed asap,Threat/Urgency,20
+netbanking closed by tonight,Threat/Urgency,20
+netbanking disabled,Threat/Urgency,20
+netbanking disabled today,Threat/Urgency,20
+netbanking disabled within 24 hours,Threat/Urgency,20
+netbanking disabled immediately,Threat/Urgency,20
+netbanking disabled now,Threat/Urgency,20
+netbanking disabled urgently,Threat/Urgency,20
+netbanking disabled asap,Threat/Urgency,20
+netbanking disabled by tonight,Threat/Urgency,20
+netbanking locked,Threat/Urgency,20
+netbanking locked today,Threat/Urgency,20
+netbanking locked within 24 hours,Threat/Urgency,20
+netbanking locked immediately,Threat/Urgency,20
+netbanking locked now,Threat/Urgency,20
+netbanking locked urgently,Threat/Urgency,20
+netbanking locked asap,Threat/Urgency,20
+netbanking locked by tonight,Threat/Urgency,20
+netbanking expired,Threat/Urgency,20
+netbanking expired today,Threat/Urgency,20
+netbanking expired within 24 hours,Threat/Urgency,20
+netbanking expired immediately,Threat/Urgency,20
+netbanking expired now,Threat/Urgency,20
+netbanking expired urgently,Threat/Urgency,20
+netbanking expired asap,Threat/Urgency,20
+netbanking expired by tonight,Threat/Urgency,20
+app blocked,Threat/Urgency,20
+app blocked today,Threat/Urgency,20
+app blocked within 24 hours,Threat/Urgency,20
+app blocked immediately,Threat/Urgency,20
+app blocked now,Threat/Urgency,20
+app blocked urgently,Threat/Urgency,20
+app blocked asap,Threat/Urgency,20
+app blocked by tonight,Threat/Urgency,20
+app suspended,Threat/Urgency,20
+app suspended today,Threat/Urgency,20
+app suspended within 24 hours,Threat/Urgency,20
+app suspended immediately,Threat/Urgency,20
+app suspended now,Threat/Urgency,20
+app suspended urgently,Threat/Urgency,20
+app suspended asap,Threat/Urgency,20
+app suspended by tonight,Threat/Urgency,20
+app deactivated,Threat/Urgency,20
+app deactivated today,Threat/Urgency,20
+app deactivated within 24 hours,Threat/Urgency,20
+app deactivated immediately,Threat/Urgency,20
+app deactivated now,Threat/Urgency,20
+app deactivated urgently,Threat/Urgency,20
+app deactivated asap,Threat/Urgency,20
+app deactivated by tonight,Threat/Urgency,20
+app restricted,Threat/Urgency,20
+app restricted today,Threat/Urgency,20
+app restricted within 24 hours,Threat/Urgency,20
+app restricted immediately,Threat/Urgency,20
+app restricted now,Threat/Urgency,20
+app restricted urgently,Threat/Urgency,20
+app restricted asap,Threat/Urgency,20
+app restricted by tonight,Threat/Urgency,20
+app closed,Threat/Urgency,20
+app closed today,Threat/Urgency,20
+app closed within 24 hours,Threat/Urgency,20
+app closed immediately,Threat/Urgency,20
+app closed now,Threat/Urgency,20
+app closed urgently,Threat/Urgency,20
+app closed asap,Threat/Urgency,20
+app closed by tonight,Threat/Urgency,20
+app disabled,Threat/Urgency,20
+app disabled today,Threat/Urgency,20
+app disabled within 24 hours,Threat/Urgency,20
+app disabled immediately,Threat/Urgency,20
+app disabled now,Threat/Urgency,20
+app disabled urgently,Threat/Urgency,20
+app disabled asap,Threat/Urgency,20
+app disabled by tonight,Threat/Urgency,20
+app locked,Threat/Urgency,20
+app locked today,Threat/Urgency,20
+app locked within 24 hours,Threat/Urgency,20
+app locked immediately,Threat/Urgency,20
+app locked now,Threat/Urgency,20
+app locked urgently,Threat/Urgency,20
+app locked asap,Threat/Urgency,20
+app locked by tonight,Threat/Urgency,20
+app expired,Threat/Urgency,20
+app expired today,Threat/Urgency,20
+app expired within 24 hours,Threat/Urgency,20
+app expired immediately,Threat/Urgency,20
+app expired now,Threat/Urgency,20
+app expired urgently,Threat/Urgency,20
+app expired asap,Threat/Urgency,20
+app expired by tonight,Threat/Urgency,20
+id blocked,Threat/Urgency,20
+id blocked today,Threat/Urgency,20
+id blocked within 24 hours,Threat/Urgency,20
+id blocked immediately,Threat/Urgency,20
+id blocked now,Threat/Urgency,20
+id blocked urgently,Threat/Urgency,20
+id blocked asap,Threat/Urgency,20
+id blocked by tonight,Threat/Urgency,20
+id suspended,Threat/Urgency,20
+id suspended today,Threat/Urgency,20
+id suspended within 24 hours,Threat/Urgency,20
+id suspended immediately,Threat/Urgency,20
+id suspended now,Threat/Urgency,20
+id suspended urgently,Threat/Urgency,20
+id suspended asap,Threat/Urgency,20
+id suspended by tonight,Threat/Urgency,20
+id deactivated,Threat/Urgency,20
+id deactivated today,Threat/Urgency,20
+id deactivated within 24 hours,Threat/Urgency,20
+id deactivated immediately,Threat/Urgency,20
+id deactivated now,Threat/Urgency,20
+id deactivated urgently,Threat/Urgency,20
+id deactivated asap,Threat/Urgency,20
+id deactivated by tonight,Threat/Urgency,20
+id restricted,Threat/Urgency,20
+id restricted today,Threat/Urgency,20
+id restricted within 24 hours,Threat/Urgency,20
+id restricted immediately,Threat/Urgency,20
+id restricted now,Threat/Urgency,20
+id restricted urgently,Threat/Urgency,20
+id restricted asap,Threat/Urgency,20
+id restricted by tonight,Threat/Urgency,20
+id closed,Threat/Urgency,20
+id closed today,Threat/Urgency,20
+id closed within 24 hours,Threat/Urgency,20
+id closed immediately,Threat/Urgency,20
+id closed now,Threat/Urgency,20
+id closed urgently,Threat/Urgency,20
+id closed asap,Threat/Urgency,20
+id closed by tonight,Threat/Urgency,20
+id disabled,Threat/Urgency,20
+id disabled today,Threat/Urgency,20
+id disabled within 24 hours,Threat/Urgency,20
+id disabled immediately,Threat/Urgency,20
+id disabled now,Threat/Urgency,20
+id disabled urgently,Threat/Urgency,20
+id disabled asap,Threat/Urgency,20
+id disabled by tonight,Threat/Urgency,20
+id locked,Threat/Urgency,20
+id locked today,Threat/Urgency,20
+id locked within 24 hours,Threat/Urgency,20
+id locked immediately,Threat/Urgency,20
+id locked now,Threat/Urgency,20
+id locked urgently,Threat/Urgency,20
+id locked asap,Threat/Urgency,20
+id locked by tonight,Threat/Urgency,20
+id expired,Threat/Urgency,20
+id expired today,Threat/Urgency,20
+id expired within 24 hours,Threat/Urgency,20
+id expired immediately,Threat/Urgency,20
+id expired now,Threat/Urgency,20
+id expired urgently,Threat/Urgency,20
+id expired asap,Threat/Urgency,20
+id expired by tonight,Threat/Urgency,20
+share otp,Credentials/Financials,40
+click to share otp,Credentials/Financials,40
+enter pin,Credentials/Financials,40
+click to enter pin,Credentials/Financials,40
+verify cvv,Credentials/Financials,40
+click to verify cvv,Credentials/Financials,40
+pay fee,Credentials/Financials,40
+click to pay fee,Credentials/Financials,40
+customs fee,Credentials/Financials,40
+click to customs fee,Credentials/Financials,40
+clear dues,Credentials/Financials,40
+click to clear dues,Credentials/Financials,40
+refund processing,Credentials/Financials,40
+click to refund processing,Credentials/Financials,40
+claim prize,Credentials/Financials,40
+click to claim prize,Credentials/Financials,40
+claim bonus,Credentials/Financials,40
+click to claim bonus,Credentials/Financials,40
+send money,Credentials/Financials,40
+click to send money,Credentials/Financials,40
+transfer funds,Credentials/Financials,40
+click to transfer funds,Credentials/Financials,40
+package delivery failed,Delivery Bait,30
+parcel stuck,Delivery Bait,30
+address missing,Delivery Bait,30
+reschedule delivery,Delivery Bait,30
+customs clearance,Delivery Bait,30
+shipping fee,Delivery Bait,30
+delivery incomplete,Delivery Bait,30
+sbi alert,Impersonation,15
+sbi notice,Impersonation,15
+sbi warning,Impersonation,15
+sbi support,Impersonation,15
+hdfc alert,Impersonation,15
+hdfc notice,Impersonation,15
+hdfc warning,Impersonation,15
+hdfc support,Impersonation,15
+icici alert,Impersonation,15
+icici notice,Impersonation,15
+icici warning,Impersonation,15
+icici support,Impersonation,15
+axis bank alert,Impersonation,15
+axis bank notice,Impersonation,15
+axis bank warning,Impersonation,15
+axis bank support,Impersonation,15
+pnb alert,Impersonation,15
+pnb notice,Impersonation,15
+pnb warning,Impersonation,15
+pnb support,Impersonation,15
+india post alert,Impersonation,15
+india post notice,Impersonation,15
+india post warning,Impersonation,15
+india post support,Impersonation,15
+fedex alert,Impersonation,15
+fedex notice,Impersonation,15
+fedex warning,Impersonation,15
+fedex support,Impersonation,15
+bluedart alert,Impersonation,15
+bluedart notice,Impersonation,15
+bluedart warning,Impersonation,15
+bluedart support,Impersonation,15
+delhivery alert,Impersonation,15
+delhivery notice,Impersonation,15
+delhivery warning,Impersonation,15
+delhivery support,Impersonation,15
+amazon alert,Impersonation,15
+amazon notice,Impersonation,15
+amazon warning,Impersonation,15
+amazon support,Impersonation,15
+flipkart alert,Impersonation,15
+flipkart notice,Impersonation,15
+flipkart warning,Impersonation,15
+flipkart support,Impersonation,15
+income tax alert,Impersonation,15
+income tax notice,Impersonation,15
+income tax warning,Impersonation,15
+income tax support,Impersonation,15
+traffic police alert,Impersonation,15
+traffic police notice,Impersonation,15
+traffic police warning,Impersonation,15
+traffic police support,Impersonation,15
+e-challan alert,Impersonation,15
+e-challan notice,Impersonation,15
+e-challan warning,Impersonation,15
+e-challan support,Impersonation,15
+cbi alert,Impersonation,15
+cbi notice,Impersonation,15
+cbi warning,Impersonation,15
+cbi support,Impersonation,15
+trai alert,Impersonation,15
+trai notice,Impersonation,15
+trai warning,Impersonation,15
+trai support,Impersonation,15
+jio alert,Impersonation,15
+jio notice,Impersonation,15
+jio warning,Impersonation,15
+jio support,Impersonation,15
+airtel alert,Impersonation,15
+airtel notice,Impersonation,15
+airtel warning,Impersonation,15
+airtel support,Impersonation,15
+vi alert,Impersonation,15
+vi notice,Impersonation,15
+vi warning,Impersonation,15
+vi support,Impersonation,15
+download apk,Suspicious Download,35
+install app,Suspicious Download,35
+anydesk,Suspicious Download,35
+teamviewer,Suspicious Download,35
+quicksupport,Suspicious Download,35
+remote support,Suspicious Download,35
+update app,Suspicious Download,35
+click to install,Suspicious Download,35
+dear customer,Generic Greeting,10
+dear user,Generic Greeting,10
+valued member,Generic Greeting,10
+dear sir/madam,Generic Greeting,10
+bit.ly/,Obfuscated Link,25
+tinyurl.com/,Obfuscated Link,25
+.xyz/,Suspicious TLD,25
+.top/,Suspicious TLD,25
+wa.me/,WhatsApp Redirect,15
+t.me/,Telegram Redirect,15
