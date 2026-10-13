@@ -38,7 +38,7 @@ export const MASTER_RULES: PatternRule[] = [
     points: 20,
     category: 'Pressure Tactics',
     patterns: [
-      /\b(?:immediately|urgent(?:ly)?|within\s+24\s+hours?|within\s+\d+\s+hours?|act\s+now|expires\s+today|last\s+chance|right\s+now|without\s+delay|immediate\s+action)\b/i,
+      /\b(?:immediately|immediate(?:\s+action|\s+arrest)?|urgent(?:ly)?|within\s+24\s+hours?|within\s+\d+\s+hours?|act\s+now|(?:will\s+)?expires?\s+today|last\s+chance|right\s+now|without\s+delay|tonight)\b/i,
       /\b(?:turant|jaldi|aaj\s+hi|24\s+ghante\s+ke\s+andar|fauran)\b/i,
       /(?:तुरंत|जल्दी|तत्काल|आज\s+ही|२४\s+घंटे|अति\s*शीघ्र)/u,
     ],
@@ -53,8 +53,8 @@ export const MASTER_RULES: PatternRule[] = [
     points: 15,
     category: 'Pressure Tactics',
     patterns: [
-      /\b(?:account\s+will\s+be\s+(?:blocked|suspended|closed|terminated|frozen|deactivated)|kyc\s+(?:has\s+)?expired|kyc\s+pending|sim\s+will\s+be\s+deactivated|legal\s+action|electricity\s+power\s+will\s+be\s+disconnected|services?\s+stopped)\b/i,
-      /\b(?:account\s+(?:band|block|deactivate)\s+ho\s+jayega|sim\s+band\s+hogi|police\s+karwai)\b/i,
+      /\b(?:account\s+will\s+be\s+(?:blocked|suspended|closed|terminated|frozen|deactivated)|kyc\s+(?:has\s+)?expired|kyc\s+pending|sim\s+will\s+be\s+deactivated|illegal\s+sims?|arrest\s+warrant|legal\s+action|electricity\s+power\s+will\s+be\s+disconnected|services?\s+stopped|(?:power|electricity|bijli|gas|connection)\s+(?:cut|disconnected|band))\b/i,
+      /\b(?:account\s+(?:band|block|deactivate)\s+ho\s+jayega|sim\s+band\s+hogi|police\s+karwai|(?:bijli|gas|power)\s+(?:connection\s+)?cut\s+ho\s+jayega)\b/i,
       /(?:खाता\s+(?:बंद|ब्लॉक|निलंबित)\s+कर\s+दिया\s+जाएगा)/u,
     ],
     explanation: 'Threats to block accounts, disconnect utilities, or take legal action are designed to force obedience.',
@@ -111,8 +111,8 @@ export const MASTER_RULES: PatternRule[] = [
     points: 40,
     category: 'Credential Theft',
     patterns: [
-      /\b(?:share|send|enter|tell|submit|reply\s+with|provide)\b[^\n\r.!?]{0,40}\b(?:password|pin|mpin|cvv|card\s+number|atm\s+pin|login\s+details)\b/i,
-      /\b(?:password|pin|mpin|cvv|card\s+number|atm\s+pin|login\s+details)\b[^\n\r.!?]{0,40}\b(?:share|send|enter|tell|submit|reply\s+with|provide)\b/i,
+      /\b(?:share|send|enter|tell|submit|reply\s+with|provide)\b[^\n\r.!?]{0,40}\b(?:password|pin|mpin|cvv|card\s+number|card\s+details|atm\s+pin|login\s+details)\b/i,
+      /\b(?:password|pin|mpin|cvv|card\s+number|card\s+details|atm\s+pin|login\s+details)\b[^\n\r.!?]{0,40}\b(?:share|send|enter|tell|submit|reply\s+with|provide)\b/i,
     ],
     explanation: 'Requests for your PIN, MPIN, CVV, or passwords are an immediate indicator of credential theft.',
     advice: 'Your PIN and CVV are strictly private. No bank official is authorized to request them.',
@@ -140,7 +140,7 @@ export const MASTER_RULES: PatternRule[] = [
     points: 30,
     category: 'Payment Tricks',
     patterns: [
-      /\b(?:approve|accept|click)\b[^\n\r.!?]{0,35}\b(?:collect\s+request|payment\s+request|mandate)\b[^\n\r.!?]{0,40}\b(?:to\s+receive|for\s+refund|to\s+get|prize)\b/i,
+      /\b(?:approve|accept|click)\b[^\n\r.!?]{0,35}\b(?:collect\s+request|payment\s+request|mandate)\b[^\n\r.!?]{0,45}\b(?:to\s+receive|for\s+refund|to\s+get|prize|to\s+unlock|winnings)\b/i,
       /\b(?:collect\s+request|mandate)\b[^\n\r.!?]{0,35}\b(?:approve\s+karein|accept\s+karein)\b/i,
     ],
     explanation: 'Approving a collect request in UPI transfers money OUT of your account, not into it.',
@@ -182,8 +182,8 @@ export const MASTER_RULES: PatternRule[] = [
     points: 25,
     category: 'Payment Tricks',
     patterns: [
-      /\b(?:pay|deposit|transfer|send)\b[^\n\r.!?]{0,30}\b(?:registration|processing|customs|tax|verification|stamp|courier)\s+(?:fee|charges?|amount)\b/i,
-      /\b(?:processing\s+fee|registration\s+fee)\b[^\n\r.!?]{0,30}\b(?:to\s+release|to\s+claim|to\s+unlock)\b/i,
+      /\b(?:pay|deposit|transfer|send)\b[^\n\r.!?]{0,35}\b(?:registration|processing|customs|tax|verification|stamp|courier|redelivery|delivery)\s+(?:fee|charges?|amount|duty)\b/i,
+      /\b(?:processing\s+fee|registration\s+fee|customs\s+fee|redelivery\s+fee)\b[^\n\r.!?]{0,30}\b(?:to\s+release|to\s+claim|to\s+unlock|to\s+start)\b/i,
     ],
     explanation: 'Legitimate loans, prizes, and deliveries never require upfront fees to release funds.',
     advice: 'Never pay upfront fees to unlock gifts, prize money, or employment offers.',
@@ -210,8 +210,8 @@ export const MASTER_RULES: PatternRule[] = [
     points: 15,
     category: 'Identity Verification',
     patterns: [
-      /\b(?:cbi|crime\s+branch|customs\s+department|delhi\s+police|mumbai\s+police|trai|rbi|income\s+tax\s+department|interpol)\b/i,
-      /\b(?:digital\s+arrest|video\s+call\s+investigation|stay\s+on\s+skype)\b/i,
+      /\b(?:cbi|crime\s+branch|customs\s+department|delhi\s+police|mumbai\s+police|trai(?:\s+alert)?|rbi|income\s+tax\s+department|interpol)\b/i,
+      /\b(?:digital\s+arrest(?:\s+warrant)?|video\s+call\s+investigation|stay\s+on\s+skype|arrest\s+warrant)\b/i,
     ],
     explanation: 'Scammers impersonate police, customs, or court officials to intimidate victims into compliance.',
     advice: 'Government agencies never place citizens under "digital arrest" or conduct interrogations over Skype/WhatsApp.',
@@ -224,8 +224,8 @@ export const MASTER_RULES: PatternRule[] = [
     points: 15,
     category: 'Bait & Lures',
     patterns: [
-      /\b(?:you\s+won|lottery|lucky\s+winner|congratulations\s+you\s+have\s+won|cashback\s+credited|exclusive\s+gift|claim\s+reward)\b/i,
-      /\b(?:guaranteed\s+return|earn\s+rs\s*\d+\s*daily|work\s+from\s+home\s+job)\b/i,
+      /\b(?:congratulations|you\s+won|lottery|lucky\s+winner|cashback\s+credited|exclusive\s+gift|claim\s+reward)\b/i,
+      /\b(?:guaranteed\s+returns?|earn\s+rs\s*\d+\s*daily|work\s+from\s+home\s+job)\b/i,
     ],
     explanation: 'Unsolicited prize or guaranteed return promises entice victims into phishing or task fraud schemes.',
     advice: 'If you did not enter a lottery or apply for a scheme, unexpected winnings are fraudulent.',

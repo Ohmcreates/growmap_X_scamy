@@ -45,12 +45,52 @@ export class ReportingService {
     return trimmed;
   }
 
+  private static rateLimitMap = new Map<string, number[]>();
+
+  static checkRateLimit(clientId: string, maxPerMinute = 5): boolean {
+    const now = Date.now();
+    const timestamps = (this.rateLimitMap.get(clientId) || []).filter((t) => now - t < 60000);
+    if (timestamps.length >= maxPerMinute) {
+      return false; // Rate limit exceeded
+    }
+    timestamps.push(now);
+    this.rateLimitMap.set(clientId, timestamps);
+    return true;
+  }
+
+  static transitionIndicatorState(
+    current: IndicatorStatus,
+    target: IndicatorStatus
+  ): { allowed: boolean; newStatus: IndicatorStatus; error?: string } {
+    const validTransitions: Record<IndicatorStatus, IndicatorStatus[]> = {
+      REPORTED: ['UNDER_REVIEW'],
+      UNDER_REVIEW: ['VERIFIED', 'EXPIRED'],
+      VERIFIED: ['EXPIRED'],
+      EXPIRED: [],
+    };
+
+    if (validTransitions[current]?.includes(target)) {
+      return { allowed: true, newStatus: target };
+    }
+
+    return {
+      allowed: false,
+      newStatus: current,
+      error: `Invalid transition from ${current} to ${target}`,
+    };
+  }
+
   static submitReport(
     type: IndicatorType,
     rawValue: string,
     category: string,
-    notes?: string
+    notes?: string,
+    clientId = 'default_client'
   ): ThreatReport {
+    if (!this.checkRateLimit(clientId)) {
+      throw new Error('RATE_LIMIT_EXCEEDED: Maximum 5 reports per minute reached.');
+    }
+
     const normalizedValue = this.normalizeIndicator(type, rawValue);
     const report: ThreatReport = {
       id: `rep_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,

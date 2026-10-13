@@ -1,0 +1,21 @@
+{
+  "manifest_version": 3,
+  "name": "Scam Spotter — Link & Fraud Shield",
+  "version": "1.0.0",
+  "description": "Real-time browser protection against phishing links, typosquatting domains, and fraudulent web addresses.",
+  "permissions": ["activeTab", "storage"],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Scam Spotter Shield"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ]
+}

@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      body {
+        width: 240px;
+        padding: 14px;
+        font-family: -apple-system, sans-serif;
+        background: #0a0e17;
+        color: #f8fafc;
+        margin: 0;
+      }
+      .header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #d4af37;
+        font-weight: bold;
+        font-size: 1rem;
+        margin-bottom: 10px;
+      }
+      .status-box {
+        background: #121826;
+        border: 1px solid #1e293b;
+        border-radius: 6px;
+        padding: 10px;
+        font-size: 0.85rem;
+      }
+      .active-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background: #22c55e;
+        border-radius: 50%;
+        margin-right: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <span>🛡️</span> Scam Spotter Shield
+    </div>
+    <div class="status-box">
+      <div><span class="active-dot"></span>Real-time Link Protection Active</div>
+      <p style="color: #94a3b8; font-size: 0.75rem; margin-top: 6px;">
+        Heuristics scanning active on all web tabs.
+      </p>
+    </div>
+    <script src="popup.js"></script>
+  </body>
+</html>

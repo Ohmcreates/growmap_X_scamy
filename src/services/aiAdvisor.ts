@@ -18,7 +18,7 @@ export class AiAdvisorService {
   static maskPii(text: string): string {
     return text
       .replace(/\b[6-9]\d{9}\b/g, '[PHONE-NUMBER]')
-      .replace(/\b\d{4}[-\s]?\d{4}[-\s]?\d{4}\b/g, '[CARD-NUMBER]')
+      .replace(/\b(?:\d{4}[-\s]?){3}\d{4}\b/g, '[CARD-NUMBER]')
       .replace(/\b[A-Z]{4}0[A-Z0-9]{6}\b/g, '[IFSC-CODE]')
       .replace(/\b\d{9,18}\b/g, '[ACCOUNT-NUMBER]');
   }
