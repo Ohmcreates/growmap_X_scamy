@@ -16,6 +16,11 @@ export const DEFAULT_OFFICIAL_DOMAINS = [
   'uidai.gov.in',
   'cybercrime.gov.in',
   'sancharsaathi.gov.in',
+  'parivahan.gov.in',
+  'echallan.parivahan.gov.in',
+  'morth.nic.in',
+  'indiapost.gov.in',
+  'digilocker.gov.in',
 ];
 
 export const DEFAULT_NEGATION_PATTERNS = [
@@ -39,6 +44,8 @@ export const MASTER_RULES: PatternRule[] = [
     category: 'Pressure Tactics',
     patterns: [
       /\b(?:immediately|immediate(?:\s+action|\s+arrest)?|urgent(?:ly)?|within\s+24\s+hours?|within\s+\d+\s+hours?|act\s+now|(?:will\s+)?expires?\s+today|last\s+chance|right\s+now|without\s+delay|tonight|legal\s+action|fail(?:ed)?\s+to\s+deliver|package\s+delivery\s+failed)\b/i,
+      /\b(?:alert|warning|notice|final\s+notice)\s*:\s*[^\n\r]{0,30}\b(?:e[\s-]*cha[lI1|]{2}an|cha[lI1|]{2}an|fine|payment|penalty|generated|due|unpaid)\b/i,
+      /\b(?:alert|warning|urgent)\b[^\n\r]{0,25}\b(?:e[\s-]*cha[lI1|]{2}an|cha[lI1|]{2}an|challan\s+generated)\b/i,
       /\b(?:turant|jaldi|aaj\s+hi|24\s+ghante\s+ke\s+andar|fauran)\b/i,
       /(?:तुरंत|जल्दी|तत्काल|आज\s+ही|२४\s+घंटे|अति\s*शीघ्र)/u,
     ],
@@ -201,6 +208,10 @@ export const MASTER_RULES: PatternRule[] = [
       /\b(?:download\s+app\s+to\s+verify|update\s+kyc|kyc\s+update|verify\s+cvv)\b/i,
       /\b(?:click\s+to\s+(?:share\s+otp|enter\s+pin|verify\s+cvv|pay\s+fee|customs\s+fee|clear\s+dues|refund\s+processing))\b/i,
       /\b(?:download\s+apk|install\s+app|anydesk|teamviewer|quicksupport)\b/i,
+      /\b(?:paynow|pay\s*now|pay\s*online|click\s*to\s*pay)\s*:\s*https?:\/\//i,
+      /\b(?:cha[lI1|]{2}an|fine|penalty|traffic\s+violation)\b[^\n\r.!?]{0,60}\b(?:generated|issued|pending|clear|paynow|pay\s*now)\b/i,
+      /\b(?:inr\.?|rs\.?|₹)\s*\d+[^\n\r.!?]{0,60}\b(?:paynow|pay\s*now|pay\s*online|pending|generated|cha[lI1|]{2}an)\b/i,
+      /\b(?:paynow|pay\s*now)\b[^\n\r.!?]{0,50}\b(?:inr\.?|rs\.?|₹)\s*\d+/i,
     ],
     explanation: 'Legitimate banks and delivery services will never ask you to share an OTP or PIN, nor will they ask for random small payments via SMS links.',
     advice: 'Official couriers and banks do not request ad-hoc fee payments or OTPs through text messages.',
@@ -227,9 +238,10 @@ export const MASTER_RULES: PatternRule[] = [
     points: 15,
     category: 'Identity Verification',
     patterns: [
-      /\b(?:cbi|crime\s+branch|customs(?:\s+department|\s+office)?|delhi\s+police|mumbai\s+police|traffic\s+police|police|e[\s-]challan|trai(?:\s+alert)?|rbi|income\s+tax(?:\s+department)?|interpol)\b/i,
+      /\b(?:cbi|crime\s+branch|customs(?:\s+department|\s+office)?|delhi\s+police|mumbai\s+police|traffic\s+police|traffic\s+department|transport\s+department|police|e[\s-]*cha[lI1|]{2}an|cha[lI1|]{2}an|mparivahan|parivahan|rto(?:\b|\.|\/)|morth(?:\b|\.|\/)|trai(?:\s+alert)?|rbi|income\s+tax(?:\s+department)?|interpol)\b/i,
+      /\b(?:traffic\s+police|delhi\s+police|mumbai\s+police|income\s+tax|parivahan|rto)\s*:/i,
+      /\b(?:challan\s+no|vehicle\s+no)\b/i,
       /\b(?:india\s+post|fedex|bluedart|delhivery)\s*:/i,
-      /\b(?:traffic\s+police|delhi\s+police|mumbai\s+police|income\s+tax)\s*:/i,
       /\b(?:india\s+post|fedex|bluedart|delhivery)\b[^\n\r.!?]{0,30}\b(?:package|parcel|delivery)\b/i,
       /\b(?:hdfc|sbi|icici|axis\s+bank|pnb)\s+bank\s+account\b/i,
       /\b(?:sbi|hdfc|icici|axis\s+bank|pnb|amazon|flipkart|airtel|jio|vi)\s+(?:alert|notice|warning|support)\b/i,

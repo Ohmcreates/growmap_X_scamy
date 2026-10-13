@@ -57,6 +57,23 @@ const COMMON_SHORTENERS = new Set([
   'shorturl.at',
 ]);
 
+const DYNAMIC_DNS_DOMAINS = new Set([
+  'redirectme.net',
+  'duckdns.org',
+  'ngrok.io',
+  'ngrok-free.app',
+  'ddns.net',
+  'hopto.org',
+  'zapto.org',
+  'bounceme.net',
+  'serveo.net',
+  'loca.lt',
+  'pagekite.me',
+  'no-ip.org',
+  'no-ip.biz',
+  'no-ip.info',
+]);
+
 const HIGH_RISK_TLDS = new Set([
   'xyz',
   'top',
@@ -241,19 +258,44 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
     score += 35;
   }
 
+  // Dynamic DNS / disposable redirection host check
+  const matchedDdns = Array.from(DYNAMIC_DNS_DOMAINS).find(
+    (ddns) => hostname === ddns || hostname.endsWith(`.${ddns}`)
+  );
+  if (matchedDdns) {
+    threats.push({
+      id: 'DYNAMIC_DNS_OR_REDIRECTOR',
+      title: `Dynamic DNS / Disposable Redirection Host (*.${matchedDdns})`,
+      severity: 'HIGH',
+      detail: `The site is hosted on a dynamic DNS redirection domain (*.${matchedDdns}). Attackers frequently register free subdomains on dynamic DNS providers to host transient e-challan or phishing landing pages without identity verification.`,
+    });
+    score += 45;
+  }
+
   // Lookalike & Typo-squatting detection
   let matchedBrandTarget: string | undefined;
   for (const target of BRAND_TARGETS) {
     const key = target.key;
     if (hostname.includes(key)) {
       matchedBrandTarget = target.brand;
-      threats.push({
-        id: 'BRAND_LOOKALIKE',
-        title: `Brand Lookalike Impersonation (${target.brand})`,
-        severity: 'HIGH',
-        detail: `The domain mimics "${target.brand}" (${target.official}) but is hosted on an unofficial server.`,
-      });
-      score += 40;
+      const isGov = ['Parivahan / E-Challan', 'India Post', 'Income Tax Department'].includes(target.brand);
+      if (isGov) {
+        threats.push({
+          id: 'GOVERNMENT_PORTAL_IMPERSONATION',
+          title: `Government Portal Impersonation (${target.brand})`,
+          severity: 'HIGH',
+          detail: `CRITICAL: This domain mimics the Indian Government portal "${target.brand}" (${target.official}) on an unauthorized private host. Official transport & government portals strictly reside under ".gov.in" or ".nic.in".`,
+        });
+        score += 55;
+      } else {
+        threats.push({
+          id: 'BRAND_LOOKALIKE',
+          title: `Brand Lookalike Impersonation (${target.brand})`,
+          severity: 'HIGH',
+          detail: `The domain mimics "${target.brand}" (${target.official}) but is hosted on an unofficial server.`,
+        });
+        score += 40;
+      }
       break;
     }
 
@@ -289,14 +331,14 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
   }
 
   // Suspicious Path or Query keywords
-  if (/\b(?:update-kyc|verify-otp|enter-pin|claim-reward|download-apk|free-gift)\b/i.test(path)) {
+  if (/\b(?:update-kyc|verify-otp|enter-pin|claim-reward|download-apk|free-gift|rto|morth|challan|echallan|traffic|vahan)\b/i.test(path)) {
     threats.push({
       id: 'SUSPICIOUS_PATH',
-      title: 'High-Risk Action Path / Form',
+      title: 'Deceptive Action Path / Government Body Emulation',
       severity: 'HIGH',
-      detail: 'The URL path leads directly to a credential harvesting form or suspicious file download.',
+      detail: 'The URL path contains official transport or sensitive action keywords (RTO / MoRTH / Challan) designed to deceive visitors.',
     });
-    score += 25;
+    score += 30;
   }
 
   // Check Community Threat Database
@@ -336,6 +378,10 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
 
   // Recommendations matching IsThisSpam
   const recommendations: string[] = [];
+  if (matchedBrandTarget === 'Parivahan / E-Challan') {
+    recommendations.push('Verify pending traffic challans ONLY at the official Ministry portal: https://echallan.parivahan.gov.in.');
+    recommendations.push('DO NOT pay traffic fines on unofficial .net or dynamic redirect URLs. Traffic police never use dynamic redirection hostnames.');
+  }
   if (riskLevel === 'HIGH') {
     recommendations.push('Do NOT open this website or enter personal information.');
     recommendations.push('Never enter your phone number, password, OTP, or UPI PIN on this site.');

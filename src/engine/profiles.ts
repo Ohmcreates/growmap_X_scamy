@@ -100,6 +100,21 @@ export const SCAM_PROFILES: ScamProfile[] = [
       'Never disclose OTPs to anyone, including persons claiming to be bank employees.',
     ],
   },
+  {
+    id: 'TRAFFIC_CHALLAN',
+    name: 'Fake E-Challan / Traffic Fine Scam',
+    description: 'Impersonation of Traffic Police, RTO, or MoRTH claiming a traffic violation or pending e-Challan with a deceptive link to steal funds or netbanking credentials.',
+    keySignals: ['Fake e-Challan / Traffic notice', 'Unofficial mParivahan or redirect link', 'Urgent paynow demand', 'Vehicle or Challan number simulation'],
+    patterns: [
+      /\b(?:e[\s-]*cha[lI1|]{2}an|cha[lI1|]{2}an|traffic\s+(?:police|fine|challan)|mparivahan|parivahan|rto|morth|vehicle\s+no|challan\s+no)\b/i,
+    ],
+    advicePayload: [
+      'Official traffic challans in India are hosted ONLY on the national government portal: https://echallan.parivahan.gov.in.',
+      'Indian traffic police and MoRTH never send payment links using .net, .com, or dynamic redirectors like redirectme.net or duckdns.org.',
+      'Verify pending challans safely by searching your vehicle registration number on the official Parivahan website or DigiLocker app.',
+      'Never enter card details or UPI PIN on links received via SMS.',
+    ],
+  },
 ];
 
 export function identifyScamProfile(

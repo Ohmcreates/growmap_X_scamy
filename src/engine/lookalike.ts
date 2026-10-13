@@ -1,3 +1,5 @@
+import { ReportingService } from '../services/reporting.js';
+
 export interface UrlAnalysis {
   rawUrl: string;
   cleanUrl: string;
@@ -21,6 +23,23 @@ const COMMON_SHORTENERS = new Set([
   'ow.ly',
   'rb.gy',
   'shorturl.at',
+]);
+
+const DYNAMIC_DNS_DOMAINS = new Set([
+  'redirectme.net',
+  'duckdns.org',
+  'ngrok.io',
+  'ngrok-free.app',
+  'ddns.net',
+  'hopto.org',
+  'zapto.org',
+  'bounceme.net',
+  'serveo.net',
+  'loca.lt',
+  'pagekite.me',
+  'no-ip.org',
+  'no-ip.biz',
+  'no-ip.info',
 ]);
 
 const SUSPICIOUS_TLDS = new Set([
@@ -53,6 +72,17 @@ const BRAND_KEYWORDS = [
   'aadhaar',
   'pan',
   'incometax',
+  'parivahan',
+  'mparivahan',
+  'echallan',
+  'challan',
+  'rto',
+  'morth',
+  'indiapost',
+  'delhivery',
+  'bluedart',
+  'electricity',
+  'digilocker',
 ];
 
 export function levenshteinDistance(a: string, b: string): number {
@@ -85,7 +115,7 @@ export function levenshteinDistance(a: string, b: string): number {
 
 export function extractAndAnalyzeUrls(
   text: string,
-  allowlist: string[]
+  allowlist: string[] = []
 ): UrlAnalysis[] {
   // Regex to match URLs with or without http(s), including IP addresses
   const urlRegex = /(?:https?:\/\/)?(?:(?:\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})|(?:(?:[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}))(?::\d+)?(?:\/[^\s]*)?/gi;
@@ -100,6 +130,26 @@ export function extractAndAnalyzeUrls(
     let cleanUrl = rawUrl.replace(/[.,!?;:()]+$/, '');
     const adjustedEnd = startIndex + cleanUrl.length;
 
+    // If no explicit scheme was present, perform sanity checks to prevent false URL matches
+    if (!cleanUrl.startsWith('http://') && !cleanUrl.startsWith('https://')) {
+      // Check if preceded by abbreviation words like "Vehicle no.", "Challan no."
+      const precedingText = text.slice(Math.max(0, startIndex - 20), startIndex);
+      if (/(?:vehicle|challan|flat|house|room|seat|plot|serial|phone|mobile|order|bill|ticket|case|fir|reg|ref)\s*$/i.test(precedingText)) {
+        continue;
+      }
+      if (/^(?:no|dr|mr|mrs|ms|vs|eg|ie|sr|jr|st)\./i.test(cleanUrl)) {
+        continue;
+      }
+      // If the match ends mid-word right before an alphanumeric character without punctuation or space
+      if (adjustedEnd < text.length && /[a-zA-Z0-9]/.test(text[adjustedEnd])) {
+        continue;
+      }
+      // Require at least a known dot in domain and a non-empty domain
+      if (!cleanUrl.includes('.')) {
+        continue;
+      }
+    }
+
     // Parse domain
     let domain = '';
     try {
@@ -113,8 +163,12 @@ export function extractAndAnalyzeUrls(
       domain = cleanUrl.split('/')[0].split(':')[0].toLowerCase();
     }
 
+    if (!domain) {
+      continue;
+    }
+
     // Check allowlist
-    const isAllowlisted = allowlist.some(
+    const isAllowlisted = (allowlist || []).some(
       (official) => domain === official.toLowerCase() || domain.endsWith(`.${official.toLowerCase()}`)
     );
 
@@ -149,39 +203,48 @@ export function extractAndAnalyzeUrls(
       reasons.push('URL shortener obscures destination address');
     }
 
-    // 3. Punycode / IDN homograph
+    // 3. Dynamic DNS / free redirection service host
+    const matchedDdns = Array.from(DYNAMIC_DNS_DOMAINS).find(
+      (ddns) => domain === ddns || domain.endsWith(`.${ddns}`)
+    );
+    if (matchedDdns) {
+      isSuspicious = true;
+      reasons.push(`Dynamic DNS or redirection service host (*.${matchedDdns}) frequently abused in phishing campaigns`);
+    }
+
+    // 4. Punycode / IDN homograph
     if (domain.includes('xn--')) {
       isSuspicious = true;
       reasons.push('Punycode character encoding (potential homoglyph attack)');
     }
 
-    // 4. '@' sign inside URL (browser authentication redirect trick)
+    // 5. '@' sign inside URL (browser authentication redirect trick)
     if (cleanUrl.includes('@')) {
       isSuspicious = true;
       reasons.push('@ symbol in link may deceive destination routing');
     }
 
-    // 5. Suspicious or cheap TLD
+    // 6. Suspicious or cheap TLD
     const tld = domain.split('.').pop() || '';
     if (SUSPICIOUS_TLDS.has(tld)) {
       isSuspicious = true;
       reasons.push(`Suspicious top-level domain (.${tld}) frequently used in scams`);
     }
 
-    // 6. Brand name in unofficial domain (e.g. sbi-kyc-update.xyz or sbi.security-alert.com)
+    // 7. Brand or Authority name in unofficial domain (e.g. sbi-kyc-update.xyz or mparivahan.redirectme.net)
     for (const brand of BRAND_KEYWORDS) {
       if (domain.includes(brand)) {
         isSuspicious = true;
         lookalikeTarget = brand.toUpperCase();
-        reasons.push(`Brand name "${brand.toUpperCase()}" appears in unofficial domain`);
+        reasons.push(`Brand / Authority name "${brand.toUpperCase()}" appears in unofficial domain`);
         break;
       }
     }
 
-    // 7. Lookalike domain check (Levenshtein distance 1-2 against official domains)
+    // 8. Lookalike domain check (Levenshtein distance 1-2 against official domains)
     if (!lookalikeTarget) {
       const sld = domain.split('.')[0];
-      for (const official of allowlist) {
+      for (const official of (allowlist || [])) {
         const officialSld = official.split('.')[0];
         const dist = levenshteinDistance(sld, officialSld);
         if (dist > 0 && dist <= 2 && Math.abs(sld.length - officialSld.length) <= 2) {
@@ -193,11 +256,23 @@ export function extractAndAnalyzeUrls(
       }
     }
 
-    // 8. Multiple hyphens or excessive subdomains
+    // 9. Multiple hyphens or excessive subdomains
     if ((domain.match(/-/g) || []).length >= 2) {
       isSuspicious = true;
       reasons.push('Multiple hyphens in domain name (common phishing pattern)');
     }
+
+    // 10. Check threat intelligence database for known bad domain
+    try {
+      const knownBad = ReportingService.getKnownBadIndicators();
+      const inThreatDb = knownBad.some(
+        (r) => r.type === 'DOMAIN' && (domain === r.normalizedValue || domain.endsWith(`.${r.normalizedValue}`))
+      );
+      if (inThreatDb) {
+        isSuspicious = true;
+        reasons.push('Confirmed malicious domain in verified cybercrime threat intelligence feed');
+      }
+    } catch {}
 
     results.push({
       rawUrl: cleanUrl,

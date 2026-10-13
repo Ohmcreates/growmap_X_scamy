@@ -135,6 +135,22 @@ export class ReportingService {
         source: 'Verified Threat Feed',
         verifiedAt: '2026-10-11T00:00:00Z',
       },
+      {
+        type: 'DOMAIN',
+        normalizedValue: 'mparivahan.redirectme.net',
+        status: 'VERIFIED',
+        threatLevel: 'CRITICAL',
+        source: 'National Cybercrime Threat Feed (E-Challan / MoRTH Phishing)',
+        verifiedAt: '2026-10-13T00:00:00Z',
+      },
+      {
+        type: 'DOMAIN',
+        normalizedValue: 'redirectme.net',
+        status: 'VERIFIED',
+        threatLevel: 'HIGH',
+        source: 'Dynamic DNS Phishing Shield',
+        verifiedAt: '2026-10-13T00:00:00Z',
+      },
     ];
   }
 }
