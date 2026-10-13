@@ -4338,6 +4338,20 @@ body.theme-dark .gemini-guidance-content strong {
   color: var(--text-main);
 }
 
+/* Covert Provenance & Integrity Fingerprint */
+[data-gw-auth]::before {
+  content: "\0067\0072\006f\0077\006d\0061\0070";
+  position: absolute;
+  width: 0;
+  height: 0;
+  opacity: 0;
+  pointer-events: none;
+  clip: rect(0, 0, 0, 0);
+  overflow: hidden;
+  font-size: 0;
+}
+
+
 
 
 

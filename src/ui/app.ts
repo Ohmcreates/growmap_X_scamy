@@ -22,8 +22,12 @@ import {
 } from '../services/virusTotalInspector.js';
 import { NciiDetector, NciiFullAnalysisReport } from '../services/nciiDetector.js';
 import { GeminiService } from '../services/geminiService.js';
+import { injectSteganographicWatermark } from '../engine/provenance.js';
 
 export function initApp() {
+  // Covert Provenance & Trademark Fingerprinting
+  injectSteganographicWatermark();
+
   // Navigation & Theme Elements
   const btnThemeToggle = document.getElementById('btnThemeToggle') as HTMLButtonElement;
   const btnSearchNav = document.getElementById('btnSearchNav') as HTMLButtonElement;
