@@ -113,12 +113,6 @@ export class DraggableMagnifier {
       }
     });
 
-    document.getElementById('btnGlideToWorkspace')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      router.navigate('workspace');
-      setTimeout(() => this.glideToElement('#messageInput', -60, -40), 150);
-    });
-
     document.getElementById('btnToggleMagnifier')?.addEventListener('click', (e) => {
       e.preventDefault();
       this.toggleVisibility();
@@ -218,12 +212,26 @@ export class DraggableMagnifier {
     requestAnimationFrame(step);
   }
 
+  public show() {
+    if (this.container) this.container.style.display = 'block';
+    const dockBar = document.getElementById('magnifierDockBar');
+    if (dockBar) dockBar.style.display = 'flex';
+    this.sampleUnderneath(true);
+  }
+
+  public hide() {
+    if (this.container) this.container.style.display = 'none';
+    const dockBar = document.getElementById('magnifierDockBar');
+    if (dockBar) dockBar.style.display = 'none';
+  }
+
   public toggleVisibility() {
     if (!this.container) return;
     const isHidden = this.container.style.display === 'none';
-    this.container.style.display = isHidden ? 'block' : 'none';
     if (isHidden) {
-      this.sampleUnderneath(true);
+      this.show();
+    } else {
+      this.hide();
     }
   }
 
@@ -236,7 +244,13 @@ export class DraggableMagnifier {
     const loop = () => {
       const now = performance.now();
       if (now - this.lastSampleTime > 100) {
-        this.sampleUnderneath();
+        if (
+          this.container &&
+          this.container.style.display !== 'none' &&
+          router.getRoute() === 'landing'
+        ) {
+          this.sampleUnderneath();
+        }
         this.lastSampleTime = now;
       }
       requestAnimationFrame(loop);

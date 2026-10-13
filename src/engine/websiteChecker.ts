@@ -3,6 +3,7 @@ import { isPrivateOrReservedHost } from './threatGateway.js';
 import { levenshteinDistance } from './lookalike.js';
 import { ReportingService } from '../services/reporting.js';
 import { evaluatePhishingMl, MlModelAssessment } from './phishingMl.js';
+import { inspectUrlHeuristics, UrlHeuristicResult } from './urlHeuristics.js';
 
 export interface ThreatSignal {
   id: string;
@@ -45,6 +46,7 @@ export interface WebsiteCheckResult {
   threats: ThreatSignal[];
   recommendations: string[];
   mlAssessment: MlModelAssessment;
+  heuristics: UrlHeuristicResult;
 }
 
 const COMMON_SHORTENERS = new Set([
@@ -158,6 +160,7 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
         'Never submit credentials, OTPs, or credit card details.',
       ],
       mlAssessment: evaluatePhishingMl(rawInput),
+      heuristics: inspectUrlHeuristics(rawInput),
     };
   }
 
@@ -208,12 +211,26 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
         'Official institutions will still never ask for your private ATM PIN or UPI PIN.',
       ],
       mlAssessment: evaluatePhishingMl(rawInput),
+      heuristics: inspectUrlHeuristics(rawInput),
     };
   }
 
   // 2. Evaluate Threat Signals
   const threats: ThreatSignal[] = [];
   let score = 0;
+
+  // 15 Production Heuristic Rules (LEX-01..07, SEM-01..04, NET-01..04)
+  const heuristics = inspectUrlHeuristics(rawInput);
+  score = Math.max(score, heuristics.totalScore);
+
+  for (const hRule of heuristics.firedRules) {
+    threats.push({
+      id: hRule.id,
+      title: `${hRule.code}: ${hRule.title} (+${hRule.points})`,
+      severity: hRule.points >= 25 ? 'HIGH' : hRule.points >= 15 ? 'MEDIUM' : 'LOW',
+      detail: `${hRule.detail} [Evidence: ${hRule.evidence}]`,
+    });
+  }
 
   // Machine Learning Phishing Classification (10-Feature Vector)
   const mlAssessment = evaluatePhishingMl(rawInput);
@@ -373,23 +390,27 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
   }
 
   // Cap score at 100
-  const finalScore = Math.min(100, Math.max(score > 0 ? score : 15, 0));
+  const finalScore = Math.min(100, Math.max(score, heuristics.totalScore));
 
   let riskLevel: 'LOW' | 'MEDIUM' | 'HIGH' = 'LOW';
   let classification: WebsiteCheckResult['classification'] = 'NO_THREATS_DETECTED';
   let verdict = 'No Strong Warning Signs Detected';
   let summary = 'This web address does not match known threat signatures, but always exercise caution before entering passwords.';
 
-  if (finalScore >= 45) {
+  // Heuristic Thresholds:
+  // 0–25:  Low Risk (Likely Safe)
+  // 26–55: Medium Risk (Suspicious)
+  // 56+:   High Risk (Likely Phishing / Scam)
+  if (finalScore >= 56) {
     riskLevel = 'HIGH';
     classification = 'SCAM_DETECTED';
     verdict = 'High-Risk Scam / Phishing Website';
-    summary = `Multiple high-severity warning signs found. This domain appears designed to impersonate brands or harvest credentials.`;
-  } else if (finalScore >= 21) {
+    summary = `High-Risk Phishing Triggered (${finalScore}/100): ${heuristics.firedRules.length} heuristic rules fired including ${heuristics.firedRules[0]?.title ?? 'critical anomalies'}.`;
+  } else if (finalScore >= 26) {
     riskLevel = 'MEDIUM';
     classification = 'SUSPICIOUS_DETECTED';
     verdict = 'Suspicious Web Address';
-    summary = 'This website shows suspicious indicators such as URL shortening, unconventional TLD, or deceptive structure.';
+    summary = `Suspicious Indicators (${finalScore}/100): Heuristic rules detected evasion or obfuscation patterns.`;
   }
 
   // Recommendations matching IsThisSpam
@@ -450,5 +471,6 @@ export function checkWebsiteUrl(rawInput: string): WebsiteCheckResult {
     threats,
     recommendations,
     mlAssessment,
+    heuristics,
   };
 }

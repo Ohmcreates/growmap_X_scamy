@@ -2742,6 +2742,333 @@ body.theme-dark .web-ml-feature-cell {
 }
 
 /* ==========================================================================
+   PRODUCTION HEURISTIC VERIFICATION ENGINE STYLES (LEX / SEM / NET)
+   ========================================================================== */
+.web-heuristics-section {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--bg-card-subtle);
+  border: 1.5px solid #06b6d4;
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  margin-top: 8px;
+}
+
+body.theme-dark .web-heuristics-section {
+  background: #082f49;
+  border-color: #0284c7;
+}
+
+.web-heuristics-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.web-heuristics-badge-cluster {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.web-heuristics-pill-tag {
+  background: #0891b2;
+  color: #ffffff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.web-heuristics-subtitle {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.web-heuristics-score-badge {
+  font-size: 0.78rem;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  background: rgba(6, 182, 212, 0.15);
+  color: #0284c7;
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+}
+
+body.theme-dark .web-heuristics-score-badge {
+  color: #38bdf8;
+  background: rgba(14, 165, 233, 0.2);
+}
+
+.web-heuristics-verdict-cluster {
+  display: flex;
+  align-items: center;
+}
+
+.web-heuristics-risk-pill {
+  font-size: 0.82rem;
+  font-weight: 800;
+  padding: 4px 12px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+
+.web-heuristics-risk-pill.low {
+  background: #dcfce7;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+body.theme-dark .web-heuristics-risk-pill.low {
+  background: #052e16;
+  color: #86efac;
+  border-color: #14532d;
+}
+
+.web-heuristics-risk-pill.medium {
+  background: #fef3c7;
+  color: #b45309;
+  border: 1px solid #fde68a;
+}
+
+body.theme-dark .web-heuristics-risk-pill.medium {
+  background: #451a03;
+  color: #fcd34d;
+  border-color: #78350f;
+}
+
+.web-heuristics-risk-pill.high {
+  background: #fee2e2;
+  color: #b91c1c;
+  border: 1px solid #fecaca;
+}
+
+body.theme-dark .web-heuristics-risk-pill.high {
+  background: #45121b;
+  color: #fca5a5;
+  border-color: #7f1d1d;
+}
+
+/* Three-Zone Threshold Progress Bar */
+.web-heuristics-threshold-bar {
+  display: flex;
+  gap: 4px;
+  background: var(--bg-card);
+  padding: 4px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-color);
+}
+
+body.theme-dark .web-heuristics-threshold-bar {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+.threshold-segment {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  opacity: 0.55;
+  transition: all 0.2s;
+}
+
+.threshold-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.threshold-segment.seg-low.active {
+  background: rgba(34, 197, 94, 0.15);
+  color: #16a34a;
+  opacity: 1;
+  border: 1px solid rgba(34, 197, 94, 0.35);
+}
+
+.threshold-segment.seg-med.active {
+  background: rgba(245, 158, 11, 0.15);
+  color: #d97706;
+  opacity: 1;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.threshold-segment.seg-high.active {
+  background: rgba(239, 68, 68, 0.15);
+  color: #dc2626;
+  opacity: 1;
+  border: 1px solid rgba(239, 68, 68, 0.35);
+}
+
+body.theme-dark .threshold-segment.seg-low.active {
+  color: #4ade80;
+}
+body.theme-dark .threshold-segment.seg-med.active {
+  color: #fbbf24;
+}
+body.theme-dark .threshold-segment.seg-high.active {
+  color: #f87171;
+}
+
+.web-heuristics-subhead {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.heuristics-count-tag {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  background: var(--bg-card);
+  padding: 2px 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid var(--border-color);
+}
+
+.web-heuristics-rules-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.heuristic-rule-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+  transition: all 0.2s;
+}
+
+body.theme-dark .heuristic-rule-item {
+  background: #0f172a;
+  border-color: #1e293b;
+}
+
+.rule-left-cluster {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  flex-grow: 1;
+}
+
+.rule-header-tags {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.rule-code-badge {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  font-weight: 800;
+  background: #0284c7;
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: var(--radius-sm);
+}
+
+.rule-category-pill {
+  font-size: 0.65rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  background: rgba(100, 116, 139, 0.15);
+  color: var(--text-muted);
+}
+
+.rule-category-pill.lexical {
+  background: rgba(59, 130, 246, 0.15);
+  color: #2563eb;
+}
+.rule-category-pill.semantic {
+  background: rgba(168, 85, 247, 0.15);
+  color: #9333ea;
+}
+.rule-category-pill.network {
+  background: rgba(249, 115, 22, 0.15);
+  color: #ea580c;
+}
+
+body.theme-dark .rule-category-pill.lexical { color: #60a5fa; }
+body.theme-dark .rule-category-pill.semantic { color: #c084fc; }
+body.theme-dark .rule-category-pill.network { color: #fb923c; }
+
+.rule-title-text {
+  font-size: 0.84rem;
+  font-weight: 700;
+  color: var(--text-main);
+}
+
+.rule-desc-text {
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.rule-evidence-tag {
+  font-size: 0.72rem;
+  font-family: var(--font-mono);
+  color: #0284c7;
+  background: rgba(6, 182, 212, 0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  width: fit-content;
+}
+
+body.theme-dark .rule-evidence-tag {
+  color: #38bdf8;
+  background: rgba(56, 189, 248, 0.1);
+}
+
+.rule-points-badge {
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  font-weight: 800;
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  background: #fee2e2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+  white-space: nowrap;
+}
+
+body.theme-dark .rule-points-badge {
+  background: #45121b;
+  color: #f87171;
+  border-color: #7f1d1d;
+}
+
+/* ==========================================================================
    SPOTTHESCAM.IN APK SECURITY INSPECTOR STYLES
    ========================================================================== */
 

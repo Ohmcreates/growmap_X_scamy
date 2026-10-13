@@ -91,5 +91,16 @@ describe('Scam Spotter — Editorial Landing Page & Components', () => {
       const cleanSnippet = generateZoomSnippet('Official and safe transaction verified', 'LOW');
       expect(cleanSnippet).toContain('zoom-mark-green');
     });
+
+    it('removes magnifying glass and dock bar on the main website workspace view', async () => {
+      const { shouldDisplayMagnifier } = await import('../router.js');
+
+      // The magnifying glass is active on the landing page
+      expect(shouldDisplayMagnifier('landing')).toBe(true);
+
+      // The magnifying glass is removed in the main website workspace and auth views
+      expect(shouldDisplayMagnifier('workspace')).toBe(false);
+      expect(shouldDisplayMagnifier('login')).toBe(false);
+    });
   });
 });

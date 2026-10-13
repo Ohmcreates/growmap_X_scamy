@@ -9,6 +9,7 @@ import pandas as pd
 from flask import Flask, request, jsonify, render_template
 
 from feature_extractor import extract_features, FEATURE_NAMES
+from url_heuristics import inspect_url
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
@@ -96,6 +97,8 @@ def predict():
         # Confidence is the probability of the predicted class
         confidence_score = round(float(phishing_prob if is_phishing else safe_prob) * 100, 2)
 
+        heuristics_data = inspect_url(url)
+
         return jsonify({
             'url': url,
             'is_phishing': is_phishing,
@@ -103,10 +106,30 @@ def predict():
             'phishing_probability': round(phishing_prob * 100, 2),
             'safe_probability': round(safe_prob * 100, 2),
             'verdict': 'Phishing / Suspicious' if is_phishing else 'Legitimate / Safe',
-            'features': features_dict
+            'features': features_dict,
+            'heuristics': heuristics_data
         })
     except Exception as err:
         return jsonify({'error': f'Inference error: {str(err)}'}), 500
+
+
+@app.route('/inspect', methods=['POST', 'OPTIONS'])
+def inspect():
+    """
+    Evaluates URL against 15 Production Heuristic Rules (LEX-01..07, SEM-01..04, NET-01..04).
+    Thresholds: 0-25 Low, 26-55 Medium, 56+ High.
+    Accepts JSON: {"url": "..."}
+    """
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    data = request.get_json(silent=True) or {}
+    url = data.get('url', '').strip()
+    if not url:
+        return jsonify({'error': 'URL parameter is required.'}), 400
+
+    result = inspect_url(url)
+    return jsonify(result)
 
 
 if __name__ == '__main__':

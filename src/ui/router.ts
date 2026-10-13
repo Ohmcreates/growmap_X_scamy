@@ -79,6 +79,13 @@ export class AppRouter {
 
     if (!this.landingView || !this.authView || !this.appWorkspaceView) return;
 
+    const magnifier = document.getElementById('draggableMagnifier');
+    const dockBar = document.getElementById('magnifierDockBar');
+
+    const showMagnifier = shouldDisplayMagnifier(this.currentRoute);
+    if (magnifier) magnifier.style.display = showMagnifier ? 'block' : 'none';
+    if (dockBar) dockBar.style.display = showMagnifier ? 'flex' : 'none';
+
     if (this.currentRoute === 'landing') {
       this.landingView.style.display = 'block';
       this.landingView.classList.add('active');
@@ -96,6 +103,7 @@ export class AppRouter {
       this.appWorkspaceView.classList.remove('active');
       window.scrollTo(0, 0);
     } else {
+      // Main website (#workspace): remove the magnifying glass and dock bar
       this.landingView.style.display = 'none';
       this.landingView.classList.remove('active');
       this.authView.style.display = 'none';
@@ -105,6 +113,10 @@ export class AppRouter {
       window.scrollTo(0, 0);
     }
   }
+}
+
+export function shouldDisplayMagnifier(route: AppRoute): boolean {
+  return route === 'landing';
 }
 
 export const router = new AppRouter();

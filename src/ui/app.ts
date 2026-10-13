@@ -778,6 +778,11 @@ export function initApp() {
         .map((rec) => `<li>${rec}</li>`)
         .join('');
 
+      // Heuristic Verification Engine (15 Concrete Rules)
+      if (webResult.heuristics) {
+        renderHeuristicsAssessment(webResult.heuristics);
+      }
+
       // Machine Learning Phishing Forensics (Random Forest 10-Feature Vector)
       if (webResult.mlAssessment) {
         renderMlAssessment(webResult.mlAssessment);
@@ -790,6 +795,79 @@ export function initApp() {
       }
     } else if (websiteInspectorCard) {
       websiteInspectorCard.style.display = 'none';
+    }
+
+    function renderHeuristicsAssessment(h: any) {
+      const webHeuristicsSection = document.getElementById('webHeuristicsSection') as HTMLElement;
+      const webHeuristicsScoreBadge = document.getElementById('webHeuristicsScoreBadge') as HTMLElement;
+      const webHeuristicsRiskPill = document.getElementById('webHeuristicsRiskPill') as HTMLElement;
+      const webHeuristicsRulesCount = document.getElementById('webHeuristicsRulesCount') as HTMLElement;
+      const webHeuristicsRulesList = document.getElementById('webHeuristicsRulesList') as HTMLElement;
+      const thresholdSegments = document.querySelectorAll('.web-heuristics-threshold-bar .threshold-segment');
+
+      if (!webHeuristicsSection || !webHeuristicsRulesList) return;
+      webHeuristicsSection.style.display = 'flex';
+
+      if (webHeuristicsScoreBadge) {
+        webHeuristicsScoreBadge.textContent = `Threat Score: ${h.totalScore}/100`;
+      }
+
+      // Threshold Active Segments: 0-25 Low, 26-55 Medium, 56+ High
+      thresholdSegments.forEach((seg) => seg.classList.remove('active'));
+      if (h.riskCode === 'HIGH') {
+        const seg = document.querySelector('.web-heuristics-threshold-bar .seg-high');
+        if (seg) seg.classList.add('active');
+      } else if (h.riskCode === 'MEDIUM') {
+        const seg = document.querySelector('.web-heuristics-threshold-bar .seg-med');
+        if (seg) seg.classList.add('active');
+      } else {
+        const seg = document.querySelector('.web-heuristics-threshold-bar .seg-low');
+        if (seg) seg.classList.add('active');
+      }
+
+      if (webHeuristicsRiskPill) {
+        if (h.riskCode === 'HIGH') {
+          webHeuristicsRiskPill.className = 'web-heuristics-risk-pill high';
+          webHeuristicsRiskPill.textContent = '56+: High Risk (Likely Phishing / Scam)';
+        } else if (h.riskCode === 'MEDIUM') {
+          webHeuristicsRiskPill.className = 'web-heuristics-risk-pill medium';
+          webHeuristicsRiskPill.textContent = '26–55: Medium Risk (Suspicious)';
+        } else {
+          webHeuristicsRiskPill.className = 'web-heuristics-risk-pill low';
+          webHeuristicsRiskPill.textContent = '0–25: Low Risk (Likely Safe)';
+        }
+      }
+
+      if (webHeuristicsRulesCount) {
+        webHeuristicsRulesCount.textContent = `${h.firedRules.length} Rule${h.firedRules.length === 1 ? '' : 's'} Fired`;
+      }
+
+      if (h.firedRules.length === 0) {
+        webHeuristicsRulesList.innerHTML = `
+          <div style="font-size: 0.82rem; color: #16a34a; padding: 10px 12px; background: rgba(34, 197, 94, 0.08); border-radius: var(--radius-sm); border: 1px dashed rgba(34, 197, 94, 0.3);">
+            ✓ 0 of 15 heuristic triggers activated. URL syntax, domain registration structure, and credentials comply with baseline safety rules.
+          </div>
+        `;
+      } else {
+        webHeuristicsRulesList.innerHTML = h.firedRules
+          .map(
+            (r: any) => `
+          <div class="heuristic-rule-item">
+            <div class="rule-left-cluster">
+              <div class="rule-header-tags">
+                <span class="rule-code-badge">${r.code}</span>
+                <span class="rule-category-pill ${String(r.category).toLowerCase()}">${r.category}</span>
+                <span class="rule-title-text">${escapeHtml(r.title)}</span>
+              </div>
+              <p class="rule-desc-text">${escapeHtml(r.detail)}</p>
+              <span class="rule-evidence-tag">Evidence: ${escapeHtml(r.evidence)}</span>
+            </div>
+            <span class="rule-points-badge">+${r.points}</span>
+          </div>
+        `
+          )
+          .join('');
+      }
     }
 
     function renderMlAssessment(ml: MlModelAssessment) {

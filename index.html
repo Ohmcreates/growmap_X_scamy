@@ -37,7 +37,6 @@
       <button id="btnGlideToHero" class="dock-btn active" type="button" title="Glide glass over Hero scam sample">📍 Scan Hero</button>
       <button id="btnGlideToDemo" class="dock-btn" type="button" title="Glide glass over Live Demo">📍 Scan Demo</button>
       <button id="btnGlideToLinks" class="dock-btn" type="button" title="Glide glass over Link Security">📍 Scan Links</button>
-      <button id="btnGlideToWorkspace" class="dock-btn" type="button" title="Glide glass over Scanner Workspace">💻 Scan Workspace</button>
       <button id="btnToggleMagnifier" class="dock-btn" type="button" title="Hide or show the magnifying glass">👁️ Toggle Glass</button>
     </div>
 
@@ -1075,6 +1074,44 @@
                   </div>
                   <div id="webMlFeaturesGrid" class="web-ml-features-grid">
                     <!-- Populated dynamically with the 10 features -->
+                  </div>
+                </div>
+              <!-- Production Heuristic Ruleset (LEX / SEM / NET) -->
+              <div id="webHeuristicsSection" class="web-heuristics-section">
+                <div class="web-heuristics-header">
+                  <div class="web-heuristics-badge-cluster">
+                    <span class="web-heuristics-pill-tag">⚡ PRODUCTION HEURISTICS</span>
+                    <span class="web-heuristics-subtitle">15 Concrete Cybersecurity Rules</span>
+                    <span id="webHeuristicsScoreBadge" class="web-heuristics-score-badge">Threat Score: 0/100</span>
+                  </div>
+                  <div class="web-heuristics-verdict-cluster">
+                    <span id="webHeuristicsRiskPill" class="web-heuristics-risk-pill low">0–25: Low Risk (Likely Safe)</span>
+                  </div>
+                </div>
+
+                <!-- Three-Zone Threshold Bar (0-25 Low, 26-55 Medium, 56+ High) -->
+                <div class="web-heuristics-threshold-bar">
+                  <div class="threshold-segment seg-low active" title="0–25: Low Risk (Likely Safe)">
+                    <span class="threshold-dot"></span>
+                    <span class="threshold-label">0–25 Low Risk (Safe)</span>
+                  </div>
+                  <div class="threshold-segment seg-med" title="26–55: Medium Risk (Suspicious)">
+                    <span class="threshold-dot"></span>
+                    <span class="threshold-label">26–55 Medium Risk (Suspicious)</span>
+                  </div>
+                  <div class="threshold-segment seg-high" title="56+: High Risk (Likely Phishing / Scam)">
+                    <span class="threshold-dot"></span>
+                    <span class="threshold-label">56+ High Risk (Scam / Phishing)</span>
+                  </div>
+                </div>
+
+                <div class="web-heuristics-body">
+                  <div class="web-heuristics-subhead">
+                    <span>Fired Heuristic Rule Triggers & Point Allocations:</span>
+                    <span id="webHeuristicsRulesCount" class="heuristics-count-tag">0 Rules Fired</span>
+                  </div>
+                  <div id="webHeuristicsRulesList" class="web-heuristics-rules-list">
+                    <!-- Populated dynamically -->
                   </div>
                 </div>
               </div>
