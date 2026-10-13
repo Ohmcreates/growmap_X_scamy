@@ -12,6 +12,13 @@ import { renderDashboardHtml } from './dashboard.js';
 import { checkWebsiteUrl } from '../engine/websiteChecker.js';
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
 import { inspectApkBuffer, createDemoSampleApk, ApkSecurityReport } from '../services/apkInspector.js';
+import {
+  inspectFileVirusTotal,
+  createVirusTotalDemoBuffer,
+  KNOWN_THREAT_HASHES,
+  SECURITY_VENDORS,
+  VirusTotalReport,
+} from '../services/virusTotalInspector.js';
 
 export function initApp() {
   // Navigation & Theme Elements
@@ -27,6 +34,7 @@ export function initApp() {
   const menuScanLink = document.getElementById('menuScanLink') as HTMLButtonElement;
   const menuScanImage = document.getElementById('menuScanImage') as HTMLButtonElement;
   const menuScanApk = document.getElementById('menuScanApk') as HTMLButtonElement;
+  const menuScanVt = document.getElementById('menuScanVt') as HTMLButtonElement;
   const menuThreatDb = document.getElementById('menuThreatDb') as HTMLButtonElement;
   const menuEvaluation = document.getElementById('menuEvaluation') as HTMLButtonElement;
   const menuHistory = document.getElementById('menuHistory') as HTMLButtonElement;
@@ -39,11 +47,13 @@ export function initApp() {
   const tabScanLink = document.getElementById('tabScanLink') as HTMLButtonElement;
   const tabUploadImage = document.getElementById('tabUploadImage') as HTMLButtonElement;
   const tabApkScan = document.getElementById('tabApkScan') as HTMLButtonElement;
+  const tabVtScan = document.getElementById('tabVtScan') as HTMLButtonElement;
 
   const panelTextMessage = document.getElementById('panelTextMessage') as HTMLElement;
   const panelScanLink = document.getElementById('panelScanLink') as HTMLElement;
   const panelUploadImage = document.getElementById('panelUploadImage') as HTMLElement;
   const panelApkScan = document.getElementById('panelApkScan') as HTMLElement;
+  const panelVtScan = document.getElementById('panelVtScan') as HTMLElement;
 
   const textarea = document.getElementById('messageInput') as HTMLTextAreaElement;
   const urlInput = document.getElementById('urlInput') as HTMLInputElement;
@@ -51,6 +61,7 @@ export function initApp() {
   const inlineError = document.getElementById('inlineError') as HTMLElement;
   const ocrStatusNotice = document.getElementById('ocrStatusNotice') as HTMLElement;
   const apkStatusNotice = document.getElementById('apkStatusNotice') as HTMLElement;
+  const vtStatusNotice = document.getElementById('vtStatusNotice') as HTMLElement;
   const langScriptPill = document.getElementById('langScriptPill') as HTMLElement;
 
   const dropZone = document.getElementById('dropZone') as HTMLElement;
@@ -88,6 +99,52 @@ export function initApp() {
 
   const apkPermissionsList = document.getElementById('apkPermissionsList') as HTMLElement;
   const apkRecommendationsList = document.getElementById('apkRecommendationsList') as HTMLElement;
+
+  // VirusTotal File & Hash Scan Elements
+  const vtDropZone = document.getElementById('vtDropZone') as HTMLElement;
+  const btnBrowseVtFile = document.getElementById('btnBrowseVtFile') as HTMLButtonElement;
+  const vtFileInput = document.getElementById('vtFileInput') as HTMLInputElement;
+  const vtHashSearchInput = document.getElementById('vtHashSearchInput') as HTMLInputElement;
+  const btnSearchVtHash = document.getElementById('btnSearchVtHash') as HTMLButtonElement;
+  const btnVtDemoRansomware = document.getElementById('btnVtDemoRansomware') as HTMLButtonElement;
+  const btnVtDemoDropper = document.getElementById('btnVtDemoDropper') as HTMLButtonElement;
+  const btnVtDemoClean = document.getElementById('btnVtDemoClean') as HTMLButtonElement;
+
+  const vtInspectorCard = document.getElementById('vtInspectorCard') as HTMLElement;
+  const vtFileNameText = document.getElementById('vtFileNameText') as HTMLElement;
+  const vtFileMetaText = document.getElementById('vtFileMetaText') as HTMLElement;
+  const vtRatioCircle = document.getElementById('vtRatioCircle') as HTMLElement;
+  const vtRatioScore = document.getElementById('vtRatioScore') as HTMLElement;
+  const vtRatioTotal = document.getElementById('vtRatioTotal') as HTMLElement;
+  const vtVerdictTitle = document.getElementById('vtVerdictTitle') as HTMLElement;
+  const vtClassificationText = document.getElementById('vtClassificationText') as HTMLElement;
+
+  const vtTabDetection = document.getElementById('vtTabDetection') as HTMLButtonElement;
+  const vtTabDetails = document.getElementById('vtTabDetails') as HTMLButtonElement;
+  const vtTabBehavior = document.getElementById('vtTabBehavior') as HTMLButtonElement;
+  const vtTabProtocol = document.getElementById('vtTabProtocol') as HTMLButtonElement;
+
+  const vtPanelDetection = document.getElementById('vtPanelDetection') as HTMLElement;
+  const vtPanelDetails = document.getElementById('vtPanelDetails') as HTMLElement;
+  const vtPanelBehavior = document.getElementById('vtPanelBehavior') as HTMLElement;
+  const vtPanelProtocol = document.getElementById('vtPanelProtocol') as HTMLElement;
+
+  const vtVendorSummaryCounts = document.getElementById('vtVendorSummaryCounts') as HTMLElement;
+  const vtVendorsGrid = document.getElementById('vtVendorsGrid') as HTMLElement;
+
+  const vtMd5Text = document.getElementById('vtMd5Text') as HTMLElement;
+  const vtSha1Text = document.getElementById('vtSha1Text') as HTMLElement;
+  const vtSha256Text = document.getElementById('vtSha256Text') as HTMLElement;
+  const vtFileTypeVal = document.getElementById('vtFileTypeVal') as HTMLElement;
+  const vtMagicVal = document.getElementById('vtMagicVal') as HTMLElement;
+  const vtEntropyFill = document.getElementById('vtEntropyFill') as HTMLElement;
+  const vtEntropyScoreVal = document.getElementById('vtEntropyScoreVal') as HTMLElement;
+  const vtEntropyRatingVal = document.getElementById('vtEntropyRatingVal') as HTMLElement;
+  const vtEntropyExplainVal = document.getElementById('vtEntropyExplainVal') as HTMLElement;
+
+  const vtBehaviorSignalsList = document.getElementById('vtBehaviorSignalsList') as HTMLElement;
+  const vtNetworkList = document.getElementById('vtNetworkList') as HTMLElement;
+  const vtRecommendationsList = document.getElementById('vtRecommendationsList') as HTMLElement;
 
   // Example Buttons (English + Multilingual Hinglish & Hindi)
   const btnExampleSbi = document.getElementById('btnExampleSbi') as HTMLButtonElement;
@@ -191,7 +248,7 @@ export function initApp() {
   const reportSuccess = document.getElementById('reportSuccess') as HTMLElement;
 
   let currentResult: ScanResult | null = null;
-  let activeTab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' = 'TEXT';
+  let activeTab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' | 'VT' = 'TEXT';
   let alarmInterval: number | null = null;
   let alarmTimeout: number | null = null;
 
@@ -207,15 +264,15 @@ export function initApp() {
   // --------------------------------------------------------------------------
   // Tab Switching
   // --------------------------------------------------------------------------
-  function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK') {
+  function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' | 'VT') {
     activeTab = tab;
 
-    [tabTextMessage, tabScanLink, tabUploadImage, tabApkScan].forEach((t) => t?.classList.remove('active'));
-    [panelTextMessage, panelScanLink, panelUploadImage, panelApkScan].forEach((p) => {
+    [tabTextMessage, tabScanLink, tabUploadImage, tabApkScan, tabVtScan].forEach((t) => t?.classList.remove('active'));
+    [panelTextMessage, panelScanLink, panelUploadImage, panelApkScan, panelVtScan].forEach((p) => {
       if (p) p.style.display = 'none';
     });
 
-    [menuScanMessage, menuScanLink, menuScanImage, menuScanApk].forEach((m) => m?.classList.remove('active'));
+    [menuScanMessage, menuScanLink, menuScanImage, menuScanApk, menuScanVt].forEach((m) => m?.classList.remove('active'));
 
     if (tab === 'TEXT') {
       tabTextMessage?.classList.add('active');
@@ -235,6 +292,10 @@ export function initApp() {
       tabApkScan?.classList.add('active');
       menuScanApk?.classList.add('active');
       if (panelApkScan) panelApkScan.style.display = 'block';
+    } else if (tab === 'VT') {
+      tabVtScan?.classList.add('active');
+      menuScanVt?.classList.add('active');
+      if (panelVtScan) panelVtScan.style.display = 'block';
     }
   }
 
@@ -242,11 +303,13 @@ export function initApp() {
   tabScanLink?.addEventListener('click', () => switchTab('LINK'));
   tabUploadImage?.addEventListener('click', () => switchTab('IMAGE'));
   tabApkScan?.addEventListener('click', () => switchTab('APK'));
+  tabVtScan?.addEventListener('click', () => switchTab('VT'));
 
   menuScanMessage?.addEventListener('click', () => switchTab('TEXT'));
   menuScanLink?.addEventListener('click', () => switchTab('LINK'));
   menuScanImage?.addEventListener('click', () => switchTab('IMAGE'));
   menuScanApk?.addEventListener('click', () => switchTab('APK'));
+  menuScanVt?.addEventListener('click', () => switchTab('VT'));
 
   // --------------------------------------------------------------------------
   // Multilingual Script Detection & Character Counter
@@ -626,6 +689,10 @@ export function initApp() {
 
     if (apkInspectorCard) {
       apkInspectorCard.style.display = 'none';
+    }
+
+    if (vtInspectorCard) {
+      vtInspectorCard.style.display = 'none';
     }
 
     // Evidence Highlighting
@@ -1077,6 +1144,7 @@ export function initApp() {
     // 1. Hide other cards & show APK card
     if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
     if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
+    if (vtInspectorCard) vtInspectorCard.style.display = 'none';
     apkInspectorCard.style.display = 'flex';
 
     // 2. Populate Identity & Verification Badges
@@ -1300,6 +1368,360 @@ export function initApp() {
 
   btnApkDemoTrojan?.addEventListener('click', () => handleDemoApk('MALICIOUS_SBI_TROJAN'));
   btnApkDemoClean?.addEventListener('click', () => handleDemoApk('BENIGN_CALCULATOR'));
+
+  // --------------------------------------------------------------------------
+  // VirusTotal Multi-Engine File & Hash Inspector Flow
+  // --------------------------------------------------------------------------
+  function switchVtSubtab(tabName: 'DETECTION' | 'DETAILS' | 'BEHAVIOR' | 'PROTOCOL') {
+    [vtTabDetection, vtTabDetails, vtTabBehavior, vtTabProtocol].forEach((btn) => btn?.classList.remove('active'));
+    [vtPanelDetection, vtPanelDetails, vtPanelBehavior, vtPanelProtocol].forEach((panel) => {
+      if (panel) panel.style.display = 'none';
+    });
+
+    if (tabName === 'DETECTION') {
+      vtTabDetection?.classList.add('active');
+      if (vtPanelDetection) vtPanelDetection.style.display = 'flex';
+    } else if (tabName === 'DETAILS') {
+      vtTabDetails?.classList.add('active');
+      if (vtPanelDetails) vtPanelDetails.style.display = 'flex';
+    } else if (tabName === 'BEHAVIOR') {
+      vtTabBehavior?.classList.add('active');
+      if (vtPanelBehavior) vtPanelBehavior.style.display = 'flex';
+    } else if (tabName === 'PROTOCOL') {
+      vtTabProtocol?.classList.add('active');
+      if (vtPanelProtocol) vtPanelProtocol.style.display = 'flex';
+    }
+  }
+
+  vtTabDetection?.addEventListener('click', () => switchVtSubtab('DETECTION'));
+  vtTabDetails?.addEventListener('click', () => switchVtSubtab('DETAILS'));
+  vtTabBehavior?.addEventListener('click', () => switchVtSubtab('BEHAVIOR'));
+  vtTabProtocol?.addEventListener('click', () => switchVtSubtab('PROTOCOL'));
+
+  async function renderVirusTotalReport(report: VirusTotalReport) {
+    if (!vtInspectorCard) return;
+
+    // 1. Hide other cards & reveal VT Inspector Card
+    if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
+    if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
+    if (apkInspectorCard) apkInspectorCard.style.display = 'none';
+    vtInspectorCard.style.display = 'flex';
+
+    // 2. Populate Header & Detection Radial Meter
+    vtFileNameText.textContent = report.fileName;
+    vtFileMetaText.textContent = `${report.fileType} • ${(report.fileSizeBytes / 1024).toFixed(1)} KB • MIME: ${report.mimeType}`;
+    vtRatioScore.textContent = `${report.stats.malicious}`;
+    vtRatioTotal.textContent = `/ ${report.stats.totalEngines}`;
+
+    vtRatioCircle.className = 'vt-ratio-circle';
+    if (report.verdict === 'MALICIOUS') {
+      vtRatioCircle.classList.add('danger');
+      vtVerdictTitle.textContent = `${report.stats.detectionRatio} Security Vendors Flagged This File`;
+      vtVerdictTitle.style.color = '#b91c1c';
+      vtClassificationText.textContent = report.threatClassification || 'Malware Threat Detected';
+    } else if (report.verdict === 'SUSPICIOUS') {
+      vtRatioCircle.classList.add('warning');
+      vtVerdictTitle.textContent = `${report.stats.detectionRatio} Security Vendors Flagged As Suspicious`;
+      vtVerdictTitle.style.color = '#b45309';
+      vtClassificationText.textContent = report.threatClassification || 'Potentially Unwanted Application (PUA)';
+    } else {
+      vtRatioCircle.classList.add('clean');
+      vtVerdictTitle.textContent = `0 / ${report.stats.totalEngines} Security Vendors Flagged This File`;
+      vtVerdictTitle.style.color = '#15803d';
+      vtClassificationText.textContent = 'Clean Application — No Malicious Traits Found';
+    }
+
+    // 3. Populate Subtab 1: 72 Security Vendors Grid
+    vtVendorSummaryCounts.textContent = `${report.stats.malicious} Malicious • ${report.stats.suspicious} Suspicious • ${report.stats.clean} Undetected`;
+    vtVendorsGrid.innerHTML = report.vendorResults
+      .map(
+        (v) => `
+        <div class="vt-vendor-item">
+          <span class="vt-vendor-name" title="${escapeHtml(v.vendor)}">${escapeHtml(v.vendor)}</span>
+          <span class="vt-vendor-status ${v.category}">
+            ${
+              v.category === 'malicious'
+                ? `🟥 ${escapeHtml(v.result || 'Malicious')}`
+                : v.category === 'suspicious'
+                ? `🟨 ${escapeHtml(v.result || 'Suspicious')}`
+                : '🟩 Clean'
+            }
+          </span>
+        </div>
+      `
+      )
+      .join('');
+
+    // 4. Populate Subtab 2: Hashes, Magic, Entropy
+    vtMd5Text.textContent = report.hashes.md5;
+    vtSha1Text.textContent = report.hashes.sha1;
+    vtSha256Text.textContent = report.hashes.sha256;
+    vtFileTypeVal.textContent = report.fileType;
+    vtMagicVal.textContent = `Magic Header: ${report.magicHeader}`;
+
+    const entropyPercent = Math.min(100, (report.entropy.score / 8) * 100);
+    vtEntropyFill.style.width = `${entropyPercent}%`;
+    vtEntropyScoreVal.textContent = `${report.entropy.score.toFixed(2)} / 8.00 bits/byte`;
+    vtEntropyRatingVal.textContent =
+      report.entropy.rating === 'HIGH_PACKED'
+        ? 'HIGH (Packed / Encrypted)'
+        : report.entropy.rating === 'LOW'
+        ? 'LOW (Uniform/Sparse)'
+        : 'NORMAL (Unpacked)';
+    vtEntropyRatingVal.style.color =
+      report.entropy.rating === 'HIGH_PACKED'
+        ? '#dc2626'
+        : report.entropy.rating === 'LOW'
+        ? '#2563eb'
+        : '#16a34a';
+    vtEntropyExplainVal.textContent = report.entropy.explanation;
+
+    // 5. Populate Subtab 3: Behavior & Sandbox Indicators
+    if (report.behaviorSignals.length > 0) {
+      vtBehaviorSignalsList.innerHTML = report.behaviorSignals
+        .map(
+          (s) => `
+          <div class="apk-perm-item ${s.severity === 'HIGH' ? 'critical' : 'dangerous'}">
+            <div class="apk-perm-top">
+              <span class="apk-perm-name">${escapeHtml(s.title)}</span>
+              <span class="apk-perm-badge">${s.severity}</span>
+            </div>
+            <p class="apk-trojan-pattern">${escapeHtml(s.detail)}</p>
+          </div>
+        `
+        )
+        .join('');
+    } else {
+      vtBehaviorSignalsList.innerHTML = `
+        <div style="font-size: 0.85rem; color: #16a34a; padding: 6px 0;">
+          ✓ No dangerous behavioral API calls or process injection patterns detected.
+        </div>
+      `;
+    }
+
+    const networkCombined = [
+      ...report.extractedStrings.urls.map((u) => `URL: ${u}`),
+      ...report.extractedStrings.ips.map((ip) => `IP: ${ip}`),
+    ];
+    if (networkCombined.length > 0) {
+      vtNetworkList.innerHTML = networkCombined.map((n) => `<div>🔗 ${escapeHtml(n)}</div>`).join('');
+    } else {
+      vtNetworkList.innerHTML = '<span style="color: #16a34a;">✓ No external C2 IP addresses or remote endpoints extracted.</span>';
+    }
+
+    // 6. Populate Subtab 4: Safety Protocol
+    vtRecommendationsList.innerHTML = report.recommendations
+      .map((r) => `<li>${escapeHtml(r)}</li>`)
+      .join('');
+
+    // Default to Detection subtab
+    switchVtSubtab('DETECTION');
+
+    // 7. Sync with Score Donut & History
+    const calculatedScore = Math.min(100, Math.round((report.stats.malicious / report.stats.totalEngines) * 100));
+    const fakeScanResult: ScanResult = {
+      score: calculatedScore,
+      rawScore: calculatedScore,
+      riskLevel: report.riskLevel,
+      headline:
+        report.verdict === 'MALICIOUS'
+          ? `VirusTotal: ${report.stats.detectionRatio} Vendors Flagged Malware`
+          : report.verdict === 'SUSPICIOUS'
+          ? `VirusTotal: ${report.stats.detectionRatio} Vendors Flagged Suspicious`
+          : 'VirusTotal: 0/72 Clean Application',
+      summary: `${report.stats.detectionRatio} security vendors flagged this file. Entropy: ${report.entropy.score} bits/byte (${report.entropy.rating}).`,
+      advice: report.recommendations[0] || 'Inspect file before execution.',
+      breakdown: report.vendorResults
+        .filter((v) => v.category !== 'clean')
+        .slice(0, 10)
+        .map((v) => ({
+          ruleId: v.vendor,
+          label: `${v.vendor}: ${v.result || 'Threat Flag'}`,
+          group: 'credential' as const,
+          rawPoints: 10,
+          awardedPoints: 10,
+          category: 'VIRUSTOTAL_ENGINE',
+          cappedByGroup: false,
+          explanation: `Flagged by security vendor ${v.vendor}.`,
+          evidence: [
+            {
+              ruleId: v.vendor,
+              ruleLabel: v.vendor,
+              group: 'credential' as const,
+              matchedText: v.result || 'Threat',
+              startIndex: 0,
+              endIndex: (v.result || 'Threat').length,
+              negated: false,
+              category: 'VIRUSTOTAL_ENGINE',
+            },
+          ],
+        })),
+      unmatchedRules: [],
+      allEvidence: [],
+      activeEvidence: [],
+      negatedEvidence: [],
+      floorApplied: calculatedScore >= 60,
+      metadata: {
+        characterCount: report.fileSizeBytes,
+        scannedAt: new Date().toISOString(),
+        engineVersion: '2.4.0-virustotal',
+        totalChecksRun: report.stats.totalEngines,
+      },
+    };
+
+    currentResult = fakeScanResult;
+    updateScoreWidgets(fakeScanResult);
+
+    // Save to private local history
+    HistoryService.saveScan(`[VirusTotal] ${report.fileName}`, fakeScanResult);
+
+    // Trigger Blinking Alarm Overlay (7s)
+    if (calculatedScore >= 60) {
+      triggerScreenAlarm('RED', calculatedScore, 7);
+    } else if (calculatedScore >= 30) {
+      triggerScreenAlarm('YELLOW', calculatedScore, 7);
+    } else {
+      triggerScreenAlarm('GREEN', calculatedScore, 7);
+    }
+
+    // Reveal and scroll
+    analysisResultCard.style.display = 'flex';
+    analysisResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  async function handleVirusTotalFile(file: File) {
+    vtStatusNotice.style.display = 'block';
+    vtStatusNotice.className = 'ocr-status-notice ocr-loading';
+    vtStatusNotice.innerHTML = `⏳ Inspecting file <code>${escapeHtml(file.name)}</code> (${(file.size / 1024).toFixed(1)} KB) across 72 antivirus engines...`;
+
+    try {
+      const buffer = await file.arrayBuffer();
+      const report = await inspectFileVirusTotal(buffer, file.name);
+      vtStatusNotice.className = 'ocr-status-notice ocr-success';
+      vtStatusNotice.innerHTML = `✓ Multi-engine scan complete for <code>${escapeHtml(file.name)}</code> (${report.stats.detectionRatio} flagged).`;
+      await renderVirusTotalReport(report);
+    } catch (err: any) {
+      console.error('VirusTotal inspection failed:', err);
+      vtStatusNotice.className = 'ocr-status-notice ocr-error';
+      vtStatusNotice.innerHTML = `❌ Failed file inspection: ${escapeHtml(err.message || 'File read error')}`;
+    }
+  }
+
+  async function handleVirusTotalDemo(type: 'RANSOMWARE_PAYLOAD' | 'SUSPICIOUS_DROPPER' | 'CLEAN_TOOL') {
+    vtStatusNotice.style.display = 'block';
+    vtStatusNotice.className = 'ocr-status-notice ocr-loading';
+    vtStatusNotice.innerHTML = '⏳ Generating and analyzing synthetic VirusTotal test payload...';
+
+    try {
+      const { buffer, fileName } = createVirusTotalDemoBuffer(type);
+      const report = await inspectFileVirusTotal(buffer, fileName);
+      vtStatusNotice.className = 'ocr-status-notice ocr-success';
+      vtStatusNotice.innerHTML = `✓ Scan complete for <code>${escapeHtml(fileName)}</code> (${report.stats.detectionRatio} flagged).`;
+      await renderVirusTotalReport(report);
+    } catch (err: any) {
+      console.error('VirusTotal demo failed:', err);
+      vtStatusNotice.className = 'ocr-status-notice ocr-error';
+      vtStatusNotice.innerHTML = `❌ Failed demo generation: ${escapeHtml(err.message)}`;
+    }
+  }
+
+  async function handleVirusTotalHashSearch(hashQuery: string) {
+    const q = hashQuery.trim().toLowerCase();
+    if (!q) return;
+
+    vtStatusNotice.style.display = 'block';
+    vtStatusNotice.className = 'ocr-status-notice ocr-loading';
+    vtStatusNotice.innerHTML = `🔍 Querying threat intelligence database for hash <code>${escapeHtml(q)}</code>...`;
+
+    setTimeout(async () => {
+      const known = KNOWN_THREAT_HASHES[q];
+      if (known) {
+        // Construct report from verified threat match
+        const dummyBuffer = new TextEncoder().encode(`KNOWN_HASH_SAMPLE:${q}`).buffer as ArrayBuffer;
+        const report = await inspectFileVirusTotal(dummyBuffer, `${known.name}.bin`);
+        report.hashes.sha256 = q.length === 64 ? q : report.hashes.sha256;
+        report.hashes.md5 = q.length === 32 ? q : report.hashes.md5;
+        report.hashes.sha1 = q.length === 40 ? q : report.hashes.sha1;
+        report.threatClassification = known.classification;
+        report.stats.malicious = known.maliciousVendors;
+        report.stats.clean = SECURITY_VENDORS.length - known.maliciousVendors;
+        report.stats.detectionRatio = `${known.maliciousVendors} / ${SECURITY_VENDORS.length}`;
+        report.verdict = 'MALICIOUS';
+        report.riskLevel = 'HIGH';
+
+        vtStatusNotice.className = 'ocr-status-notice ocr-success';
+        vtStatusNotice.innerHTML = `✓ Threat match identified for hash: <strong>${escapeHtml(known.name)}</strong> (${known.maliciousVendors}/${SECURITY_VENDORS.length} vendors).`;
+        await renderVirusTotalReport(report);
+      } else {
+        // Hash not in known database
+        const dummyBuffer = new TextEncoder().encode(`HASH_INQUIRY:${q}`).buffer as ArrayBuffer;
+        const report = await inspectFileVirusTotal(dummyBuffer, `HashSearch_${q.slice(0, 8)}.dat`);
+        if (q.length === 64) report.hashes.sha256 = q;
+        if (q.length === 32) report.hashes.md5 = q;
+        if (q.length === 40) report.hashes.sha1 = q;
+
+        vtStatusNotice.className = 'ocr-status-notice ocr-success';
+        vtStatusNotice.innerHTML = `✓ Hash query evaluated: <code>${escapeHtml(q)}</code> (No verified public threat intelligence matches).`;
+        await renderVirusTotalReport(report);
+      }
+    }, 400);
+  }
+
+  // Copy mini-buttons inside VirusTotal Details
+  document.querySelectorAll('.vt-copy-mini-btn').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      const targetId = (e.currentTarget as HTMLElement).getAttribute('data-copy');
+      if (targetId) {
+        const el = document.getElementById(targetId);
+        if (el && el.textContent) {
+          try {
+            await navigator.clipboard.writeText(el.textContent);
+            const orig = (e.currentTarget as HTMLElement).textContent;
+            (e.currentTarget as HTMLElement).textContent = '✓';
+            setTimeout(() => {
+              (e.currentTarget as HTMLElement).textContent = orig;
+            }, 1500);
+          } catch {}
+        }
+      }
+    });
+  });
+
+  btnBrowseVtFile?.addEventListener('click', () => vtFileInput?.click());
+  vtFileInput?.addEventListener('change', () => {
+    if (vtFileInput.files && vtFileInput.files[0]) {
+      handleVirusTotalFile(vtFileInput.files[0]);
+    }
+  });
+
+  vtDropZone?.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    vtDropZone.style.borderColor = 'var(--accent-red)';
+  });
+  vtDropZone?.addEventListener('dragleave', () => {
+    vtDropZone.style.borderColor = 'var(--border-color)';
+  });
+  vtDropZone?.addEventListener('drop', (e) => {
+    e.preventDefault();
+    vtDropZone.style.borderColor = 'var(--border-color)';
+    if (e.dataTransfer && e.dataTransfer.files[0]) {
+      handleVirusTotalFile(e.dataTransfer.files[0]);
+    }
+  });
+
+  btnSearchVtHash?.addEventListener('click', () => {
+    handleVirusTotalHashSearch(vtHashSearchInput.value);
+  });
+  vtHashSearchInput?.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      handleVirusTotalHashSearch(vtHashSearchInput.value);
+    }
+  });
+
+  btnVtDemoRansomware?.addEventListener('click', () => handleVirusTotalDemo('RANSOMWARE_PAYLOAD'));
+  btnVtDemoDropper?.addEventListener('click', () => handleVirusTotalDemo('SUSPICIOUS_DROPPER'));
+  btnVtDemoClean?.addEventListener('click', () => handleVirusTotalDemo('CLEAN_TOOL'));
 
   textarea.addEventListener('paste', (e: ClipboardEvent) => {
     if (e.clipboardData && e.clipboardData.items) {

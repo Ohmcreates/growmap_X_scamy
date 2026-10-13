@@ -2411,4 +2411,317 @@ body {
   color: #14532d;
 }
 
+/* ==========================================================================
+   VIRUSTOTAL MULTI-ENGINE FILE & HASH INSPECTOR STYLES
+   ========================================================================== */
+
+.vt-inspector-card {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
+}
+
+.vt-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.vt-file-info {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vt-file-icon {
+  font-size: 2.2rem;
+}
+
+.vt-file-name {
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: var(--text-main);
+  display: block;
+  word-break: break-all;
+}
+
+.vt-file-meta {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 3px;
+}
+
+.vt-ratio-cluster {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.vt-ratio-circle {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-family: var(--font-mono);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.vt-ratio-circle.danger {
+  background: #fef2f2;
+  border: 3px solid #ef4444;
+  color: #b91c1c;
+}
+
+.vt-ratio-circle.warning {
+  background: #fffbeb;
+  border: 3px solid #f59e0b;
+  color: #b45309;
+}
+
+.vt-ratio-circle.clean {
+  background: #f0fdf4;
+  border: 3px solid #22c55e;
+  color: #15803d;
+}
+
+.vt-ratio-score {
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.vt-ratio-total {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+}
+
+.vt-verdict-title {
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.vt-verdict-desc {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin: 2px 0 0 0;
+}
+
+.vt-nav-tabs {
+  display: flex;
+  gap: 6px;
+  border-bottom: 2px solid var(--border-color);
+  padding-bottom: 2px;
+}
+
+.vt-subtab-btn {
+  background: transparent;
+  border: none;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-muted);
+  padding: 8px 14px;
+  cursor: pointer;
+  border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+  transition: all 0.2s;
+}
+
+.vt-subtab-btn:hover {
+  color: var(--text-main);
+  background: var(--bg-card-subtle);
+}
+
+.vt-subtab-btn.active {
+  color: var(--accent-red);
+  border-bottom: 2.5px solid var(--accent-red);
+  margin-bottom: -4px;
+}
+
+.vt-tab-content-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Security Vendors Grid */
+.vt-vendors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+  gap: 8px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding: 4px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-card-subtle);
+}
+
+.vt-vendor-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  font-size: 0.8rem;
+}
+
+.vt-vendor-name {
+  font-weight: 600;
+  color: var(--text-main);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 110px;
+}
+
+.vt-vendor-status {
+  font-size: 0.75rem;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.vt-vendor-status.malicious {
+  color: #dc2626;
+}
+
+.vt-vendor-status.clean {
+  color: #16a34a;
+}
+
+/* Details Panel Hashes & Entropy */
+.vt-details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 12px;
+}
+
+.vt-prop-card {
+  background: var(--bg-card-subtle);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vt-prop-label {
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+
+.vt-hash-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  padding: 4px 8px;
+}
+
+.vt-hash-row code {
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+  word-break: break-all;
+  color: var(--text-main);
+}
+
+.vt-copy-mini-btn {
+  background: transparent;
+  border: none;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--text-muted);
+  transition: color 0.15s;
+}
+
+.vt-copy-mini-btn:hover {
+  color: var(--text-main);
+}
+
+/* Entropy Meter */
+.vt-entropy-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.vt-entropy-bar-track {
+  width: 100%;
+  height: 8px;
+  background: #e2e8f0;
+  border-radius: var(--radius-pill);
+  overflow: hidden;
+}
+
+.vt-entropy-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #22c55e 0%, #eab308 65%, #ef4444 100%);
+  border-radius: var(--radius-pill);
+  transition: width 0.3s ease;
+}
+
+.vt-entropy-readout {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+}
+
+/* Hash Search Field in Panel */
+.vt-hash-search-container {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.vt-hash-search-field {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-family: var(--font-mono);
+  font-size: 0.85rem;
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.btn-vt-search {
+  background: var(--accent-red);
+  color: #ffffff;
+  border: none;
+  padding: 10px 18px;
+  border-radius: var(--radius-md);
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-vt-search:hover {
+  background: var(--accent-red-hover);
+}
+
+
 

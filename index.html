@@ -81,6 +81,10 @@
             <span class="sidebar-icon">📱</span>
             <span class="sidebar-label">Scan APK File</span>
           </button>
+          <button id="menuScanVt" class="sidebar-item" type="button">
+            <span class="sidebar-icon">🛡️</span>
+            <span class="sidebar-label">VirusTotal File Scan</span>
+          </button>
           <button id="menuThreatDb" class="sidebar-item" type="button">
             <span class="sidebar-icon">🛡️</span>
             <span class="sidebar-label">Threat Database</span>
@@ -169,6 +173,9 @@
                 <button id="tabApkScan" class="tab-button" role="tab" aria-selected="false" type="button">
                   <span>📱</span> APK File Scan
                 </button>
+                <button id="tabVtScan" class="tab-button" role="tab" aria-selected="false" type="button">
+                  <span>🛡️</span> Multi-Engine File Scan
+                </button>
               </div>
 
               <!-- Multilingual Script Detector Pill -->
@@ -217,8 +224,8 @@
               <div id="panelUploadImage" class="tab-panel" style="display: none;">
                 <div id="dropZone" class="upload-dropzone">
                   <div class="dropzone-icon">📸</div>
-                  <strong>Upload Screenshot, Payment Receipt, QR Code, or APK</strong>
-                  <p>Drag and drop your file here, or click to browse (PNG, JPG, WEBP, APK)</p>
+                  <strong>Upload Screenshot, Payment Receipt, QR Code, or Binary</strong>
+                  <p>Drag and drop your file here, or click to browse (PNG, JPG, WEBP, APK, EXE, PDF)</p>
                   <button id="btnBrowseOcr" class="btn-browse-file" type="button">
                     Select File
                   </button>
@@ -244,11 +251,37 @@
                 </div>
               </div>
 
+              <!-- VirusTotal Multi-Engine File & Hash Scan Panel -->
+              <div id="panelVtScan" class="tab-panel" style="display: none;">
+                <div id="vtDropZone" class="upload-dropzone">
+                  <div class="dropzone-icon">🛡️</div>
+                  <strong>Upload Any File (VirusTotal 72-Vendor Antivirus Inspection)</strong>
+                  <p>Client-side multi-engine detection, SHA-256 / SHA-1 / MD5 hashes, Shannon Entropy & Sandbox indicators.</p>
+                  <button id="btnBrowseVtFile" class="btn-browse-file" type="button">
+                    Select Any File
+                  </button>
+                  <input type="file" id="vtFileInput" style="display: none;" />
+                </div>
+
+                <div class="vt-hash-search-container">
+                  <input id="vtHashSearchInput" type="text" placeholder="Or search by File Hash (SHA-256, SHA-1, MD5)..." class="vt-hash-search-field" />
+                  <button id="btnSearchVtHash" class="btn-vt-search" type="button">🔍 Search Hash</button>
+                </div>
+
+                <div class="apk-demo-chips-row">
+                  <span class="chips-intro">VirusTotal Demo Tests:</span>
+                  <button id="btnVtDemoRansomware" class="chip-item chip-danger" type="button">🚨 Test Ransomware Payload (LockBit)</button>
+                  <button id="btnVtDemoDropper" class="chip-item chip-danger" type="button">⚠️ Test Dropper Script</button>
+                  <button id="btnVtDemoClean" class="chip-item chip-lang" type="button">✅ Test Clean Utility</button>
+                </div>
+              </div>
+
               <div id="inlineError" class="inline-error" style="display: none;" role="alert">
-                Please enter a message, URL, or upload an image/APK first.
+                Please enter a message, URL, or upload a file first.
               </div>
               <div id="ocrStatusNotice" class="ocr-status-notice" style="display: none;"></div>
               <div id="apkStatusNotice" class="ocr-status-notice" style="display: none;"></div>
+              <div id="vtStatusNotice" class="ocr-status-notice" style="display: none;"></div>
 
               <!-- Bottom Action Row: Examples & Analyze Button -->
               <div class="input-actions-row">
@@ -438,6 +471,114 @@
               <div id="apkRecommendationsContainer" class="web-recommendations-container">
                 <h4 class="web-threats-title">🛡️ Emergency Malware Incident Protocol</h4>
                 <ul id="apkRecommendationsList" class="web-recs-list"></ul>
+              </div>
+            </div>
+
+            <!-- VirusTotal Multi-Engine File & Hash Inspector Card -->
+            <div id="vtInspectorCard" class="vt-inspector-card" style="display: none;">
+              <div class="vt-header-row">
+                <div class="vt-file-info">
+                  <span class="vt-file-icon">🛡️</span>
+                  <div>
+                    <strong id="vtFileNameText" class="vt-file-name">LockBit_Invoice_Payment.pdf.exe</strong>
+                    <div id="vtFileMetaText" class="vt-file-meta">Win32 / PE Executable • 520 KB</div>
+                  </div>
+                </div>
+
+                <div class="vt-ratio-cluster">
+                  <div id="vtRatioCircle" class="vt-ratio-circle danger">
+                    <span id="vtRatioScore" class="vt-ratio-score">58</span>
+                    <span id="vtRatioTotal" class="vt-ratio-total">/ 72</span>
+                  </div>
+                  <div>
+                    <div id="vtVerdictTitle" class="vt-verdict-title" style="color: #b91c1c;">58 / 72 Security Vendors Flagged This File</div>
+                    <p id="vtClassificationText" class="vt-verdict-desc">Trojan:Win32/AgentTesla.Injector</p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- VirusTotal Subtabs: Detection / Details / Behavior / Recommendations -->
+              <div class="vt-nav-tabs" role="tablist">
+                <button id="vtTabDetection" class="vt-subtab-btn active" type="button">🔍 Detection (72 Vendors)</button>
+                <button id="vtTabDetails" class="vt-subtab-btn" type="button">📋 Details & Hashes</button>
+                <button id="vtTabBehavior" class="vt-subtab-btn" type="button">⚙️ Behavior & Sandbox</button>
+                <button id="vtTabProtocol" class="vt-subtab-btn" type="button">🛡️ Safety Protocol</button>
+              </div>
+
+              <!-- Subtab 1: Detection (72 Antivirus Vendors Grid) -->
+              <div id="vtPanelDetection" class="vt-tab-content-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
+                  <span>Antivirus Security Vendors & Classification:</span>
+                  <span id="vtVendorSummaryCounts">58 Malicious • 0 Suspicious • 14 Undetected</span>
+                </div>
+                <div id="vtVendorsGrid" class="vt-vendors-grid"></div>
+              </div>
+
+              <!-- Subtab 2: Details (Hashes, Magic Header, Shannon Entropy) -->
+              <div id="vtPanelDetails" class="vt-tab-content-panel" style="display: none;">
+                <div class="vt-details-grid">
+                  <div class="vt-prop-card">
+                    <span class="vt-prop-label">MD5 Checksum</span>
+                    <div class="vt-hash-row">
+                      <code id="vtMd5Text">9e107d9d372bb6826bd81d3542a419d6</code>
+                      <button class="vt-copy-mini-btn" data-copy="vtMd5Text" title="Copy MD5" type="button">📋</button>
+                    </div>
+                  </div>
+
+                  <div class="vt-prop-card">
+                    <span class="vt-prop-label">SHA-1 Checksum</span>
+                    <div class="vt-hash-row">
+                      <code id="vtSha1Text">2ef7bde608ce5404e97d5f042f95f89f1c232871</code>
+                      <button class="vt-copy-mini-btn" data-copy="vtSha1Text" title="Copy SHA-1" type="button">📋</button>
+                    </div>
+                  </div>
+
+                  <div class="vt-prop-card" style="grid-column: 1 / -1;">
+                    <span class="vt-prop-label">SHA-256 Cryptographic Fingerprint</span>
+                    <div class="vt-hash-row">
+                      <code id="vtSha256Text">24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c</code>
+                      <button class="vt-copy-mini-btn" data-copy="vtSha256Text" title="Copy SHA-256" type="button">📋</button>
+                    </div>
+                  </div>
+
+                  <div class="vt-prop-card">
+                    <span class="vt-prop-label">File Type & Header Magic</span>
+                    <strong id="vtFileTypeVal" style="font-size: 0.85rem; color: var(--text-main);">Win32 / PE Executable</strong>
+                    <div id="vtMagicVal" style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Magic: MZ (4D 5A 90 00)</div>
+                  </div>
+
+                  <div class="vt-prop-card">
+                    <span class="vt-prop-label">Shannon Entropy (0 – 8 bits/byte)</span>
+                    <div class="vt-entropy-wrapper">
+                      <div class="vt-entropy-bar-track">
+                        <div id="vtEntropyFill" class="vt-entropy-bar-fill" style="width: 95%;"></div>
+                      </div>
+                      <div class="vt-entropy-readout">
+                        <strong id="vtEntropyScoreVal">7.85 bits/byte</strong>
+                        <span id="vtEntropyRatingVal" style="color: #dc2626; font-weight: 700;">HIGH (Packed / Encrypted)</span>
+                      </div>
+                    </div>
+                    <p id="vtEntropyExplainVal" style="font-size: 0.75rem; color: var(--text-muted); margin: 0;"></p>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Subtab 3: Behavior & Sandbox Indicators -->
+              <div id="vtPanelBehavior" class="vt-tab-content-panel" style="display: none;">
+                <div id="vtBehaviorSignalsList" class="apk-permissions-list"></div>
+                
+                <div style="margin-top: 8px;">
+                  <h5 style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Network Callouts (Extracted C2 URLs & IPs):</h5>
+                  <div id="vtNetworkList" style="font-family: var(--font-mono); font-size: 0.78rem; background: var(--bg-card-subtle); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);"></div>
+                </div>
+              </div>
+
+              <!-- Subtab 4: Safety Protocol -->
+              <div id="vtPanelProtocol" class="vt-tab-content-panel" style="display: none;">
+                <div class="web-recommendations-container" style="margin: 0;">
+                  <h4 class="web-threats-title">🛡️ Antivirus Threat Response Protocol</h4>
+                  <ul id="vtRecommendationsList" class="web-recs-list"></ul>
+                </div>
               </div>
             </div>
 
