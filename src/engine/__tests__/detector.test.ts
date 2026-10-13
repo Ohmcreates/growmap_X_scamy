@@ -101,4 +101,42 @@ describe('Scam Spotter — Phase 1 Core Rule Engine', () => {
     // But multiple evidence occurrences are captured
     expect(result.breakdown[0].evidence.length).toBeGreaterThan(1);
   });
+
+  it('detects combined account threat and OTP request matching the 75-point spec test case', () => {
+    const threatMsg = 'Dear customer, your account will be blocked. Share OTP immediately.';
+    const result = analyzeMessage(threatMsg);
+
+    expect(result.score).toBe(75);
+    expect(result.riskLevel).toBe('HIGH');
+    const firedIds = result.breakdown.map((b) => b.ruleId);
+    expect(firedIds).toEqual(expect.arrayContaining(['URGENCY', 'ACCOUNT_THREAT', 'OTP_REQUEST']));
+  });
+
+  it('preserves exact character slice offsets across emojis and special symbols', () => {
+    const textWithEmojis = '⚠️ Urgent: 🚨 Please share your OTP immediately 🙏';
+    const result = analyzeMessage(textWithEmojis);
+
+    expect(result.allEvidence.length).toBeGreaterThan(0);
+    for (const ev of result.allEvidence) {
+      const extractedSlice = textWithEmojis.slice(ev.startIndex, ev.endIndex);
+      expect(extractedSlice).toBe(ev.matchedText);
+    }
+  });
+
+  it('satisfies performance SLA executing 5,000-character payload in under 5ms', () => {
+    const paragraph = 'Your KYC status is under review. Please confirm your details with your bank. ';
+    const payload = paragraph.repeat(70).slice(0, 5000); // exactly 5000 chars
+
+    // Warm-up run
+    analyzeMessage(payload);
+
+    const start = performance.now();
+    for (let i = 0; i < 5; i++) {
+      analyzeMessage(payload);
+    }
+    const end = performance.now();
+    const avgMs = (end - start) / 5;
+
+    expect(avgMs).toBeLessThan(5); // under 5ms per scan
+  });
 });
