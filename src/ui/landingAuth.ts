@@ -21,20 +21,20 @@ export function updateLandingAuthState(): void {
     if (userGroup) userGroup.style.display = 'flex';
 
     if (heroCta) {
-      heroCta.setAttribute('href', '#workspace');
+      heroCta.setAttribute('href', '/workspace');
       heroCta.setAttribute('data-route-to', 'workspace');
     }
     if (heroCtaText) heroCtaText.textContent = 'Open Scanner Workspace';
 
     if (finalCta) {
-      finalCta.setAttribute('href', '#workspace');
+      finalCta.setAttribute('href', '/workspace');
       finalCta.setAttribute('data-route-to', 'workspace');
     }
     if (finalCtaText) finalCtaText.textContent = 'Open Scanner Workspace';
 
     [footerLinkScanner, footerLinkUrl, footerLinkOcr].forEach((link) => {
       if (link) {
-        link.setAttribute('href', '#workspace');
+        link.setAttribute('href', '/workspace');
         link.setAttribute('data-route-to', 'workspace');
       }
     });
@@ -45,20 +45,20 @@ export function updateLandingAuthState(): void {
     if (userGroup) userGroup.style.display = 'none';
 
     if (heroCta) {
-      heroCta.setAttribute('href', '#login');
+      heroCta.setAttribute('href', '/login');
       heroCta.setAttribute('data-route-to', 'login');
     }
     if (heroCtaText) heroCtaText.textContent = 'Check a Message';
 
     if (finalCta) {
-      finalCta.setAttribute('href', '#login');
+      finalCta.setAttribute('href', '/login');
       finalCta.setAttribute('data-route-to', 'login');
     }
     if (finalCtaText) finalCtaText.textContent = 'Scan a Suspicious Message';
 
     [footerLinkScanner, footerLinkUrl, footerLinkOcr].forEach((link) => {
       if (link) {
-        link.setAttribute('href', '#login');
+        link.setAttribute('href', '/login');
         link.setAttribute('data-route-to', 'login');
       }
     });

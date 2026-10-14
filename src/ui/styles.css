@@ -654,19 +654,52 @@ code, pre, .font-mono {
 }
 
 /* ==========================================================================
-   APP LAYOUT (SIDEBAR + MAIN GRID)
+   APP LAYOUT (FIXED SIDEBAR + SCROLLABLE MAIN CONTENT)
    ========================================================================== */
+
+#appWorkspaceView {
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-toggle-btn {
+  background: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.15rem;
+  color: var(--text-main);
+  cursor: pointer;
+  margin-right: 14px;
+  transition: all 0.15s ease;
+}
+
+.sidebar-toggle-btn:hover {
+  background-color: var(--bg-card-subtle);
+  border-color: var(--text-muted);
+}
 
 .app-layout {
   display: flex;
-  max-width: 1440px;
-  margin: 0 auto;
-  min-height: calc(100vh - 68px);
+  width: 100%;
+  max-width: 100%;
+  flex: 1;
+  height: calc(100vh - 68px);
+  overflow: hidden;
+  margin: 0;
 }
 
-/* Left Sidebar */
+/* Left Sidebar - Fixed and Unscrollable */
 .sidebar {
-  width: 230px;
+  width: 240px;
+  height: 100%;
+  overflow: hidden; /* Fixed and strictly unscrollable */
   padding: 24px 16px;
   border-right: 1px solid var(--border-color);
   background-color: var(--bg-card);
@@ -674,6 +707,28 @@ code, pre, .font-mono {
   flex-direction: column;
   justify-content: space-between;
   flex-shrink: 0;
+  box-sizing: border-box;
+  transition: width 0.25s cubic-bezier(0.16, 1, 0.3, 1), padding 0.25s ease;
+}
+
+.sidebar.collapsed {
+  width: 76px;
+  padding: 24px 8px;
+}
+
+.sidebar.collapsed .sidebar-label,
+.sidebar.collapsed .sidebar-cards-group {
+  display: none !important;
+}
+
+.sidebar.collapsed .sidebar-item {
+  justify-content: center;
+  padding: 12px 0;
+}
+
+.sidebar.collapsed .sidebar-icon {
+  font-size: 1.25rem;
+  margin: 0;
 }
 
 .sidebar-menu {
@@ -783,11 +838,12 @@ code, pre, .font-mono {
    ========================================================================== */
 
 .workspace-main-content {
-  flex-grow: 1;
-  padding: 32px 36px;
+  flex: 1;
+  padding: 32px 36px 64px 36px;
   overflow-y: auto;
   background-color: var(--bg-main);
-  min-height: calc(100vh - 68px);
+  height: 100%;
+  box-sizing: border-box;
 }
 
 .workspace-subview {

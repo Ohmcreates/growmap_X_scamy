@@ -1,10 +1,14 @@
 /**
- * Scam Spotter — Client-Side Hash Router
+ * Scam Spotter — Client-Side Router
  * Orchestrates seamless transitions between:
- *  - Editorial Landing Page (#landing)
- *  - Authentication View (#login)
- *  - Main Scanner Workspace (#workspace)
+ *  - Editorial Landing Page (/)
+ *  - Authentication View (/login)
+ *  - Main Scanner Workspace (/workspace)
+ *
+ * Enforces strict authentication security: unauthenticated users cannot access /workspace.
  */
+
+import { AuthService } from '../services/authService.js';
 
 export type AppRoute = 'landing' | 'login' | 'workspace';
 
@@ -17,7 +21,7 @@ export class AppRouter {
   private appWorkspaceView: HTMLElement | null = null;
 
   constructor() {
-    this.handleHashChange = this.handleHashChange.bind(this);
+    this.handleLocationChange = this.handleLocationChange.bind(this);
   }
 
   public init() {
@@ -25,7 +29,15 @@ export class AppRouter {
     this.authView = document.getElementById('authView');
     this.appWorkspaceView = document.getElementById('appWorkspaceView');
 
-    window.addEventListener('hashchange', this.handleHashChange);
+    window.addEventListener('popstate', this.handleLocationChange);
+    window.addEventListener('hashchange', this.handleLocationChange);
+
+    // Watch auth changes: if user logs out while in workspace, kick them out to /login
+    window.addEventListener('auth-state-changed', () => {
+      if (this.currentRoute === 'workspace' && !AuthService.isAuthenticated()) {
+        this.navigate('login');
+      }
+    });
 
     // Mobile nav toggle
     const menuToggle = document.querySelector('.metic-menu-toggle');
@@ -37,10 +49,17 @@ export class AppRouter {
 
     // Delegate clicks for routing and anchor links
     document.addEventListener('click', (e) => {
-      // 1. Check data-route-to
-      const target = (e.target as HTMLElement).closest('[data-route-to]') as HTMLElement | null;
+      // 1. Check data-route-to or clean path links
+      const target = (e.target as HTMLElement).closest('[data-route-to], a[href="/workspace"], a[href="/login"], a[href="/"]') as HTMLElement | null;
       if (target) {
-        const route = target.getAttribute('data-route-to') as AppRoute;
+        let route = target.getAttribute('data-route-to') as AppRoute | null;
+        if (!route) {
+          const href = target.getAttribute('href');
+          if (href === '/workspace') route = 'workspace';
+          else if (href === '/login') route = 'login';
+          else if (href === '/') route = 'landing';
+        }
+
         if (route && (route === 'landing' || route === 'login' || route === 'workspace')) {
           e.preventDefault();
           this.navigate(route);
@@ -48,7 +67,7 @@ export class AppRouter {
         }
       }
 
-      // 2. Check anchor links (e.g. #how-it-works, #features, etc.)
+      // 2. Check anchor links (e.g. #heroSection, #how-it-works, #features, etc.)
       const anchor = (e.target as HTMLElement).closest('.metic-nav-links a, a[href^="#"]') as HTMLAnchorElement | null;
       if (anchor) {
         const href = anchor.getAttribute('href');
@@ -63,6 +82,7 @@ export class AppRouter {
 
             if (this.currentRoute !== 'landing') {
               this.currentRoute = 'landing';
+              this.updateUrl('landing');
               this.render(false);
               setTimeout(() => {
                 targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -77,26 +97,16 @@ export class AppRouter {
       }
     });
 
-    // Check initial hash
-    const initialHash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
-    if (initialHash === 'workspace' || initialHash === 'app') {
-      this.navigate('workspace');
-    } else if (initialHash === 'login' || initialHash === 'auth' || initialHash === 'signup') {
-      this.navigate('login');
-      if (initialHash === 'signup') {
-        setTimeout(() => {
-          document.getElementById('authViewTabSignUp')?.click();
-        }, 50);
-      }
-    } else if (initialHash && !APP_ROUTES.has(initialHash)) {
-      // Section anchor on landing page
+    // Check initial route from URL
+    const { route, sectionId } = this.getRouteFromLocation();
+    if (sectionId) {
       this.navigate('landing', false);
       setTimeout(() => {
-        const el = document.getElementById(initialHash);
+        const el = document.getElementById(sectionId);
         if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }, 150);
     } else {
-      this.navigate('landing', true);
+      this.navigate(route, true);
     }
 
     this.initScrollspy();
@@ -160,10 +170,26 @@ export class AppRouter {
   }
 
   public navigate(route: AppRoute, scrollToTop: boolean = true) {
-    this.currentRoute = route;
-    if (window.location.hash.replace(/^#\/?/, '').toLowerCase() !== route) {
-      window.location.hash = `#${route}`;
+    // SECURITY GUARD: If user attempts to enter workspace without login, block access!
+    if (route === 'workspace') {
+      if (!AuthService.isAuthenticated()) {
+        this.currentRoute = 'login';
+        this.updateUrl('login');
+        this.render(true);
+
+        setTimeout(() => {
+          const alertBox = document.getElementById('authViewAlert');
+          if (alertBox) {
+            alertBox.textContent = '🔒 Access Restricted: Please sign in to access the scanner workspace.';
+            alertBox.style.display = 'block';
+          }
+        }, 100);
+        return;
+      }
     }
+
+    this.currentRoute = route;
+    this.updateUrl(route);
     this.render(scrollToTop);
   }
 
@@ -171,27 +197,35 @@ export class AppRouter {
     return this.currentRoute;
   }
 
-  private handleHashChange() {
-    const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
-    if (hash === 'workspace' || hash === 'app') {
-      this.currentRoute = 'workspace';
-      this.render(true);
-      return;
-    }
-    if (hash === 'login' || hash === 'auth' || hash === 'signup') {
-      this.currentRoute = 'login';
-      this.render(true);
-      if (hash === 'signup') {
-        setTimeout(() => {
-          document.getElementById('authViewTabSignUp')?.click();
-        }, 50);
+  private updateUrl(route: AppRoute) {
+    const targetPath = route === 'landing' ? '/' : `/${route}`;
+    try {
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState(null, '', targetPath);
       }
-      return;
+    } catch {
+      window.location.hash = targetPath.replace(/^\//, '#');
     }
+  }
 
-    // Check if hash points to a landing section element
-    if (hash && hash !== 'landing') {
-      const targetEl = document.getElementById(hash);
+  private getRouteFromLocation(): { route: AppRoute; sectionId?: string } {
+    const pathname = window.location.pathname.replace(/^\//, '').toLowerCase();
+    if (pathname === 'workspace' || pathname === 'app') return { route: 'workspace' };
+    if (pathname === 'login' || pathname === 'auth' || pathname === 'signup') return { route: 'login' };
+
+    const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
+    if (hash === 'workspace' || hash === 'app') return { route: 'workspace' };
+    if (hash === 'login' || hash === 'auth' || hash === 'signup') return { route: 'login' };
+    if (hash && hash !== 'landing') return { route: 'landing', sectionId: hash };
+
+    return { route: 'landing' };
+  }
+
+  private handleLocationChange() {
+    const { route, sectionId } = this.getRouteFromLocation();
+
+    if (sectionId) {
+      const targetEl = document.getElementById(sectionId);
       if (targetEl) {
         const wasNotLanding = this.currentRoute !== 'landing';
         this.currentRoute = 'landing';
@@ -207,8 +241,7 @@ export class AppRouter {
       }
     }
 
-    this.currentRoute = 'landing';
-    this.render(true);
+    this.navigate(route, true);
   }
 
   private render(scrollToTop: boolean = true) {
@@ -257,7 +290,7 @@ export class AppRouter {
         window.scrollTo(0, 0);
       }
     } else {
-      // Main website (#workspace): remove the magnifying glass and dock bar
+      // Main website (/workspace): remove the magnifying glass and dock bar
       this.landingView.style.display = 'none';
       this.landingView.classList.remove('active');
       this.authView.style.display = 'none';

@@ -167,7 +167,7 @@ export function initApp() {
   const dashboardMount = document.getElementById('dashboardMount') as HTMLElement;
   const threatDbSearchInput = document.getElementById('threatDbSearchInput') as HTMLInputElement;
   const threatDbResultsMount = document.getElementById('threatDbResultsMount') as HTMLElement;
-  const evalMetricsMount = document.getElementById('evalMetricsMount') as HTMLElement;
+  const benchmarkMetricsMount = document.getElementById('benchmarkMetricsMount') as HTMLElement;
   const historyListMount = document.getElementById('historyListMount') as HTMLElement;
   const btnClearHistory = document.getElementById('btnClearHistory') as HTMLButtonElement;
   const pricingMount = document.getElementById('pricingMount') as HTMLElement;
@@ -256,7 +256,7 @@ export function initApp() {
     if (subviewId === 'subviewThreatDb') {
       renderThreatDatabase(threatDbSearchInput?.value || '');
     } else if (subviewId === 'subviewBenchmark') {
-      openModelEvaluationModal();
+      renderBenchmarkPage();
     } else if (subviewId === 'subviewHistory') {
       renderHistoryList();
     }
@@ -1059,10 +1059,13 @@ export function initApp() {
     } catch {}
   });
 
-  function openModelEvaluationModal() {
+  function renderBenchmarkPage() {
+    const mount = benchmarkMetricsMount || document.getElementById('benchmarkMetricsMount');
+    if (!mount) return;
+
     const metrics = computeBenchmarkMetrics((text) => analyzeMessage(text));
 
-    evalMetricsMount.innerHTML = `
+    mount.innerHTML = `
       <div class="eval-stats-grid">
         <div class="eval-stat-card">
           <div class="eval-stat-num" style="color: #16a34a;">${metrics.precision}%</div>
@@ -1082,7 +1085,7 @@ export function initApp() {
         </div>
       </div>
 
-      <div class="confusion-matrix-box">
+      <div class="confusion-matrix-box" style="margin-top: 24px;">
         <strong>Confusion Matrix (100 Samples: 50 Scams, 50 Benign Controls):</strong>
         <table class="cm-table">
           <thead>
@@ -1107,8 +1110,8 @@ export function initApp() {
         </table>
       </div>
 
-      <div>
-        <h4 style="margin-bottom: 8px;">Standardized Test Corpus Explorer:</h4>
+      <div style="margin-top: 28px;">
+        <h4 style="margin-bottom: 12px; font-weight: 700;">Standardized Test Corpus Explorer:</h4>
         <div class="benchmark-table-wrap">
           <table class="benchmark-samples-table">
             <thead>
@@ -1138,7 +1141,9 @@ export function initApp() {
       </div>
     `;
 
-    evalModal.classList.add('open');
+    // Ensure modal never opens
+    const evalModal = document.getElementById('evalModal');
+    if (evalModal) evalModal.classList.remove('open');
   }
 
   btnOpenModelEval?.addEventListener('click', () => {
@@ -1151,7 +1156,12 @@ export function initApp() {
     e.preventDefault();
     showWorkspaceSubview('subviewBenchmark');
   });
-  closeEvalModal?.addEventListener('click', () => evalModal.classList.remove('open'));
+  closeEvalModal?.addEventListener('click', () => evalModal?.classList.remove('open'));
+
+  // Sidebar toggle button (collapse / expand sidebar)
+  document.getElementById('btnSidebarToggle')?.addEventListener('click', () => {
+    document.querySelector('.sidebar')?.classList.toggle('collapsed');
+  });
 
   // --------------------------------------------------------------------------
   // Feature 1: Scam Reporting & Verified Indicator Database
