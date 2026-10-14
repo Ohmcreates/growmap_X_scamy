@@ -3,6 +3,7 @@ import uuid
 import json
 import secrets
 import hashlib
+import string
 from datetime import datetime
 from flask import Flask, request, jsonify, render_template
 import joblib
@@ -37,6 +38,11 @@ def get_model():
             raise FileNotFoundError(f"Model file '{MODEL_PATH}' not found.")
         _model = joblib.load(MODEL_PATH)
     return _model
+
+def generate_session_id() -> str:
+    # Generates a clean, compact 10-character cryptographically secure token
+    alphabet = string.ascii_letters + string.digits
+    return ''.join(secrets.choice(alphabet) for _ in range(10))
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
@@ -129,7 +135,7 @@ def api_signup():
                 (user_id, email, name, pw_hash)
             )
 
-            session_id = secrets.token_hex(32)
+            session_id = generate_session_id()
             ip_addr = request.remote_addr
             user_agent = request.headers.get('User-Agent', '')[:250]
             cur.execute(
@@ -188,7 +194,7 @@ def api_login():
             elif not verify_password(user['password_hash'], password):
                 return jsonify({'error': 'Invalid password. Please check your credentials.'}), 401
 
-            session_id = secrets.token_hex(32)
+            session_id = generate_session_id()
             ip_addr = request.remote_addr
             user_agent = request.headers.get('User-Agent', '')[:250]
             cur.execute(
