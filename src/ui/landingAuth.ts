@@ -4,8 +4,6 @@ export function updateLandingAuthState(): void {
   const user = AuthService.getUser();
   const guestGroup = document.getElementById('landingGuestAuthCluster');
   const userGroup = document.getElementById('landingUserAuthCluster');
-  const userName = document.getElementById('landingUserName');
-  const userAvatar = document.getElementById('landingUserAvatar');
 
   const heroCta = document.getElementById('heroPrimaryCta');
   const heroCtaText = document.getElementById('heroPrimaryCtaText');
@@ -18,11 +16,9 @@ export function updateLandingAuthState(): void {
 
   if (user && AuthService.isAuthenticated()) {
     // USER IS SIGNED IN:
-    // Hide Sign In / Sign Up, show user greeting and direct workspace navigation
+    // Hide guest buttons, show direct workspace navigation with ZERO user personal data displayed on landing page
     if (guestGroup) guestGroup.style.display = 'none';
     if (userGroup) userGroup.style.display = 'flex';
-    if (userName) userName.textContent = user.name.split(' ')[0] || user.name;
-    if (userAvatar) userAvatar.textContent = (user.name[0] || 'U').toUpperCase();
 
     if (heroCta) {
       heroCta.setAttribute('href', '#workspace');

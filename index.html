@@ -21,6 +21,7 @@
          Always-on draggable forensic lens with optical zoom & dynamic tri-color glow
          ========================================================================== -->
     <div id="draggableMagnifier" class="draggable-magnifier" role="region" aria-label="Draggable Malware Magnifying Glass">
+      <button id="btnMagnifierClose" class="magnifier-close-btn" type="button" title="Minimize Magnifier to bottom corner" aria-label="Minimize Magnifier">✕</button>
       <div id="magnifierDragHint" class="magnifier-drag-hint">✋ Drag glass to scan for malware</div>
       <div id="magnifierLensViewport" class="magnifier-viewport">
         <div id="magnifierGlowRing" class="magnifier-glow-ring glow-red"></div>
@@ -41,6 +42,13 @@
       <button id="btnToggleMagnifier" class="dock-btn" type="button" title="Hide or show the magnifying glass">👁️ Toggle Glass</button>
     </div>
 
+    <!-- Floating Bottom-Right Corner Toggle for Magnifier -->
+    <button id="btnMagnifierCornerToggle" class="magnifier-corner-toggle" type="button" title="Minimize Magnifier to bottom corner" aria-label="Toggle Forensic Magnifier">
+      <span class="corner-toggle-icon">🔍</span>
+      <span class="corner-toggle-text" id="cornerToggleText">Forensic Lens</span>
+      <span class="corner-toggle-badge badge-active" id="cornerToggleBadge">ON</span>
+    </button>
+
     <!-- ==========================================================================
          SCAM SPOTTER — EDITORIAL LANDING PAGE (#landingView)
          Inspired by metic.studio: Minimalist, Architectural, Handcrafted
@@ -60,7 +68,7 @@
               </div>
             </a>
 
-            <nav class="metic-nav-links" aria-label="Editorial Navigation">
+            <nav class="metic-nav-links" id="meticNavLinks" aria-label="Editorial Navigation">
               <li><a href="#how-it-works">How It Works</a></li>
               <li><a href="#features">Features</a></li>
               <li><a href="#build">Inspection</a></li>
@@ -76,10 +84,6 @@
                 <a href="#login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
               </div>
               <div id="landingUserAuthCluster" class="landing-user-group" style="display: none;">
-                <span class="landing-user-badge">
-                  <span class="user-avatar-circle" id="landingUserAvatar">U</span>
-                  <span class="user-greeting-name" id="landingUserName">User</span>
-                </span>
                 <a href="#workspace" class="metic-btn-solid" data-route-to="workspace">Open Workspace →</a>
               </div>
               <button class="metic-menu-toggle" type="button" aria-label="Toggle Navigation Menu">☰</button>

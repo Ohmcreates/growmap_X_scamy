@@ -8,6 +8,8 @@
 
 export type AppRoute = 'landing' | 'login' | 'workspace';
 
+const APP_ROUTES = new Set(['landing', 'login', 'workspace', 'app', 'auth', 'signup']);
+
 export class AppRouter {
   private currentRoute: AppRoute = 'landing';
   private landingView: HTMLElement | null = null;
@@ -25,14 +27,52 @@ export class AppRouter {
 
     window.addEventListener('hashchange', this.handleHashChange);
 
-    // Delegate clicks for elements with data-route-to
+    // Mobile nav toggle
+    const menuToggle = document.querySelector('.metic-menu-toggle');
+    const navLinks = document.getElementById('meticNavLinks');
+    menuToggle?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      navLinks?.classList.toggle('mobile-open');
+    });
+
+    // Delegate clicks for routing and anchor links
     document.addEventListener('click', (e) => {
+      // 1. Check data-route-to
       const target = (e.target as HTMLElement).closest('[data-route-to]') as HTMLElement | null;
       if (target) {
         const route = target.getAttribute('data-route-to') as AppRoute;
         if (route && (route === 'landing' || route === 'login' || route === 'workspace')) {
           e.preventDefault();
           this.navigate(route);
+          return;
+        }
+      }
+
+      // 2. Check anchor links (e.g. #how-it-works, #features, etc.)
+      const anchor = (e.target as HTMLElement).closest('.metic-nav-links a, a[href^="#"]') as HTMLAnchorElement | null;
+      if (anchor) {
+        const href = anchor.getAttribute('href');
+        if (href && href.startsWith('#') && href.length > 1) {
+          const targetId = href.replace(/^#\/?/, '').toLowerCase();
+          if (APP_ROUTES.has(targetId)) return;
+
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) {
+            e.preventDefault();
+            navLinks?.classList.remove('mobile-open');
+
+            if (this.currentRoute !== 'landing') {
+              this.currentRoute = 'landing';
+              this.render(false);
+              setTimeout(() => {
+                targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                history.pushState(null, '', `#${targetId}`);
+              }, 80);
+            } else {
+              targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              history.pushState(null, '', `#${targetId}`);
+            }
+          }
         }
       }
     });
@@ -48,15 +88,24 @@ export class AppRouter {
           document.getElementById('authViewTabSignUp')?.click();
         }, 50);
       }
+    } else if (initialHash && !APP_ROUTES.has(initialHash)) {
+      // Section anchor on landing page
+      this.navigate('landing', false);
+      setTimeout(() => {
+        const el = document.getElementById(initialHash);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 150);
     } else {
-      this.navigate('landing');
+      this.navigate('landing', true);
     }
   }
 
-  public navigate(route: AppRoute) {
+  public navigate(route: AppRoute, scrollToTop: boolean = true) {
     this.currentRoute = route;
-    window.location.hash = `#${route}`;
-    this.render();
+    if (window.location.hash.replace(/^#\/?/, '').toLowerCase() !== route) {
+      window.location.hash = `#${route}`;
+    }
+    this.render(scrollToTop);
   }
 
   public getRoute(): AppRoute {
@@ -67,20 +116,43 @@ export class AppRouter {
     const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
     if (hash === 'workspace' || hash === 'app') {
       this.currentRoute = 'workspace';
-    } else if (hash === 'login' || hash === 'auth' || hash === 'signup') {
+      this.render(true);
+      return;
+    }
+    if (hash === 'login' || hash === 'auth' || hash === 'signup') {
       this.currentRoute = 'login';
+      this.render(true);
       if (hash === 'signup') {
         setTimeout(() => {
           document.getElementById('authViewTabSignUp')?.click();
         }, 50);
       }
-    } else {
-      this.currentRoute = 'landing';
+      return;
     }
-    this.render();
+
+    // Check if hash points to a landing section element
+    if (hash && hash !== 'landing') {
+      const targetEl = document.getElementById(hash);
+      if (targetEl) {
+        const wasNotLanding = this.currentRoute !== 'landing';
+        this.currentRoute = 'landing';
+        if (wasNotLanding) {
+          this.render(false);
+          setTimeout(() => {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 80);
+        } else {
+          targetEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+        return;
+      }
+    }
+
+    this.currentRoute = 'landing';
+    this.render(true);
   }
 
-  private render() {
+  private render(scrollToTop: boolean = true) {
     if (!this.landingView || !this.authView || !this.appWorkspaceView) {
       this.landingView = document.getElementById('landingView');
       this.authView = document.getElementById('authView');
@@ -91,10 +163,19 @@ export class AppRouter {
 
     const magnifier = document.getElementById('draggableMagnifier');
     const dockBar = document.getElementById('magnifierDockBar');
+    const cornerToggle = document.getElementById('btnMagnifierCornerToggle');
 
     const showMagnifier = shouldDisplayMagnifier(this.currentRoute);
-    if (magnifier) magnifier.style.display = showMagnifier ? 'block' : 'none';
-    if (dockBar) dockBar.style.display = showMagnifier ? 'flex' : 'none';
+    if (!showMagnifier) {
+      if (magnifier) magnifier.style.display = 'none';
+      if (dockBar) dockBar.style.display = 'none';
+      if (cornerToggle) cornerToggle.style.display = 'none';
+    } else {
+      if (cornerToggle) cornerToggle.style.display = 'inline-flex';
+      const isMinimized = cornerToggle?.classList.contains('minimized');
+      if (magnifier) magnifier.style.display = isMinimized ? 'none' : 'block';
+      if (dockBar) dockBar.style.display = isMinimized ? 'none' : 'flex';
+    }
 
     if (this.currentRoute === 'landing') {
       this.landingView.style.display = 'block';
@@ -103,7 +184,9 @@ export class AppRouter {
       this.authView.classList.remove('active');
       this.appWorkspaceView.style.display = 'none';
       this.appWorkspaceView.classList.remove('active');
-      window.scrollTo(0, 0);
+      if (scrollToTop) {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     } else if (this.currentRoute === 'login') {
       this.landingView.style.display = 'none';
       this.landingView.classList.remove('active');
@@ -111,7 +194,9 @@ export class AppRouter {
       this.authView.classList.add('active');
       this.appWorkspaceView.style.display = 'none';
       this.appWorkspaceView.classList.remove('active');
-      window.scrollTo(0, 0);
+      if (scrollToTop) {
+        window.scrollTo(0, 0);
+      }
     } else {
       // Main website (#workspace): remove the magnifying glass and dock bar
       this.landingView.style.display = 'none';
@@ -120,7 +205,9 @@ export class AppRouter {
       this.authView.classList.remove('active');
       this.appWorkspaceView.style.display = 'block';
       this.appWorkspaceView.classList.add('active');
-      window.scrollTo(0, 0);
+      if (scrollToTop) {
+        window.scrollTo(0, 0);
+      }
     }
   }
 }

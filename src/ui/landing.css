@@ -23,6 +23,10 @@
 }
 
 /* Base Editorial Page Setup */
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -31,6 +35,16 @@ body {
   font-family: var(--metic-font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+#build,
+#features,
+#how-it-works,
+#live-demo,
+#link-security,
+#trust,
+.metic-section {
+  scroll-margin-top: 84px;
 }
 
 /* Blueprint subtle architectural background grid */
@@ -1662,6 +1676,21 @@ body {
   .metic-nav-links {
     display: none;
   }
+  .metic-nav-links.mobile-open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: rgba(251, 251, 250, 0.98);
+    backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--metic-border);
+    padding: 20px 24px;
+    gap: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    z-index: 1000;
+  }
   .metic-menu-toggle {
     display: block;
   }
@@ -2276,4 +2305,108 @@ body {
   background: var(--metic-ink);
   color: #ffffff;
 }
+
+/* Close/minimize button directly on top of the physical magnifying glass */
+.magnifier-close-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: rgba(17, 24, 39, 0.9);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 100;
+  transition: all 0.15s ease;
+  padding: 0;
+  line-height: 1;
+}
+
+.magnifier-close-btn:hover {
+  background: #ef4444;
+  border-color: #ef4444;
+  transform: scale(1.1);
+}
+
+/* Floating Bottom-Right Corner Launcher / Toggle Button */
+.magnifier-corner-toggle {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 995;
+  display: none; /* Managed dynamically by router and DraggableMagnifier */
+  align-items: center;
+  gap: 8px;
+  padding: 9px 18px;
+  background: rgba(17, 24, 39, 0.94);
+  backdrop-filter: blur(12px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 9999px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+  cursor: pointer;
+  font-family: var(--metic-font-mono, monospace);
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.magnifier-corner-toggle:hover {
+  background: #000000;
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+}
+
+.magnifier-corner-toggle.minimized {
+  background: #111827;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  animation: pulseCornerGlow 2.5s infinite;
+}
+
+@keyframes pulseCornerGlow {
+  0%, 100% {
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  }
+  50% {
+    box-shadow: 0 8px 30px rgba(34, 197, 94, 0.45);
+  }
+}
+
+.corner-toggle-icon {
+  font-size: 14px;
+}
+
+.corner-toggle-text {
+  font-size: 12px;
+  letter-spacing: -0.01em;
+}
+
+.corner-toggle-badge {
+  font-size: 10px;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 9999px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.corner-toggle-badge.badge-active {
+  background: #10b981;
+  color: #ffffff;
+}
+
+.corner-toggle-badge.badge-restore {
+  background: rgba(255, 255, 255, 0.22);
+  color: #e5e7eb;
+}
+
 

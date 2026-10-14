@@ -51,6 +51,7 @@ export class DraggableMagnifier {
   // Sampling throttle
   private lastSampleTime: number = 0;
   private currentState: ThreatAnalysisState | null = null;
+  private isEnabled: boolean = true;
 
   public init() {
     this.container = document.getElementById('draggableMagnifier');
@@ -113,10 +114,27 @@ export class DraggableMagnifier {
       }
     });
 
+    // Close button directly on top of the magnifying glass
+    document.getElementById('btnMagnifierClose')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      this.disable();
+    });
+
+    // Floating corner launcher toggle
+    document.getElementById('btnMagnifierCornerToggle')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.toggleEnabled();
+    });
+
+    // Dock bar toggle button
     document.getElementById('btnToggleMagnifier')?.addEventListener('click', (e) => {
       e.preventDefault();
-      this.toggleVisibility();
+      this.toggleEnabled();
     });
+
+    // Sync initial visibility
+    this.syncVisibility();
 
     // Start continuous sampling loop
     this.startLoop();
@@ -212,26 +230,79 @@ export class DraggableMagnifier {
     requestAnimationFrame(step);
   }
 
+  public isGlassEnabled(): boolean {
+    return this.isEnabled;
+  }
+
+  public enable() {
+    this.isEnabled = true;
+    this.syncVisibility();
+  }
+
+  public disable() {
+    this.isEnabled = false;
+    this.syncVisibility();
+  }
+
+  public toggleEnabled() {
+    this.isEnabled = !this.isEnabled;
+    this.syncVisibility();
+  }
+
   public show() {
-    if (this.container) this.container.style.display = 'block';
-    const dockBar = document.getElementById('magnifierDockBar');
-    if (dockBar) dockBar.style.display = 'flex';
-    this.sampleUnderneath(true);
+    this.enable();
   }
 
   public hide() {
-    if (this.container) this.container.style.display = 'none';
-    const dockBar = document.getElementById('magnifierDockBar');
-    if (dockBar) dockBar.style.display = 'none';
+    this.disable();
   }
 
   public toggleVisibility() {
-    if (!this.container) return;
-    const isHidden = this.container.style.display === 'none';
-    if (isHidden) {
-      this.show();
+    this.toggleEnabled();
+  }
+
+  public syncVisibility() {
+    const isLanding = router.getRoute() === 'landing';
+    const cornerToggle = document.getElementById('btnMagnifierCornerToggle');
+    const cornerBadge = document.getElementById('cornerToggleBadge');
+    const cornerText = document.getElementById('cornerToggleText');
+    const dockBar = document.getElementById('magnifierDockBar');
+
+    if (!isLanding) {
+      if (this.container) this.container.style.display = 'none';
+      if (dockBar) dockBar.style.display = 'none';
+      if (cornerToggle) cornerToggle.style.display = 'none';
+      return;
+    }
+
+    // On landing page:
+    if (cornerToggle) cornerToggle.style.display = 'inline-flex';
+
+    if (this.isEnabled) {
+      if (this.container) this.container.style.display = 'block';
+      if (dockBar) dockBar.style.display = 'flex';
+      if (cornerToggle) {
+        cornerToggle.classList.remove('minimized');
+        cornerToggle.title = 'Minimize Magnifier to bottom corner';
+      }
+      if (cornerBadge) {
+        cornerBadge.textContent = 'ON';
+        cornerBadge.className = 'corner-toggle-badge badge-active';
+      }
+      if (cornerText) cornerText.textContent = 'Forensic Lens';
+      this.sampleUnderneath(true);
     } else {
-      this.hide();
+      if (this.container) this.container.style.display = 'none';
+      if (dockBar) dockBar.style.display = 'none';
+      if (cornerToggle) {
+        cornerToggle.classList.add('minimized');
+        cornerToggle.title = 'Click to restore Forensic Magnifier';
+      }
+      if (cornerBadge) {
+        cornerBadge.textContent = 'RESTORE';
+        cornerBadge.className = 'corner-toggle-badge badge-restore';
+      }
+      if (cornerText) cornerText.textContent = 'Forensic Lens';
     }
   }
 
