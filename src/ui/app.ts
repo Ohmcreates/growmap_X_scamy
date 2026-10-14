@@ -1175,14 +1175,46 @@ export function initApp() {
   // Sidebar toggle button (collapse / expand sidebar with animated hamburger icon)
   const btnSidebarToggle = document.getElementById('btnSidebarToggle') as HTMLButtonElement | null;
   const sidebarEl = document.querySelector('.sidebar') as HTMLElement | null;
+  const SIDEBAR_STATE_KEY = 'scam_spotter_sidebar_state';
+
+  function applySidebarState(collapsed: boolean) {
+    if (!sidebarEl || !btnSidebarToggle) return;
+    if (collapsed) {
+      sidebarEl.classList.add('collapsed');
+      btnSidebarToggle.classList.remove('is-open');
+      btnSidebarToggle.setAttribute('aria-expanded', 'false');
+    } else {
+      sidebarEl.classList.remove('collapsed');
+      btnSidebarToggle.classList.add('is-open');
+      btnSidebarToggle.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  // Restore remembered sidebar state from localStorage on page load / refresh
+  try {
+    const savedSidebarState = localStorage.getItem(SIDEBAR_STATE_KEY);
+    if (savedSidebarState === 'collapsed') {
+      applySidebarState(true);
+    } else if (savedSidebarState === 'open') {
+      applySidebarState(false);
+    }
+  } catch {}
 
   btnSidebarToggle?.addEventListener('click', () => {
     if (!sidebarEl) return;
     const isCollapsed = sidebarEl.classList.toggle('collapsed');
     if (isCollapsed) {
       btnSidebarToggle.classList.remove('is-open');
+      btnSidebarToggle.setAttribute('aria-expanded', 'false');
+      try {
+        localStorage.setItem(SIDEBAR_STATE_KEY, 'collapsed');
+      } catch {}
     } else {
       btnSidebarToggle.classList.add('is-open');
+      btnSidebarToggle.setAttribute('aria-expanded', 'true');
+      try {
+        localStorage.setItem(SIDEBAR_STATE_KEY, 'open');
+      } catch {}
     }
   });
 
