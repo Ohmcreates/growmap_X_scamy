@@ -108,18 +108,23 @@ export class AuthService {
   }
 
   static async signup(name: string, email: string, password: string): Promise<AuthUser> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+
     try {
       const res = await fetch('/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password }),
+        signal: controller.signal
       });
+      clearTimeout(timeout);
 
       let data: any = {};
       try {
         data = await res.json();
       } catch {
-        throw new Error(`Server returned status ${res.status}. Please ensure backend is active.`);
+        throw new Error(`Server returned status ${res.status}.`);
       }
 
       if (!res.ok) {
@@ -136,7 +141,15 @@ export class AuthService {
       this.notifyAuthStateChanged();
       return data.user;
     } catch (err: any) {
-      if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+      clearTimeout(timeout);
+      const isOfflineOrTimeout = !err.message ||
+        err.name === 'AbortError' ||
+        err.message.includes('Failed to fetch') ||
+        err.message.includes('NetworkError') ||
+        err.message.includes('status 5') ||
+        err.message.includes('unavailable');
+
+      if (isOfflineOrTimeout) {
         const localUser: AuthUser = {
           id: 'analyst-' + Math.floor(1000 + Math.random() * 9000),
           name: name || 'Analyst',
@@ -158,18 +171,23 @@ export class AuthService {
   }
 
   static async login(email: string, password: string): Promise<AuthUser> {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 3500);
+
     try {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        signal: controller.signal
       });
+      clearTimeout(timeout);
 
       let data: any = {};
       try {
         data = await res.json();
       } catch {
-        throw new Error(`Server returned status ${res.status}. Please check server logs.`);
+        throw new Error(`Server returned status ${res.status}.`);
       }
 
       if (!res.ok) {
@@ -186,10 +204,18 @@ export class AuthService {
       this.notifyAuthStateChanged();
       return data.user;
     } catch (err: any) {
-      if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+      clearTimeout(timeout);
+      const isOfflineOrTimeout = !err.message ||
+        err.name === 'AbortError' ||
+        err.message.includes('Failed to fetch') ||
+        err.message.includes('NetworkError') ||
+        err.message.includes('status 5') ||
+        err.message.includes('unavailable');
+
+      if (isOfflineOrTimeout) {
         const localUser: AuthUser = {
           id: 'analyst-local',
-          name: email.split('@')[0] || 'Analyst',
+          name: email.split('@')[0].replace('.', ' ').replace(/^./, (c) => c.toUpperCase()) || 'Analyst',
           email: email
         };
         const localSession = 'local_session_' + Date.now();

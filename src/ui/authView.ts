@@ -153,18 +153,26 @@ export class AuthViewController {
       this.btnSubmitSignIn.textContent = 'Authenticating...';
     }
 
+    const watchdog = setTimeout(() => {
+      if (this.btnSubmitSignIn && this.btnSubmitSignIn.disabled) {
+        this.btnSubmitSignIn.disabled = false;
+        this.btnSubmitSignIn.textContent = 'Sign In & Enter Workspace →';
+      }
+    }, 4000);
+
     try {
       await AuthService.login(email, password);
-      this.showAlert('Authentication successful. Redirecting to workspace...', 'success');
-      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      clearTimeout(watchdog);
+      this.showAlert('Authentication successful! Entering workspace...', 'success');
+      if (this.btnSubmitSignIn) {
+        this.btnSubmitSignIn.disabled = false;
+        this.btnSubmitSignIn.textContent = 'Sign In & Enter Workspace →';
+      }
       setTimeout(() => {
-        if (this.btnSubmitSignIn) {
-          this.btnSubmitSignIn.disabled = false;
-          this.btnSubmitSignIn.textContent = 'Sign In & Enter Workspace →';
-        }
         router.navigate('workspace');
-      }, 350);
+      }, 150);
     } catch (err: any) {
+      clearTimeout(watchdog);
       if (this.btnSubmitSignIn) {
         this.btnSubmitSignIn.disabled = false;
         this.btnSubmitSignIn.textContent = 'Sign In & Enter Workspace →';
@@ -196,18 +204,26 @@ export class AuthViewController {
       this.btnSubmitSignUp.textContent = 'Creating account...';
     }
 
+    const watchdog = setTimeout(() => {
+      if (this.btnSubmitSignUp && this.btnSubmitSignUp.disabled) {
+        this.btnSubmitSignUp.disabled = false;
+        this.btnSubmitSignUp.textContent = 'Create Account & Enter →';
+      }
+    }, 4000);
+
     try {
       await AuthService.signup(name, email, password);
-      this.showAlert('Account created successfully! Redirecting to workspace...', 'success');
-      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      clearTimeout(watchdog);
+      this.showAlert('Account created successfully! Entering workspace...', 'success');
+      if (this.btnSubmitSignUp) {
+        this.btnSubmitSignUp.disabled = false;
+        this.btnSubmitSignUp.textContent = 'Create Account & Enter →';
+      }
       setTimeout(() => {
-        if (this.btnSubmitSignUp) {
-          this.btnSubmitSignUp.disabled = false;
-          this.btnSubmitSignUp.textContent = 'Create Account & Enter →';
-        }
         router.navigate('workspace');
-      }, 350);
+      }, 150);
     } catch (err: any) {
+      clearTimeout(watchdog);
       if (this.btnSubmitSignUp) {
         this.btnSubmitSignUp.disabled = false;
         this.btnSubmitSignUp.textContent = 'Create Account & Enter →';

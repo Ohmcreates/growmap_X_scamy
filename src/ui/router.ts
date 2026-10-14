@@ -166,6 +166,11 @@ export class AppRouter {
     this.currentRoute = route;
     this.updateUrl(route);
     this.render(scrollToTop);
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      try {
+        window.dispatchEvent(new CustomEvent('route-changed', { detail: { route } }));
+      } catch {}
+    }
   }
 
   public getRoute(): AppRoute {

@@ -810,6 +810,20 @@
       </div>
     </header>
 
+    <!-- Sticky Guest Session Countdown Timer Bar (Active only in Guest Mode) -->
+    <div id="guestSessionTimerBar" class="guest-session-timer-bar" style="display: none;">
+      <div class="guest-timer-content">
+        <span class="guest-timer-badge">⏱️ GUEST TRIAL</span>
+        <span class="guest-timer-clock">Session expires in: <strong id="guestTimerCount">05:00</strong></span>
+        <span class="guest-timer-note">• Text Analysis only • In-memory evaluation (Zero Saved Data)</span>
+      </div>
+      <div class="guest-timer-actions">
+        <a href="/login" data-route-to="login" class="btn-guest-upgrade">
+          🔑 Sign In for Full Access & Unlimited Time →
+        </a>
+      </div>
+    </div>
+
     <!-- Main Application Layout with Left Sidebar -->
     <div class="app-layout">
       <!-- Left Sidebar Navigation -->
@@ -888,15 +902,32 @@
                 </button>
                 <button id="tabScanLink" class="tab-button" role="tab" aria-selected="false" type="button">
                   <span class="tab-icon">🔗</span> URL / Link
+                  <span id="lockBadgeLink" class="guest-tab-lock-badge" style="display: none;">🔒 Locked</span>
                 </button>
                 <button id="tabUploadImage" class="tab-button" role="tab" aria-selected="false" type="button">
                   <span class="tab-icon">🖼️</span> Upload Image / QR
+                  <span id="lockBadgeImage" class="guest-tab-lock-badge" style="display: none;">🔒 Locked</span>
                 </button>
               </div>
 
               <!-- Multilingual Script Detector Pill -->
               <div id="langScriptPill" class="lang-script-badge" title="Real-time script detection">
                 🌐 Script: Latin (English)
+              </div>
+            </div>
+
+            <!-- In-place Locked Feature Banner for Guests -->
+            <div id="guestLockedFeatureBanner" class="guest-locked-feature-banner" style="display: none;" role="alert">
+              <div class="locked-banner-text">
+                <span class="locked-banner-icon">🔒</span>
+                <div>
+                  <strong>Analyst Account Required:</strong>
+                  <span>URL link security inspection and QR/Image malware analysis are restricted to registered analysts. Sign in or create an account to unlock these features, or continue with Text Analysis in guest mode.</span>
+                </div>
+              </div>
+              <div class="locked-banner-actions">
+                <a href="/login" data-route-to="login" class="btn-locked-banner-signin">Sign In to Unlock →</a>
+                <button id="btnDismissLockedBanner" type="button" class="btn-dismiss-locked-banner" title="Dismiss">✕</button>
               </div>
             </div>
 

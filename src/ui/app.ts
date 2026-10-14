@@ -207,7 +207,11 @@ export function initApp() {
   // --------------------------------------------------------------------------
   function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE') {
     if (tab !== 'TEXT' && !AuthService.isAuthenticated()) {
-      router.navigate('login');
+      const lockedBanner = document.getElementById('guestLockedFeatureBanner');
+      if (lockedBanner) {
+        lockedBanner.style.display = 'flex';
+        lockedBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
       return;
     }
 
@@ -1535,6 +1539,117 @@ export function initApp() {
   const userDisplayName = document.getElementById('userDisplayName') as HTMLElement;
   const btnLogout = document.getElementById('btnLogout') as HTMLButtonElement;
 
+  // --------------------------------------------------------------------------
+  // 5-Minute Guest Mode Countdown Timer & Tab Restrictions
+  // --------------------------------------------------------------------------
+  let guestTimerInterval: any = null;
+  let guestTimerSecondsLeft = 300; // 5 minutes
+
+  function startGuestTimer() {
+    if (AuthService.isAuthenticated()) {
+      stopGuestTimer();
+      return;
+    }
+    const timerBar = document.getElementById('guestSessionTimerBar');
+    const timerCount = document.getElementById('guestTimerCount');
+    if (timerBar) timerBar.style.display = 'flex';
+
+    if (guestTimerInterval) return;
+
+    function renderTime() {
+      if (!timerCount) return;
+      const m = Math.floor(guestTimerSecondsLeft / 60);
+      const s = guestTimerSecondsLeft % 60;
+      timerCount.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      if (guestTimerSecondsLeft <= 60) {
+        timerCount.classList.add('urgent-pulse');
+      } else {
+        timerCount.classList.remove('urgent-pulse');
+      }
+    }
+
+    renderTime();
+
+    guestTimerInterval = setInterval(() => {
+      if (AuthService.isAuthenticated()) {
+        stopGuestTimer();
+        return;
+      }
+      guestTimerSecondsLeft--;
+      renderTime();
+
+      if (guestTimerSecondsLeft <= 0) {
+        stopGuestTimer();
+        if (textarea) textarea.value = '';
+        if (urlInput) urlInput.value = '';
+        updateInputMetrics();
+        resetScoreWidgets();
+        if (analysisResultCard) analysisResultCard.style.display = 'none';
+        if (screenAlarmOverlay) screenAlarmOverlay.style.display = 'none';
+
+        alert('⏱️ Guest session expired (5-minute limit reached).\n\nPlease sign in or create an account to continue using Scam Spotter without time restrictions and save your scans.');
+        router.navigate('login');
+      }
+    }, 1000);
+  }
+
+  function stopGuestTimer() {
+    if (guestTimerInterval) {
+      clearInterval(guestTimerInterval);
+      guestTimerInterval = null;
+    }
+    guestTimerSecondsLeft = 300;
+    const timerBar = document.getElementById('guestSessionTimerBar');
+    if (timerBar) timerBar.style.display = 'none';
+    const timerCount = document.getElementById('guestTimerCount');
+    if (timerCount) {
+      timerCount.textContent = '05:00';
+      timerCount.classList.remove('urgent-pulse');
+    }
+  }
+
+  function updateGuestModeUi() {
+    const isAuth = AuthService.isAuthenticated();
+    const lockBadgeLink = document.getElementById('lockBadgeLink');
+    const lockBadgeImage = document.getElementById('lockBadgeImage');
+    const lockedBanner = document.getElementById('guestLockedFeatureBanner');
+
+    if (!isAuth) {
+      if (lockBadgeLink) lockBadgeLink.style.display = 'inline-flex';
+      if (lockBadgeImage) lockBadgeImage.style.display = 'inline-flex';
+      tabScanLink?.classList.add('guest-locked');
+      tabUploadImage?.classList.add('guest-locked');
+      tabScanLink?.setAttribute('title', 'Requires Analyst Sign In');
+      tabUploadImage?.setAttribute('title', 'Requires Analyst Sign In');
+
+      if (router.getRoute() === 'workspace') {
+        startGuestTimer();
+      }
+    } else {
+      if (lockBadgeLink) lockBadgeLink.style.display = 'none';
+      if (lockBadgeImage) lockBadgeImage.style.display = 'none';
+      tabScanLink?.classList.remove('guest-locked');
+      tabUploadImage?.classList.remove('guest-locked');
+      tabScanLink?.removeAttribute('title');
+      tabUploadImage?.removeAttribute('title');
+      if (lockedBanner) lockedBanner.style.display = 'none';
+      stopGuestTimer();
+    }
+  }
+
+  document.getElementById('btnDismissLockedBanner')?.addEventListener('click', () => {
+    const banner = document.getElementById('guestLockedFeatureBanner');
+    if (banner) banner.style.display = 'none';
+  });
+
+  window.addEventListener('route-changed', (e: any) => {
+    if (e.detail?.route === 'workspace') {
+      updateGuestModeUi();
+    } else {
+      stopGuestTimer();
+    }
+  });
+
   function updateAuthUi() {
     const user = AuthService.getUser();
     if (user && userProfileBadge && btnOpenAuthModal) {
@@ -1546,6 +1661,7 @@ export function initApp() {
       btnOpenAuthModal.style.display = 'block';
       userProfileBadge.style.display = 'none';
     }
+    updateGuestModeUi();
   }
 
   // Check existing session
@@ -1612,6 +1728,7 @@ export function initApp() {
   });
 
   btnLogout?.addEventListener('click', async () => {
+    stopGuestTimer();
     await AuthService.logout();
     HistoryService.clearHistory();
     if (textarea) textarea.value = '';

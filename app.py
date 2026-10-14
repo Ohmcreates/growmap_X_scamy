@@ -173,8 +173,20 @@ def api_login():
         with conn.cursor() as cur:
             cur.execute("SELECT id, email, name, password_hash FROM users WHERE email = %s", (email,))
             user = cur.fetchone()
-            if not user or not verify_password(user['password_hash'], password):
-                return jsonify({'error': 'Invalid email or password.'}), 401
+            if not user:
+                # If user doesn't exist yet, auto-provision account seamlessly on first sign-in
+                if len(password) < 6:
+                    return jsonify({'error': 'Account not found. For new accounts, password must be at least 6 characters.'}), 400
+                name = email.split('@')[0].replace('.', ' ').title() or 'Analyst'
+                salt, pw_hash = hash_password(password)
+                user_id = str(uuid.uuid4())
+                cur.execute(
+                    "INSERT INTO users (id, email, name, password_hash, password_salt, role) VALUES (%s, %s, %s, %s, %s, %s)",
+                    (user_id, email, name, pw_hash, salt, 'analyst')
+                )
+                user = {'id': user_id, 'email': email, 'name': name}
+            elif not verify_password(user['password_hash'], password):
+                return jsonify({'error': 'Invalid password. Please check your credentials.'}), 401
 
             session_id = secrets.token_hex(32)
             ip_addr = request.remote_addr

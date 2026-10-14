@@ -4819,6 +4819,173 @@ body.theme-dark .gemini-guidance-content strong {
   margin: 0 auto;
 }
 
+/* --------------------------------------------------------------------------
+   GUEST RESTRICTIONS & 5-MINUTE COUNTDOWN TIMER BAR
+   -------------------------------------------------------------------------- */
+.guest-tab-lock-badge {
+  font-size: 0.68rem;
+  margin-left: 5px;
+  background: rgba(220, 38, 38, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(220, 38, 38, 0.25);
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+.tab-button.guest-locked {
+  opacity: 0.72;
+  position: relative;
+  border-style: dashed;
+}
+
+.tab-button.guest-locked:hover {
+  border-color: #f87171;
+  background-color: #fef2f2;
+}
+
+.guest-locked-feature-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: linear-gradient(135deg, #fff1f2 0%, #fff7ed 100%);
+  border: 1px solid #fecdd3;
+  border-left: 4px solid #e11d48;
+  padding: 10px 14px;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  font-size: 0.85rem;
+  color: #881337;
+  animation: slideDownFade 0.25s ease-out;
+}
+
+.locked-banner-text {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.locked-banner-icon {
+  font-size: 1.25rem;
+  flex-shrink: 0;
+}
+
+.locked-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.btn-locked-banner-signin {
+  background: #e11d48;
+  color: #ffffff !important;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 6px;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-locked-banner-signin:hover {
+  background: #be123c;
+}
+
+.btn-dismiss-locked-banner {
+  background: none;
+  border: none;
+  font-size: 1rem;
+  color: #9f1239;
+  cursor: pointer;
+  padding: 4px 6px;
+  line-height: 1;
+}
+
+/* 5-Minute Sticky Guest Session Countdown Bar */
+.guest-session-timer-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 8px 18px;
+  background: #0f172a;
+  color: #f8fafc;
+  font-size: 0.84rem;
+  border-bottom: 1px solid #334155;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  position: relative;
+  z-index: 50;
+  flex-wrap: wrap;
+}
+
+.guest-timer-content {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.guest-timer-badge {
+  background: #ea580c;
+  color: #ffffff;
+  font-size: 0.7rem;
+  font-weight: 800;
+  padding: 2px 7px;
+  border-radius: 4px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.guest-timer-clock {
+  font-weight: 500;
+  color: #e2e8f0;
+}
+
+.guest-timer-clock strong {
+  color: #38bdf8;
+  font-size: 0.95rem;
+  font-family: monospace;
+  font-weight: 700;
+}
+
+.guest-timer-clock strong.urgent-pulse {
+  color: #ef4444;
+  animation: pulseTimer 1s infinite alternate;
+}
+
+@keyframes pulseTimer {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0.55; transform: scale(1.08); }
+}
+
+.guest-timer-note {
+  color: #94a3b8;
+  font-size: 0.78rem;
+}
+
+.btn-guest-upgrade {
+  background: #2563eb;
+  color: #ffffff !important;
+  text-decoration: none;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 5px;
+  transition: background 0.2s;
+  white-space: nowrap;
+}
+
+.btn-guest-upgrade:hover {
+  background: #1d4ed8;
+}
+
 
 
 
