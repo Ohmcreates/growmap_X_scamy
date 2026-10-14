@@ -231,13 +231,55 @@ export function initApp() {
     }
   }
 
+  function showWorkspaceSubview(subviewId: string) {
+    const allSubviews = document.querySelectorAll('.workspace-subview');
+    allSubviews.forEach((v) => {
+      (v as HTMLElement).style.display = 'none';
+      v.classList.remove('active');
+    });
+
+    const target = document.getElementById(subviewId);
+    if (target) {
+      target.style.display = 'flex';
+      target.classList.add('active');
+    }
+
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    sidebarItems.forEach((btn) => {
+      if (btn.getAttribute('data-subview') === subviewId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    if (subviewId === 'subviewThreatDb') {
+      renderThreatDatabase(threatDbSearchInput?.value || '');
+    } else if (subviewId === 'subviewBenchmark') {
+      openModelEvaluationModal();
+    } else if (subviewId === 'subviewHistory') {
+      renderHistoryList();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
   tabTextMessage?.addEventListener('click', () => switchTab('TEXT'));
   tabScanLink?.addEventListener('click', () => switchTab('LINK'));
   tabUploadImage?.addEventListener('click', () => switchTab('IMAGE'));
 
-  menuScanMessage?.addEventListener('click', () => switchTab('TEXT'));
-  menuScanLink?.addEventListener('click', () => switchTab('LINK'));
-  menuScanImage?.addEventListener('click', () => switchTab('IMAGE'));
+  menuScanMessage?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewScanner');
+    switchTab('TEXT');
+  });
+  menuScanLink?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewScanner');
+    switchTab('LINK');
+  });
+  menuScanImage?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewScanner');
+    switchTab('IMAGE');
+  });
 
   // --------------------------------------------------------------------------
   // Multilingual Script Detection & Character Counter
@@ -1099,11 +1141,15 @@ export function initApp() {
     evalModal.classList.add('open');
   }
 
-  btnOpenModelEval?.addEventListener('click', openModelEvaluationModal);
-  menuEvaluation?.addEventListener('click', openModelEvaluationModal);
+  btnOpenModelEval?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewBenchmark');
+  });
+  menuEvaluation?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewBenchmark');
+  });
   navEvaluation?.addEventListener('click', (e) => {
     e.preventDefault();
-    openModelEvaluationModal();
+    showWorkspaceSubview('subviewBenchmark');
   });
   closeEvalModal?.addEventListener('click', () => evalModal.classList.remove('open'));
 
@@ -1172,9 +1218,9 @@ export function initApp() {
   }
 
   function openThreatDatabaseModal() {
-    threatDbSearchInput.value = '';
+    if (threatDbSearchInput) threatDbSearchInput.value = '';
     renderThreatDatabase('');
-    threatDbModal.classList.add('open');
+    showWorkspaceSubview('subviewThreatDb');
   }
 
   threatDbSearchInput?.addEventListener('input', () => {
@@ -1350,8 +1396,7 @@ export function initApp() {
   closeDashboardModal?.addEventListener('click', () => dashboardModal.classList.remove('open'));
 
   menuHistory?.addEventListener('click', () => {
-    renderHistoryList();
-    historyModal.classList.add('open');
+    showWorkspaceSubview('subviewHistory');
   });
   closeHistoryModal?.addEventListener('click', () => historyModal.classList.remove('open'));
 
@@ -1391,18 +1436,35 @@ export function initApp() {
   closePricingModal?.addEventListener('click', () => pricingModal.classList.remove('open'));
 
   menuReport?.addEventListener('click', () => {
-    reportSuccess.style.display = 'none';
-    reportForm.reset();
-    reportModal.classList.add('open');
+    showWorkspaceSubview('subviewReport');
   });
   closeReportModal?.addEventListener('click', () => reportModal.classList.remove('open'));
 
-  menuLearn?.addEventListener('click', () => learnModal.classList.add('open'));
+  menuLearn?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewLearn');
+  });
   navHowItWorks?.addEventListener('click', (e) => {
     e.preventDefault();
-    learnModal.classList.add('open');
+    showWorkspaceSubview('subviewLearn');
   });
   closeLearnModal?.addEventListener('click', () => learnModal.classList.remove('open'));
+
+  // Technical Forensic Details Accordion Toggle
+  const btnToggleTechDetails = document.getElementById('btnToggleTechDetails') as HTMLButtonElement | null;
+  const techDetailsAccordion = document.getElementById('techDetailsAccordion') as HTMLElement | null;
+  const accordionArrow = document.getElementById('accordionArrow') as HTMLElement | null;
+
+  btnToggleTechDetails?.addEventListener('click', () => {
+    if (!techDetailsAccordion) return;
+    const isVisible = techDetailsAccordion.style.display === 'flex' || techDetailsAccordion.style.display === 'block';
+    if (isVisible) {
+      techDetailsAccordion.style.display = 'none';
+      if (accordionArrow) accordionArrow.textContent = '▾';
+    } else {
+      techDetailsAccordion.style.display = 'flex';
+      if (accordionArrow) accordionArrow.textContent = '▴';
+    }
+  });
 
 
 
