@@ -13,6 +13,7 @@ import { checkWebsiteUrl } from '../engine/websiteChecker.js';
 import { predictPhishingMlAsync, MlModelAssessment } from '../engine/phishingMl.js';
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
 import { GeminiService } from '../services/geminiService.js';
+import { AuthService } from '../services/authService.js';
 
 export function initApp() {
 
@@ -1403,8 +1404,116 @@ export function initApp() {
   });
   closeLearnModal?.addEventListener('click', () => learnModal.classList.remove('open'));
 
+
+
+  
+  // Auth DOM Elements
+  const authModal = document.getElementById('authModal') as HTMLElement;
+  const closeAuthModal = document.getElementById('closeAuthModal') as HTMLButtonElement;
+  const btnOpenAuthModal = document.getElementById('btnOpenAuthModal') as HTMLButtonElement;
+  const btnTabLogin = document.getElementById('btnTabLogin') as HTMLButtonElement;
+  const btnTabSignup = document.getElementById('btnTabSignup') as HTMLButtonElement;
+  const formLogin = document.getElementById('formLogin') as HTMLFormElement;
+  const formSignup = document.getElementById('formSignup') as HTMLFormElement;
+  const loginEmail = document.getElementById('loginEmail') as HTMLInputElement;
+  const loginPassword = document.getElementById('loginPassword') as HTMLInputElement;
+  const signupName = document.getElementById('signupName') as HTMLInputElement;
+  const signupEmail = document.getElementById('signupEmail') as HTMLInputElement;
+  const signupPassword = document.getElementById('signupPassword') as HTMLInputElement;
+  const loginError = document.getElementById('loginError') as HTMLElement;
+  const signupError = document.getElementById('signupError') as HTMLElement;
+  const userProfileBadge = document.getElementById('userProfileBadge') as HTMLElement;
+  const userAvatarIcon = document.getElementById('userAvatarIcon') as HTMLElement;
+  const userDisplayName = document.getElementById('userDisplayName') as HTMLElement;
+  const btnLogout = document.getElementById('btnLogout') as HTMLButtonElement;
+
+  function updateAuthUi() {
+    const user = AuthService.getUser();
+    if (user && userProfileBadge && btnOpenAuthModal) {
+      btnOpenAuthModal.style.display = 'none';
+      userProfileBadge.style.display = 'flex';
+      if (userDisplayName) userDisplayName.textContent = user.name.split(' ')[0] || user.name;
+      if (userAvatarIcon) userAvatarIcon.textContent = (user.name[0] || 'U').toUpperCase();
+    } else if (userProfileBadge && btnOpenAuthModal) {
+      btnOpenAuthModal.style.display = 'block';
+      userProfileBadge.style.display = 'none';
+    }
+  }
+
+  // Check existing session
+  AuthService.verifySession().then(() => updateAuthUi());
+
+  btnOpenAuthModal?.addEventListener('click', () => {
+    loginError.style.display = 'none';
+    signupError.style.display = 'none';
+    formLogin.reset();
+    formSignup.reset();
+    btnTabLogin.classList.add('active');
+    btnTabSignup.classList.remove('active');
+    formLogin.style.display = 'flex';
+    formSignup.style.display = 'none';
+    authModal.classList.add('open');
+  });
+
+  closeAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
+
+  btnTabLogin?.addEventListener('click', () => {
+    btnTabLogin.classList.add('active');
+    btnTabSignup.classList.remove('active');
+    formLogin.style.display = 'flex';
+    formSignup.style.display = 'none';
+    loginError.style.display = 'none';
+  });
+
+  btnTabSignup?.addEventListener('click', () => {
+    btnTabSignup.classList.add('active');
+    btnTabLogin.classList.remove('active');
+    formSignup.style.display = 'flex';
+    formLogin.style.display = 'none';
+    signupError.style.display = 'none';
+  });
+
+  formLogin?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.style.display = 'none';
+    const email = loginEmail.value.trim();
+    const pw = loginPassword.value;
+    try {
+      await AuthService.login(email, pw);
+      updateAuthUi();
+      authModal.classList.remove('open');
+      renderHistoryList();
+    } catch (err: any) {
+      loginError.textContent = err.message || 'Login failed.';
+      loginError.style.display = 'block';
+    }
+  });
+
+  formSignup?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    signupError.style.display = 'none';
+    const name = signupName.value.trim();
+    const email = signupEmail.value.trim();
+    const pw = signupPassword.value;
+    try {
+      await AuthService.signup(name, email, pw);
+      updateAuthUi();
+      authModal.classList.remove('open');
+      renderHistoryList();
+    } catch (err: any) {
+      signupError.textContent = err.message || 'Signup failed.';
+      signupError.style.display = 'block';
+    }
+  });
+
+  btnLogout?.addEventListener('click', async () => {
+    await AuthService.logout();
+    updateAuthUi();
+    renderHistoryList();
+  });
+
   // Close modals on backdrop click
-  [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal].forEach((m) => {
+  [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal, authModal].forEach((m) => {
     m?.addEventListener('click', (e) => {
       if (e.target === m) m.classList.remove('open');
     });
@@ -1414,17 +1523,18 @@ export function initApp() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       dismissScreenAlarm();
-      [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal].forEach((m) =>
+      [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal, authModal].forEach((m) =>
         m?.classList.remove('open')
       );
     }
   });
 
+
   // --------------------------------------------------------------------------
   // History List Management
   // --------------------------------------------------------------------------
-  function renderHistoryList() {
-    const list = HistoryService.getHistory();
+  async function renderHistoryList() {
+    const list = await HistoryService.fetchServerHistory();
     if (list.length === 0) {
       historyListMount.innerHTML =
         '<p style="color: var(--text-muted); font-size: 0.9rem;">No saved scans found on this device.</p>';

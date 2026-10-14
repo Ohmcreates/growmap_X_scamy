@@ -6,6 +6,16 @@ export default defineConfig({
     host: true,
     strictPort: true,
     open: false,
+    proxy: {
+      '/api': {
+        target: 'http://127.0.0.1:5001',
+        changeOrigin: true,
+      },
+      '/predict': {
+        target: 'http://127.0.0.1:5001',
+        changeOrigin: true,
+      },
+    },
   },
   test: {
     globals: true,

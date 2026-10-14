@@ -1,4 +1,5 @@
 import { RiskLevel, ScanResult } from '../engine/types.js';
+import { AuthService } from './authService.js';
 
 export interface HistoryItem {
   id: string;
@@ -15,7 +16,6 @@ const STORAGE_KEY = 'scam_spotter_history_v1';
 const MAX_HISTORY_ITEMS = 50;
 
 function maskSensitiveDigits(text: string): string {
-  // Mask 10-digit mobile numbers or 12-16 digit account/card numbers
   return text.replace(/\b\d{4}[-\s]?\d{4}[-\s]?\d{2,8}\b/g, '[MASKED]');
 }
 
@@ -32,16 +32,54 @@ export class HistoryService {
     }
   }
 
-  static getHistory(): HistoryItem[] {
+  static getLocalHistory(): HistoryItem[] {
     if (!this.isAvailable()) return [];
     try {
       const data = window.localStorage.getItem(STORAGE_KEY);
       if (!data) return [];
       const parsed = JSON.parse(data);
       return Array.isArray(parsed) ? parsed : [];
-    } catch (e) {
-      console.warn('Failed to read scan history from storage:', e);
+    } catch {
       return [];
+    }
+  }
+
+  static getHistory(): HistoryItem[] {
+    return this.getLocalHistory();
+  }
+
+  static async fetchServerHistory(): Promise<HistoryItem[]> {
+    const session = AuthService.getSessionId();
+    if (!session) {
+      return this.getLocalHistory();
+    }
+
+    try {
+      const res = await fetch('/api/scans', {
+        headers: { 'X-Session-ID': session }
+      });
+      if (!res.ok) return this.getLocalHistory();
+
+      const data = await res.json();
+      const rows = data.history || [];
+
+      const serverItems: HistoryItem[] = rows.map((r: any) => ({
+        id: r.id,
+        createdAt: r.created_at || new Date().toISOString(),
+        score: r.risk_score,
+        riskLevel: r.risk_level as RiskLevel,
+        ruleIds: Array.isArray(r.rules_fired_json) ? r.rules_fired_json : [],
+        preview: r.content_preview,
+        scamProfileName: r.headline
+      }));
+
+      if (serverItems.length > 0 && this.isAvailable()) {
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(serverItems.slice(0, MAX_HISTORY_ITEMS)));
+      }
+
+      return serverItems.length > 0 ? serverItems : this.getLocalHistory();
+    } catch {
+      return this.getLocalHistory();
     }
   }
 
@@ -50,44 +88,55 @@ export class HistoryService {
     result: ScanResult,
     saveFullText = false
   ): HistoryItem | null {
-    if (!this.isAvailable()) return null;
+    const maskedText = maskSensitiveDigits(rawText.trim());
+    const preview = maskedText.length > 60 ? `${maskedText.slice(0, 60)}...` : maskedText;
 
-    try {
-      const history = this.getHistory();
-      const maskedText = maskSensitiveDigits(rawText.trim());
-      const preview = maskedText.length > 60 ? `${maskedText.slice(0, 60)}...` : maskedText;
+    const newItem: HistoryItem = {
+      id: `scan_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+      createdAt: new Date().toISOString(),
+      score: result.score,
+      riskLevel: result.riskLevel,
+      ruleIds: result.breakdown.map((b) => b.ruleId),
+      preview,
+      fullText: saveFullText ? rawText : undefined,
+      scamProfileName: result.scamProfile?.name,
+    };
 
-      const newItem: HistoryItem = {
-        id: `scan_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
-        createdAt: new Date().toISOString(),
-        score: result.score,
-        riskLevel: result.riskLevel,
-        ruleIds: result.breakdown.map((b) => b.ruleId),
-        preview,
-        fullText: saveFullText ? rawText : undefined,
-        scamProfileName: result.scamProfile?.name,
-      };
-
-      // Add to front of history list
-      history.unshift(newItem);
-
-      // Enforce 50-item limit
-      if (history.length > MAX_HISTORY_ITEMS) {
-        history.length = MAX_HISTORY_ITEMS;
-      }
-
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
-      return newItem;
-    } catch (e) {
-      console.warn('Failed to save scan to storage:', e);
-      return null;
+    if (this.isAvailable()) {
+      try {
+        const history = this.getLocalHistory();
+        history.unshift(newItem);
+        if (history.length > MAX_HISTORY_ITEMS) {
+          history.length = MAX_HISTORY_ITEMS;
+        }
+        window.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+      } catch {}
     }
+
+    const session = AuthService.getSessionId();
+    fetch('/api/scans', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(session ? { 'X-Session-ID': session } : {})
+      },
+      body: JSON.stringify({
+        content: preview,
+        riskScore: result.score,
+        riskLevel: result.riskLevel,
+        scanType: 'TEXT_MESSAGE',
+        headline: result.headline || result.scamProfile?.name || 'Message Scan',
+        rulesFired: result.breakdown.map((b) => b.ruleId)
+      })
+    }).catch(() => {});
+
+    return newItem;
   }
 
   static deleteItem(id: string): boolean {
     if (!this.isAvailable()) return false;
     try {
-      const history = this.getHistory().filter((item) => item.id !== id);
+      const history = this.getLocalHistory().filter((item) => item.id !== id);
       window.localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
       return true;
     } catch {

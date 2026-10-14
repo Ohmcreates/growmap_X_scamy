@@ -705,7 +705,16 @@
       <div class="nav-right">
         <button id="btnThemeToggle" class="icon-nav-btn" title="Toggle Theme" aria-label="Toggle Theme">☀️</button>
         <button id="btnSearchNav" class="icon-nav-btn" title="Threat Analytics Dashboard" aria-label="Analytics Dashboard">📊</button>
-        <div class="user-avatar" title="Verified Safe Profile">P</div>
+        <div id="authNavCluster" class="auth-nav-cluster">
+          <button id="btnOpenAuthModal" class="btn-auth-signin" type="button">Sign In</button>
+          <div id="userProfileBadge" class="user-profile-badge" style="display: none;">
+            <div id="userAvatarIcon" class="user-avatar" title="Logged In">U</div>
+            <div class="user-meta-drop">
+              <span id="userDisplayName" class="user-name-text">User</span>
+              <button id="btnLogout" class="btn-logout-link" type="button" title="Sign Out">Logout</button>
+            </div>
+          </div>
+        </div>
       </div>
     </header>
 
@@ -1400,6 +1409,67 @@
             <p>Verified phishing URLs and known malware domains lock the minimum score to High (45+) immediately.</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 8. Clean Email Sign In & Sign Up Modal -->
+    <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+      <div class="modal-container auth-modal-box">
+        <button id="closeAuthModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        
+        <div class="auth-tabs-row">
+          <button id="btnTabLogin" class="auth-tab-btn active" type="button">Sign In</button>
+          <button id="btnTabSignup" class="auth-tab-btn" type="button">Create Account</button>
+        </div>
+
+        <!-- Sign In Form -->
+        <form id="formLogin" class="auth-form-panel">
+          <h3 id="authModalTitle" class="auth-title">Welcome Back</h3>
+          <p class="auth-subtitle">Sign in to sync your personal scan history and active session data.</p>
+          
+          <div class="auth-field">
+            <label for="loginEmail">Email Address</label>
+            <input id="loginEmail" type="email" placeholder="you@example.com" required autocomplete="username" />
+          </div>
+
+          <div class="auth-field">
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+
+          <div id="loginError" class="auth-error-box" style="display: none;"></div>
+
+          <button id="btnSubmitLogin" type="submit" class="btn-auth-submit">
+            Sign In
+          </button>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="formSignup" class="auth-form-panel" style="display: none;">
+          <h3 class="auth-title">Create an Account</h3>
+          <p class="auth-subtitle">Create a secure profile to record all message scans across your sessions.</p>
+          
+          <div class="auth-field">
+            <label for="signupName">Full Name</label>
+            <input id="signupName" type="text" placeholder="Subham Moharana" required autocomplete="name" />
+          </div>
+
+          <div class="auth-field">
+            <label for="signupEmail">Email Address</label>
+            <input id="signupEmail" type="email" placeholder="you@example.com" required autocomplete="email" />
+          </div>
+
+          <div class="auth-field">
+            <label for="signupPassword">Password (6+ chars)</label>
+            <input id="signupPassword" type="password" placeholder="••••••••" required minlength="6" autocomplete="new-password" />
+          </div>
+
+          <div id="signupError" class="auth-error-box" style="display: none;"></div>
+
+          <button id="btnSubmitSignup" type="submit" class="btn-auth-submit">
+            Create Account
+          </button>
+        </form>
       </div>
     </div>
     </div> <!-- /appWorkspaceView -->
