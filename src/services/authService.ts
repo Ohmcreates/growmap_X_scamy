@@ -96,6 +96,53 @@ export class AuthService {
     }
   }
 
+  private static readonly GUEST_EXPIRY_KEY = 'scam_spotter_guest_expires_at';
+  private static readonly GUEST_DURATION_MS = 5 * 60 * 1000; // 5 minutes
+
+  static getGuestRemainingSeconds(): number {
+    const storage = safeStorage();
+    if (!storage) return -1;
+    try {
+      const stored = storage.getItem(this.GUEST_EXPIRY_KEY);
+      if (!stored) return -1;
+      const expiry = parseInt(stored, 10);
+      if (isNaN(expiry)) return -1;
+      const diff = expiry - Date.now();
+      return Math.floor(diff / 1000);
+    } catch {
+      return -1;
+    }
+  }
+
+  static isGuestExpired(): boolean {
+    const remaining = this.getGuestRemainingSeconds();
+    return remaining !== -1 && remaining <= 0;
+  }
+
+  static initOrGetGuestExpiry(): number {
+    const storage = safeStorage();
+    let remaining = this.getGuestRemainingSeconds();
+    if (remaining === -1) {
+      const expiry = Date.now() + this.GUEST_DURATION_MS;
+      if (storage) {
+        try {
+          storage.setItem(this.GUEST_EXPIRY_KEY, String(expiry));
+        } catch {}
+      }
+      return 300;
+    }
+    return remaining;
+  }
+
+  static resetGuestExpiry(): void {
+    const storage = safeStorage();
+    if (storage) {
+      try {
+        storage.removeItem(this.GUEST_EXPIRY_KEY);
+      } catch {}
+    }
+  }
+
   static setGuestMode(): AuthUser {
     this.clearSession();
     const guestUser: AuthUser = {
@@ -166,6 +213,7 @@ export class AuthService {
         storage.setItem(SESSION_KEY, data.sessionId);
         storage.setItem(USER_KEY, JSON.stringify(data.user));
       }
+      this.resetGuestExpiry();
       this.notifyAuthStateChanged();
       return data.user;
     } catch (err: any) {
@@ -229,6 +277,7 @@ export class AuthService {
         storage.setItem(SESSION_KEY, data.sessionId);
         storage.setItem(USER_KEY, JSON.stringify(data.user));
       }
+      this.resetGuestExpiry();
       this.notifyAuthStateChanged();
       return data.user;
     } catch (err: any) {

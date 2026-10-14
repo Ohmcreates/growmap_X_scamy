@@ -1603,42 +1603,50 @@ export function initApp() {
   // 5-Minute Guest Mode Countdown Timer & Tab Restrictions
   // --------------------------------------------------------------------------
   let guestTimerInterval: any = null;
-  let guestTimerSecondsLeft = 300; // 5 minutes
 
   function startGuestTimer() {
     if (AuthService.isAuthenticated()) {
       stopGuestTimer();
       return;
     }
+
+    const secLeft = AuthService.initOrGetGuestExpiry();
+    if (secLeft <= 0) {
+      stopGuestTimer();
+      alert('⏱️ Your 5-minute guest session has already expired.\n\nPlease sign in or create an account to continue using Scam Spotter without time restrictions.');
+      router.navigate('login');
+      return;
+    }
+
     const timerBar = document.getElementById('guestSessionTimerBar');
     const timerCount = document.getElementById('guestTimerCount');
     if (timerBar) timerBar.style.display = 'flex';
 
     if (guestTimerInterval) return;
 
-    function renderTime() {
+    function renderTime(seconds: number) {
       if (!timerCount) return;
-      const m = Math.floor(guestTimerSecondsLeft / 60);
-      const s = guestTimerSecondsLeft % 60;
+      const valid = Math.max(0, seconds);
+      const m = Math.floor(valid / 60);
+      const s = valid % 60;
       timerCount.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
-      if (guestTimerSecondsLeft <= 60) {
+      if (valid <= 60) {
         timerCount.classList.add('urgent-pulse');
       } else {
         timerCount.classList.remove('urgent-pulse');
       }
     }
 
-    renderTime();
+    renderTime(secLeft);
 
     guestTimerInterval = setInterval(() => {
       if (AuthService.isAuthenticated()) {
         stopGuestTimer();
         return;
       }
-      guestTimerSecondsLeft--;
-      renderTime();
 
-      if (guestTimerSecondsLeft <= 0) {
+      const remaining = AuthService.getGuestRemainingSeconds();
+      if (remaining <= 0) {
         stopGuestTimer();
         if (textarea) textarea.value = '';
         if (urlInput) urlInput.value = '';
@@ -1649,7 +1657,10 @@ export function initApp() {
 
         alert('⏱️ Guest session expired (5-minute limit reached).\n\nPlease sign in or create an account to continue using Scam Spotter without time restrictions and save your scans.');
         router.navigate('login');
+        return;
       }
+
+      renderTime(remaining);
     }, 1000);
   }
 
@@ -1658,7 +1669,6 @@ export function initApp() {
       clearInterval(guestTimerInterval);
       guestTimerInterval = null;
     }
-    guestTimerSecondsLeft = 300;
     const timerBar = document.getElementById('guestSessionTimerBar');
     if (timerBar) timerBar.style.display = 'none';
     const timerCount = document.getElementById('guestTimerCount');

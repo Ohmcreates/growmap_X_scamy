@@ -8,6 +8,8 @@
  * Enforces strict authentication security: unauthenticated users cannot access /workspace.
  */
 
+import { AuthService } from '../services/authService.js';
+
 export type AppRoute = 'landing' | 'login' | 'workspace';
 
 const APP_ROUTES = new Set(['landing', 'login', 'workspace', 'app', 'auth', 'signup']);
@@ -288,7 +290,11 @@ export class AppRouter {
         window.scrollTo(0, 0);
       }
     } else {
-      // Main website (/workspace): remove the magnifying glass and dock bar
+      // Main website (/workspace): block if guest session has expired
+      if (!AuthService.isAuthenticated() && AuthService.isGuestExpired()) {
+        this.navigate('login');
+        return;
+      }
       document.body.style.overflow = '';
       this.landingView.style.display = 'none';
       this.landingView.classList.remove('active');
