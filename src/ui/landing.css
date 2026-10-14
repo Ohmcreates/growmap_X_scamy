@@ -37,6 +37,7 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+#heroSection,
 #build,
 #features,
 #how-it-works,
@@ -147,23 +148,140 @@ body {
 .metic-nav-links {
   display: flex;
   align-items: center;
-  gap: 32px;
+  gap: 8px;
   list-style: none;
   margin: 0;
   padding: 0;
+  height: 100%;
 }
 
-.metic-nav-links a {
+.nav-section-item {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 10px 10px;
   text-decoration: none;
-  font-size: 13.5px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.nav-item-primary {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 5px;
+}
+
+.nav-num {
+  font-family: var(--metic-font-mono, monospace);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--metic-ink-light);
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+}
+
+.nav-label {
+  font-size: 13px;
   font-weight: 500;
   color: var(--metic-ink-muted);
-  transition: color 0.15s ease;
   letter-spacing: -0.01em;
+  transition: color 0.2s ease, font-weight 0.2s ease;
+  white-space: nowrap;
 }
 
-.metic-nav-links a:hover {
+/* Dynamic Underline Highlight */
+.nav-section-item::after {
+  content: '';
+  position: absolute;
+  bottom: 0px;
+  left: 8px;
+  right: 8px;
+  height: 2px;
+  background: var(--metic-ink);
+  transform: scaleX(0);
+  transform-origin: center;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, height 0.2s ease;
+  border-radius: 2px;
+}
+
+.nav-section-item:hover::after {
+  transform: scaleX(1);
+  background: var(--metic-ink);
+}
+
+.nav-section-item:hover .nav-label {
   color: var(--metic-ink);
+}
+
+.nav-section-item:hover .nav-num {
+  color: var(--metic-ink);
+}
+
+/* Active Highlight when scrolled to or positioned at this section */
+.nav-section-item.active {
+  color: var(--metic-ink);
+}
+
+.nav-section-item.active .nav-label {
+  color: var(--metic-ink);
+  font-weight: 700;
+}
+
+.nav-section-item.active .nav-num {
+  color: var(--metic-crimson, #dc2626);
+  font-weight: 700;
+}
+
+.nav-section-item.active::after {
+  transform: scaleX(1);
+  background: var(--metic-crimson, #dc2626);
+  height: 2.5px;
+}
+
+/* Micro Subtitle Fade-in Tooltip Badge */
+.nav-sub-fade {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%) translateY(2px);
+  pointer-events: none;
+  opacity: 0;
+  visibility: hidden;
+  white-space: nowrap;
+  font-family: var(--metic-font-mono, monospace);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(18, 19, 22, 0.94);
+  backdrop-filter: blur(8px);
+  color: #ffffff;
+  padding: 5px 11px;
+  border-radius: 4px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.16);
+  transition: opacity 0.22s cubic-bezier(0.16, 1, 0.3, 1), transform 0.22s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.22s;
+  z-index: 500;
+}
+
+.nav-sub-fade::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 4px;
+  border-style: solid;
+  border-color: transparent transparent rgba(18, 19, 22, 0.94) transparent;
+}
+
+.nav-section-item:hover .nav-sub-fade,
+.nav-section-item:focus-visible .nav-sub-fade {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(8px);
 }
 
 .metic-header-actions {
@@ -1687,9 +1805,33 @@ body {
     backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--metic-border);
     padding: 20px 24px;
-    gap: 16px;
+    gap: 12px;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
     z-index: 1000;
+  }
+  .metic-nav-links.mobile-open .nav-section-item {
+    width: 100%;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+  .metic-nav-links.mobile-open .nav-section-item::after {
+    display: none;
+  }
+  .metic-nav-links.mobile-open .nav-sub-fade {
+    position: static;
+    transform: none;
+    opacity: 0.8;
+    visibility: visible;
+    margin-top: 4px;
+    font-size: 9px;
+    background: transparent;
+    color: var(--metic-ink-muted);
+    padding: 0;
+    box-shadow: none;
+  }
+  .metic-nav-links.mobile-open .nav-sub-fade::before {
+    display: none;
   }
   .metic-menu-toggle {
     display: block;

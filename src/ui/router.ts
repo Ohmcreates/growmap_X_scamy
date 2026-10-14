@@ -98,6 +98,65 @@ export class AppRouter {
     } else {
       this.navigate('landing', true);
     }
+
+    this.initScrollspy();
+  }
+
+  private initScrollspy() {
+    const sectionConfigs = [
+      { id: 'heroSection', navTarget: 'heroSection' },
+      { id: 'build', navTarget: 'build' },
+      { id: 'features', navTarget: 'features' },
+      { id: 'how-it-works', navTarget: 'how-it-works' },
+      { id: 'live-demo', navTarget: 'live-demo' },
+      { id: 'link-security', navTarget: 'link-security' },
+      { id: 'trust', navTarget: 'trust' },
+    ];
+
+    let ticking = false;
+
+    const onScroll = () => {
+      if (this.currentRoute !== 'landing') return;
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY || window.pageYOffset;
+          const headerOffset = 140;
+          let activeTarget = 'heroSection';
+
+          for (const item of sectionConfigs) {
+            const el = document.getElementById(item.id);
+            if (el) {
+              const top = el.offsetTop - headerOffset;
+              if (scrollY >= top) {
+                activeTarget = item.navTarget;
+              }
+            }
+          }
+
+          // Near bottom of page: activate last section
+          if (window.innerHeight + scrollY >= document.body.offsetHeight - 80) {
+            activeTarget = 'trust';
+          }
+
+          const navItems = document.querySelectorAll('.nav-section-item');
+          navItems.forEach((navItem) => {
+            const target = navItem.getAttribute('data-section-target');
+            if (target === activeTarget) {
+              navItem.classList.add('active');
+            } else {
+              navItem.classList.remove('active');
+            }
+          });
+
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+    setTimeout(onScroll, 100);
   }
 
   public navigate(route: AppRoute, scrollToTop: boolean = true) {
