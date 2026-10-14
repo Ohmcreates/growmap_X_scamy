@@ -206,6 +206,11 @@ export function initApp() {
   // Tab Switching
   // --------------------------------------------------------------------------
   function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE') {
+    if (tab !== 'TEXT' && !AuthService.isAuthenticated()) {
+      router.navigate('login');
+      return;
+    }
+
     activeTab = tab;
 
     [tabTextMessage, tabScanLink, tabUploadImage].forEach((t) => t?.classList.remove('active'));

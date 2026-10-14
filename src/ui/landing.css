@@ -1540,12 +1540,12 @@ body {
 
 .metic-auth-card {
   width: 100%;
-  max-width: 440px;
+  max-width: 390px;
   background: var(--metic-canvas-card, #ffffff);
   border: 1px solid var(--metic-border, #e2ded8);
   border-radius: 8px;
-  padding: 32px 36px;
-  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.06);
+  padding: 20px 24px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.07);
   margin: auto;
   box-sizing: border-box;
 }
@@ -1555,19 +1555,19 @@ body {
   background: var(--metic-canvas-subtle);
   border: 1px solid var(--metic-border);
   border-radius: 6px;
-  padding: 4px;
-  margin-bottom: 24px;
-  gap: 4px;
+  padding: 3px;
+  margin-bottom: 12px;
+  gap: 3px;
 }
 
 .metic-auth-tab {
   flex: 1;
-  padding: 9px 14px;
+  padding: 6px 10px;
   background: transparent;
   border: none;
   border-radius: 4px;
   font-family: var(--metic-font-mono);
-  font-size: 12px;
+  font-size: 11.5px;
   font-weight: 600;
   color: var(--metic-ink-muted);
   cursor: pointer;
@@ -1586,11 +1586,11 @@ body {
 }
 
 .auth-view-alert {
-  padding: 10px 14px;
+  padding: 8px 12px;
   border-radius: 4px;
-  font-size: 13px;
-  margin-bottom: 18px;
-  line-height: 1.4;
+  font-size: 12px;
+  margin-bottom: 10px;
+  line-height: 1.35;
 }
 
 .auth-view-alert.error {
@@ -1606,55 +1606,59 @@ body {
 }
 
 .metic-auth-header {
-  margin-bottom: 24px;
+  margin-bottom: 10px;
 }
 
 .auth-editorial-tag {
   font-family: var(--metic-font-mono);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: var(--metic-crimson);
-  margin-bottom: 8px;
+  margin-bottom: 3px;
+  letter-spacing: 0.05em;
 }
 
 .auth-title {
   font-family: var(--metic-font-serif);
-  font-size: 32px;
-  font-weight: 400;
-  margin: 0 0 8px 0;
+  font-size: 21px;
+  font-weight: 500;
+  margin: 0 0 3px 0;
+  color: var(--metic-ink);
+  line-height: 1.2;
 }
 
 .auth-subtitle {
-  font-size: 13.5px;
+  font-size: 11.5px;
   color: var(--metic-ink-muted);
   margin: 0;
+  line-height: 1.35;
 }
 
 .metic-auth-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 8px;
 }
 
 .auth-form-group {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 2px;
 }
 
 .auth-form-group label {
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--metic-ink);
 }
 
 .auth-form-group input {
-  padding: 12px;
+  padding: 7px 10px;
   border: 1px solid var(--metic-border);
   border-radius: 4px;
   background: var(--metic-canvas);
   font-family: var(--metic-font-sans);
-  font-size: 14px;
+  font-size: 12.5px;
   color: var(--metic-ink);
 }
 
@@ -1665,16 +1669,16 @@ body {
 }
 
 .metic-btn-auth-submit {
-  padding: 14px;
+  padding: 9px;
   background: var(--metic-ink);
   color: #ffffff;
   border: 1px solid var(--metic-ink);
   border-radius: 4px;
-  font-size: 14px;
+  font-size: 12.5px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
-  margin-top: 6px;
+  margin-top: 3px;
 }
 
 .metic-btn-auth-submit:hover {
@@ -1691,8 +1695,8 @@ body {
   align-items: center;
   justify-content: center;
   gap: 6px;
-  margin-top: 14px;
-  font-size: 12.5px;
+  margin-top: 6px;
+  font-size: 11px;
   color: var(--metic-ink-muted);
 }
 
@@ -1700,7 +1704,7 @@ body {
   background: none;
   border: none;
   padding: 0;
-  font-size: 12.5px;
+  font-size: 11px;
   font-weight: 600;
   color: var(--metic-crimson);
   cursor: pointer;
@@ -1715,9 +1719,9 @@ body {
 .metic-auth-divider {
   display: flex;
   align-items: center;
-  gap: 12px;
-  margin: 16px 0;
-  font-size: 11.5px;
+  gap: 8px;
+  margin: 8px 0;
+  font-size: 9.5px;
   color: var(--metic-ink-light);
   font-family: var(--metic-font-mono);
 }
@@ -1731,15 +1735,16 @@ body {
 }
 
 .metic-btn-auth-demo {
-  padding: 12px;
+  padding: 7px 10px;
   background: var(--metic-canvas-subtle);
   color: var(--metic-ink);
   border: 1px solid var(--metic-border);
   border-radius: 4px;
-  font-size: 13px;
+  font-size: 11.5px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
+  width: 100%;
 }
 
 .metic-btn-auth-demo:hover {
@@ -1750,8 +1755,8 @@ body {
 .metic-auth-back {
   display: block;
   text-align: center;
-  margin-top: 24px;
-  font-size: 12.5px;
+  margin-top: 8px;
+  font-size: 11px;
   color: var(--metic-ink-muted);
   text-decoration: none;
   transition: color 0.15s ease;
