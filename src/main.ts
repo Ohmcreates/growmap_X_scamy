@@ -5,6 +5,7 @@ import { router } from './ui/router.js';
 import { initApp } from './ui/app.js';
 
 import { authViewController } from './ui/authView.js';
+import { initLandingAuth } from './ui/landingAuth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // 1. Initialize client-side view router
@@ -19,8 +20,9 @@ document.addEventListener('DOMContentLoaded', () => {
   // 4. Initialize live product demonstration with authentic SBI KYC scam analysis
   liveDemo.init();
 
-  // 5. Initialize Authentication interactions (Sign In & Sign Up)
+  // 5. Initialize Authentication interactions (Sign In & Sign Up & Landing state)
   authViewController.init();
+  initLandingAuth();
 
   // 6. Initialize existing full-featured Scam Spotter scanner workspace
   initApp();

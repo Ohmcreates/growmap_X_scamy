@@ -70,9 +70,18 @@
             </nav>
 
             <div class="metic-header-actions">
-              <a href="#login" class="metic-btn-ghost" data-route-to="login" data-auth-mode="signin">Sign In</a>
-              <a href="#login" class="metic-btn-ghost" data-route-to="login" data-auth-mode="signup">Sign Up</a>
-              <a href="#login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
+              <div id="landingGuestAuthCluster" class="landing-auth-group">
+                <a href="#login" class="metic-btn-ghost" data-route-to="login" data-auth-mode="signin">Sign In</a>
+                <a href="#login" class="metic-btn-ghost" data-route-to="login" data-auth-mode="signup">Sign Up</a>
+                <a href="#login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
+              </div>
+              <div id="landingUserAuthCluster" class="landing-user-group" style="display: none;">
+                <span class="landing-user-badge">
+                  <span class="user-avatar-circle" id="landingUserAvatar">U</span>
+                  <span class="user-greeting-name" id="landingUserName">User</span>
+                </span>
+                <a href="#workspace" class="metic-btn-solid" data-route-to="workspace">Open Workspace →</a>
+              </div>
               <button class="metic-menu-toggle" type="button" aria-label="Toggle Navigation Menu">☰</button>
             </div>
           </div>
@@ -95,8 +104,8 @@
                   Suspicious message, unfamiliar link, or unexpected payment request? Understand the warning signs before you act.
                 </p>
                 <div class="metic-hero-ctas">
-                  <a href="#login" class="metic-btn-primary" data-route-to="login">
-                    <span>Check a Message</span>
+                  <a id="heroPrimaryCta" href="#login" class="metic-btn-primary" data-route-to="login">
+                    <span id="heroPrimaryCtaText">Check a Message</span>
                     <span>→</span>
                   </a>
                   <a href="#how-it-works" class="metic-btn-secondary">
@@ -546,8 +555,8 @@
             <p class="metic-cta-sub">
               Verify suspicious messages, links, and payment requests with zero guesswork. Protect your finances and personal identity now.
             </p>
-            <a href="#login" class="metic-btn-cta-large" data-route-to="login">
-              <span>Scan a Suspicious Message</span>
+            <a id="landingFinalCta" href="#login" class="metic-btn-cta-large" data-route-to="login">
+              <span id="landingFinalCtaText">Scan a Suspicious Message</span>
               <span>→</span>
             </a>
           </div>
@@ -585,11 +594,9 @@
             <div class="footer-nav-col">
               <h4>FORENSICS</h4>
               <ul>
-                <li><a href="#login" data-route-to="login">Message Scanner</a></li>
-                <li><a href="#login" data-route-to="login">URL Deconstruction</a></li>
-                <li><a href="#login" data-route-to="login">OCR Receipt Audit</a></li>
-                <li><a href="#login" data-route-to="login">APK Static Sandbox</a></li>
-                <li><a href="#login" data-route-to="login">VirusTotal File Scan</a></li>
+                <li><a id="footerLinkScanner" href="#login" data-route-to="login">Message Scanner</a></li>
+                <li><a id="footerLinkUrl" href="#login" data-route-to="login">URL Deconstruction</a></li>
+                <li><a id="footerLinkOcr" href="#login" data-route-to="login">OCR Receipt Audit</a></li>
               </ul>
             </div>
 

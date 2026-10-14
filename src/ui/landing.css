@@ -158,6 +158,47 @@ body {
   gap: 12px;
 }
 
+.landing-auth-group {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.landing-user-group {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.landing-user-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--metic-canvas-subtle);
+  border: 1px solid var(--metic-border);
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  color: var(--metic-ink);
+}
+
+.user-avatar-circle {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--metic-crimson);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.user-greeting-name {
+  font-weight: 600;
+}
+
 .metic-btn-ghost {
   text-decoration: none;
   font-size: 13px;
