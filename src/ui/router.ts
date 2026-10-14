@@ -230,10 +230,10 @@ export class AppRouter {
       if (dockBar) dockBar.style.display = 'none';
       if (cornerToggle) cornerToggle.style.display = 'none';
     } else {
-      if (cornerToggle) cornerToggle.style.display = 'inline-flex';
-      const isMinimized = cornerToggle?.classList.contains('minimized');
-      if (magnifier) magnifier.style.display = isMinimized ? 'none' : 'block';
-      if (dockBar) dockBar.style.display = isMinimized ? 'none' : 'flex';
+      if (cornerToggle) cornerToggle.style.display = 'flex';
+      const isOff = cornerToggle?.classList.contains('is-off') || cornerToggle?.classList.contains('minimized');
+      if (magnifier) magnifier.style.display = isOff ? 'none' : 'block';
+      if (dockBar) dockBar.style.display = isOff ? 'none' : 'flex';
     }
 
     if (this.currentRoute === 'landing') {

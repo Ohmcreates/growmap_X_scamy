@@ -114,14 +114,7 @@ export class DraggableMagnifier {
       }
     });
 
-    // Close button directly on top of the magnifying glass
-    document.getElementById('btnMagnifierClose')?.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      this.disable();
-    });
-
-    // Floating corner launcher toggle
+    // Floating circular corner toggle
     document.getElementById('btnMagnifierCornerToggle')?.addEventListener('click', (e) => {
       e.preventDefault();
       this.toggleEnabled();
@@ -264,8 +257,6 @@ export class DraggableMagnifier {
   public syncVisibility() {
     const isLanding = router.getRoute() === 'landing';
     const cornerToggle = document.getElementById('btnMagnifierCornerToggle');
-    const cornerBadge = document.getElementById('cornerToggleBadge');
-    const cornerText = document.getElementById('cornerToggleText');
     const dockBar = document.getElementById('magnifierDockBar');
 
     if (!isLanding) {
@@ -276,33 +267,23 @@ export class DraggableMagnifier {
     }
 
     // On landing page:
-    if (cornerToggle) cornerToggle.style.display = 'inline-flex';
+    if (cornerToggle) cornerToggle.style.display = 'flex';
 
     if (this.isEnabled) {
       if (this.container) this.container.style.display = 'block';
       if (dockBar) dockBar.style.display = 'flex';
       if (cornerToggle) {
-        cornerToggle.classList.remove('minimized');
-        cornerToggle.title = 'Minimize Magnifier to bottom corner';
+        cornerToggle.classList.remove('is-off');
+        cornerToggle.title = 'Click to disable Forensic Magnifier';
       }
-      if (cornerBadge) {
-        cornerBadge.textContent = 'ON';
-        cornerBadge.className = 'corner-toggle-badge badge-active';
-      }
-      if (cornerText) cornerText.textContent = 'Forensic Lens';
       this.sampleUnderneath(true);
     } else {
       if (this.container) this.container.style.display = 'none';
       if (dockBar) dockBar.style.display = 'none';
       if (cornerToggle) {
-        cornerToggle.classList.add('minimized');
-        cornerToggle.title = 'Click to restore Forensic Magnifier';
+        cornerToggle.classList.add('is-off');
+        cornerToggle.title = 'Click to enable Forensic Magnifier';
       }
-      if (cornerBadge) {
-        cornerBadge.textContent = 'RESTORE';
-        cornerBadge.className = 'corner-toggle-badge badge-restore';
-      }
-      if (cornerText) cornerText.textContent = 'Forensic Lens';
     }
   }
 

@@ -21,7 +21,6 @@
          Always-on draggable forensic lens with optical zoom & dynamic tri-color glow
          ========================================================================== -->
     <div id="draggableMagnifier" class="draggable-magnifier" role="region" aria-label="Draggable Malware Magnifying Glass">
-      <button id="btnMagnifierClose" class="magnifier-close-btn" type="button" title="Minimize Magnifier to bottom corner" aria-label="Minimize Magnifier">✕</button>
       <div id="magnifierDragHint" class="magnifier-drag-hint">✋ Drag glass to scan for malware</div>
       <div id="magnifierLensViewport" class="magnifier-viewport">
         <div id="magnifierGlowRing" class="magnifier-glow-ring glow-red"></div>
@@ -42,11 +41,12 @@
       <button id="btnToggleMagnifier" class="dock-btn" type="button" title="Hide or show the magnifying glass">👁️ Toggle Glass</button>
     </div>
 
-    <!-- Floating Bottom-Right Corner Toggle for Magnifier -->
-    <button id="btnMagnifierCornerToggle" class="magnifier-corner-toggle" type="button" title="Minimize Magnifier to bottom corner" aria-label="Toggle Forensic Magnifier">
-      <span class="corner-toggle-icon">🔍</span>
-      <span class="corner-toggle-text" id="cornerToggleText">Forensic Lens</span>
-      <span class="corner-toggle-badge badge-active" id="cornerToggleBadge">ON</span>
+    <!-- Floating Circular Bottom-Right Corner Toggle for Magnifier -->
+    <button id="btnMagnifierCornerToggle" class="magnifier-circular-toggle" type="button" title="Toggle Forensic Magnifier" aria-label="Toggle Forensic Magnifier">
+      <div class="circular-toggle-inner">
+        <img src="/assets/magnifying_glass.png" alt="Forensic Magnifier" class="circular-toggle-icon-img" draggable="false" />
+        <span class="circular-toggle-slash" id="circularToggleSlash"></span>
+      </div>
     </button>
 
     <!-- ==========================================================================
