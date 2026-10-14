@@ -70,7 +70,8 @@
             </nav>
 
             <div class="metic-header-actions">
-              <a href="#login" class="metic-btn-ghost" data-route-to="login">Sign In</a>
+              <a href="#login" class="metic-btn-ghost" data-route-to="login" data-auth-mode="signin">Sign In</a>
+              <a href="#login" class="metic-btn-ghost" data-route-to="login" data-auth-mode="signup">Sign Up</a>
               <a href="#login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
               <button class="metic-menu-toggle" type="button" aria-label="Toggle Navigation Menu">☰</button>
             </div>
@@ -618,29 +619,70 @@
     <div id="authView" class="view-panel" style="display: none;">
       <div class="metic-auth-container">
         <div class="metic-auth-card">
+          <!-- Segmented Tab Switcher (Sign In vs Sign Up) -->
+          <div class="metic-auth-tabs" role="tablist">
+            <button type="button" id="authViewTabSignIn" class="metic-auth-tab active" role="tab" aria-selected="true">
+              Sign In
+            </button>
+            <button type="button" id="authViewTabSignUp" class="metic-auth-tab" role="tab" aria-selected="false">
+              Create Account
+            </button>
+          </div>
+
           <div class="metic-auth-header">
-            <div class="auth-editorial-tag">01 // ACCESS CONTROL</div>
-            <h2 class="auth-title">Analyst Sign In</h2>
-            <p class="auth-subtitle">
-              Sign in to access the full Scam Spotter Intelligence Workspace.
+            <div id="authViewEditorialTag" class="auth-editorial-tag">01 // ACCESS CONTROL</div>
+            <h2 id="authViewTitle" class="auth-title">Analyst Sign In</h2>
+            <p id="authViewSubtitle" class="auth-subtitle">
+              Sign in to access your scam detection history & analysis workspace.
             </p>
           </div>
 
-          <form id="authForm" class="metic-auth-form">
+          <!-- Alert / Feedback Message Box -->
+          <div id="authViewAlert" class="auth-view-alert" style="display: none;" role="alert"></div>
+
+          <!-- SIGN IN FORM -->
+          <form id="authFormSignIn" class="metic-auth-form">
             <div class="auth-form-group">
-              <label for="authEmail">Email Address</label>
-              <input id="authEmail" type="email" value="analyst@scamspotter.org" required />
+              <label for="authSignInEmail">Email Address</label>
+              <input id="authSignInEmail" type="email" placeholder="name@example.com" required autocomplete="email" />
             </div>
 
             <div class="auth-form-group">
-              <label for="authPassword">Security Key / Password</label>
-              <input id="authPassword" type="password" value="••••••••••••" required />
+              <label for="authSignInPassword">Security Key / Password</label>
+              <input id="authSignInPassword" type="password" placeholder="••••••••••••" required autocomplete="current-password" />
             </div>
 
-            <button type="submit" class="metic-btn-auth-submit">
-              Enter Workspace →
+            <button type="submit" id="btnSubmitSignIn" class="metic-btn-auth-submit">
+              Sign In & Enter Workspace →
             </button>
           </form>
+
+          <!-- SIGN UP FORM -->
+          <form id="authFormSignUp" class="metic-auth-form" style="display: none;">
+            <div class="auth-form-group">
+              <label for="authSignUpName">Full Name</label>
+              <input id="authSignUpName" type="text" placeholder="e.g. Subham Moharana" required autocomplete="name" />
+            </div>
+
+            <div class="auth-form-group">
+              <label for="authSignUpEmail">Email Address</label>
+              <input id="authSignUpEmail" type="email" placeholder="name@example.com" required autocomplete="email" />
+            </div>
+
+            <div class="auth-form-group">
+              <label for="authSignUpPassword">Security Key / Password</label>
+              <input id="authSignUpPassword" type="password" placeholder="At least 6 characters" minlength="6" required autocomplete="new-password" />
+            </div>
+
+            <button type="submit" id="btnSubmitSignUp" class="metic-btn-auth-submit">
+              Create Account & Enter →
+            </button>
+          </form>
+
+          <div class="metic-auth-toggle-hint">
+            <span id="authToggleHintText">Don't have an account?</span>
+            <button type="button" id="btnToggleAuthMode" class="btn-auth-toggle-link">Create an account</button>
+          </div>
 
           <div class="metic-auth-divider">
             <span>OR CONTINUE DIRECTLY</span>

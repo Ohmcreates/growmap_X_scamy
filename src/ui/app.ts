@@ -1443,6 +1443,11 @@ export function initApp() {
   // Check existing session
   AuthService.verifySession().then(() => updateAuthUi());
 
+  window.addEventListener('auth-state-changed', () => {
+    updateAuthUi();
+    renderHistoryList();
+  });
+
   btnOpenAuthModal?.addEventListener('click', () => {
     loginError.style.display = 'none';
     signupError.style.display = 'none';

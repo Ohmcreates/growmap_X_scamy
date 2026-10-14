@@ -41,8 +41,13 @@ export class AppRouter {
     const initialHash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
     if (initialHash === 'workspace' || initialHash === 'app') {
       this.navigate('workspace');
-    } else if (initialHash === 'login' || initialHash === 'auth') {
+    } else if (initialHash === 'login' || initialHash === 'auth' || initialHash === 'signup') {
       this.navigate('login');
+      if (initialHash === 'signup') {
+        setTimeout(() => {
+          document.getElementById('authViewTabSignUp')?.click();
+        }, 50);
+      }
     } else {
       this.navigate('landing');
     }
@@ -62,8 +67,13 @@ export class AppRouter {
     const hash = window.location.hash.replace(/^#\/?/, '').toLowerCase();
     if (hash === 'workspace' || hash === 'app') {
       this.currentRoute = 'workspace';
-    } else if (hash === 'login' || hash === 'auth') {
+    } else if (hash === 'login' || hash === 'auth' || hash === 'signup') {
       this.currentRoute = 'login';
+      if (hash === 'signup') {
+        setTimeout(() => {
+          document.getElementById('authViewTabSignUp')?.click();
+        }, 50);
+      }
     } else {
       this.currentRoute = 'landing';
     }

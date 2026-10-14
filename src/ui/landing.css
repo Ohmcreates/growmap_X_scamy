@@ -1355,8 +1355,63 @@ body {
   box-shadow: 0 12px 40px rgba(0, 0, 0, 0.05);
 }
 
+.metic-auth-tabs {
+  display: flex;
+  background: var(--metic-canvas-subtle);
+  border: 1px solid var(--metic-border);
+  border-radius: 6px;
+  padding: 4px;
+  margin-bottom: 24px;
+  gap: 4px;
+}
+
+.metic-auth-tab {
+  flex: 1;
+  padding: 9px 14px;
+  background: transparent;
+  border: none;
+  border-radius: 4px;
+  font-family: var(--metic-font-mono);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--metic-ink-muted);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  text-align: center;
+}
+
+.metic-auth-tab:hover {
+  color: var(--metic-ink);
+}
+
+.metic-auth-tab.active {
+  background: #ffffff;
+  color: var(--metic-ink);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.auth-view-alert {
+  padding: 10px 14px;
+  border-radius: 4px;
+  font-size: 13px;
+  margin-bottom: 18px;
+  line-height: 1.4;
+}
+
+.auth-view-alert.error {
+  background: #fdf2f2;
+  border: 1px solid #f87171;
+  color: #b91c1c;
+}
+
+.auth-view-alert.success {
+  background: #f0fdf4;
+  border: 1px solid #4ade80;
+  color: #15803d;
+}
+
 .metic-auth-header {
-  margin-bottom: 28px;
+  margin-bottom: 24px;
 }
 
 .auth-editorial-tag {
@@ -1429,6 +1484,37 @@ body {
 
 .metic-btn-auth-submit:hover {
   background: #000000;
+}
+
+.metic-btn-auth-submit:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.metic-auth-toggle-hint {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 14px;
+  font-size: 12.5px;
+  color: var(--metic-ink-muted);
+}
+
+.btn-auth-toggle-link {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--metic-crimson);
+  cursor: pointer;
+  text-decoration: underline;
+  transition: opacity 0.15s;
+}
+
+.btn-auth-toggle-link:hover {
+  opacity: 0.8;
 }
 
 .metic-auth-divider {
