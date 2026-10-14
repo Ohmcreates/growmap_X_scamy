@@ -93,6 +93,7 @@ def home():
     return render_template('index.html')
 
 @app.route('/health', methods=['GET'])
+@app.route('/api/health', methods=['GET'])
 def health():
     return jsonify({
         'status': 'healthy',
@@ -180,18 +181,9 @@ def api_login():
             cur.execute("SELECT id, email, name, password_hash FROM users WHERE email = %s", (email,))
             user = cur.fetchone()
             if not user:
-                # If user doesn't exist yet, auto-provision account seamlessly on first sign-in
-                if len(password) < 6:
-                    return jsonify({'error': 'Account not found. For new accounts, password must be at least 6 characters.'}), 400
-                name = email.split('@')[0].replace('.', ' ').title() or 'Analyst'
-                salt, pw_hash = hash_password(password)
-                user_id = str(uuid.uuid4())
-                cur.execute(
-                    "INSERT INTO users (id, email, name, password_hash, password_salt, role) VALUES (%s, %s, %s, %s, %s, %s)",
-                    (user_id, email, name, pw_hash, salt, 'analyst')
-                )
-                user = {'id': user_id, 'email': email, 'name': name}
-            elif not verify_password(user['password_hash'], password):
+                return jsonify({'error': 'No account found with this email. Please sign up first.'}), 404
+
+            if not verify_password(user['password_hash'], password):
                 return jsonify({'error': 'Invalid password. Please check your credentials.'}), 401
 
             session_id = generate_session_id()
@@ -422,4 +414,4 @@ if __name__ == '__main__':
     init_db()
     port = int(os.environ.get('PORT', 5001))
     print(f"[*] Starting Scam Spotter Full-Stack Backend on http://127.0.0.1:{port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)

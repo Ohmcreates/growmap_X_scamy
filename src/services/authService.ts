@@ -29,7 +29,7 @@ export class AuthService {
     if (cachedSession && cachedUser) {
       try {
         const u = JSON.parse(cachedUser);
-        if (u && u.id && u.id.startsWith('analyst-guest')) {
+        if (u && u.id && (u.id.startsWith('analyst-guest') || u.id.startsWith('analyst-local') || u.id === 'guest')) {
           storage.removeItem(SESSION_KEY);
           storage.removeItem(USER_KEY);
           this.sessionId = null;
@@ -80,7 +80,10 @@ export class AuthService {
       const res = await fetch('/api/auth/me', {
         headers: { 'X-Session-ID': session }
       });
-      if (!res.ok) return null;
+      if (!res.ok) {
+        this.clearSession();
+        return null;
+      }
       const data = await res.json();
       if (data.authenticated && data.user) {
         this.currentUser = data.user;
@@ -92,7 +95,8 @@ export class AuthService {
         return null;
       }
     } catch {
-      return this.currentUser;
+      this.clearSession();
+      return null;
     }
   }
 
@@ -184,7 +188,7 @@ export class AuthService {
 
   static async signup(name: string, email: string, password: string): Promise<AuthUser> {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3500);
+    const timeout = setTimeout(() => controller.abort(), 6000);
 
     try {
       const res = await fetch('/api/auth/signup', {
@@ -218,29 +222,8 @@ export class AuthService {
       return data.user;
     } catch (err: any) {
       clearTimeout(timeout);
-      const isOfflineOrTimeout = !err.message ||
-        err.name === 'AbortError' ||
-        err.message.includes('Failed to fetch') ||
-        err.message.includes('NetworkError') ||
-        err.message.includes('status 5') ||
-        err.message.includes('unavailable');
-
-      if (isOfflineOrTimeout) {
-        const localUser: AuthUser = {
-          id: 'analyst-' + Math.floor(1000 + Math.random() * 9000),
-          name: name || 'Analyst',
-          email: email
-        };
-        const localSession = 'local_session_' + Date.now();
-        this.sessionId = localSession;
-        this.currentUser = localUser;
-        const storage = safeStorage();
-        if (storage) {
-          storage.setItem(SESSION_KEY, localSession);
-          storage.setItem(USER_KEY, JSON.stringify(localUser));
-        }
-        this.notifyAuthStateChanged();
-        return localUser;
+      if (err.name === 'AbortError') {
+        throw new Error('Connection timed out. Please check if your backend server is running.');
       }
       throw err;
     }
@@ -248,7 +231,7 @@ export class AuthService {
 
   static async login(email: string, password: string): Promise<AuthUser> {
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 3500);
+    const timeout = setTimeout(() => controller.abort(), 6000);
 
     try {
       const res = await fetch('/api/auth/login', {
@@ -267,7 +250,7 @@ export class AuthService {
       }
 
       if (!res.ok) {
-        throw new Error(data.error || 'Invalid credentials.');
+        throw new Error(data.error || 'Invalid email or password.');
       }
 
       this.sessionId = data.sessionId;
@@ -282,29 +265,8 @@ export class AuthService {
       return data.user;
     } catch (err: any) {
       clearTimeout(timeout);
-      const isOfflineOrTimeout = !err.message ||
-        err.name === 'AbortError' ||
-        err.message.includes('Failed to fetch') ||
-        err.message.includes('NetworkError') ||
-        err.message.includes('status 5') ||
-        err.message.includes('unavailable');
-
-      if (isOfflineOrTimeout) {
-        const localUser: AuthUser = {
-          id: 'analyst-local',
-          name: email.split('@')[0].replace('.', ' ').replace(/^./, (c) => c.toUpperCase()) || 'Analyst',
-          email: email
-        };
-        const localSession = 'local_session_' + Date.now();
-        this.sessionId = localSession;
-        this.currentUser = localUser;
-        const storage = safeStorage();
-        if (storage) {
-          storage.setItem(SESSION_KEY, localSession);
-          storage.setItem(USER_KEY, JSON.stringify(localUser));
-        }
-        this.notifyAuthStateChanged();
-        return localUser;
+      if (err.name === 'AbortError') {
+        throw new Error('Connection timed out. Please check if your backend server is running.');
       }
       throw err;
     }
