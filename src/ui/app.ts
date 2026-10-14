@@ -207,11 +207,13 @@ export function initApp() {
   // --------------------------------------------------------------------------
   function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE') {
     if (tab !== 'TEXT' && !AuthService.isAuthenticated()) {
-      const lockedBanner = document.getElementById('guestLockedFeatureBanner');
-      if (lockedBanner) {
-        lockedBanner.style.display = 'flex';
-        lockedBanner.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-      }
+      activeTab = 'TEXT';
+      tabTextMessage?.classList.add('active');
+      tabScanLink?.classList.remove('active');
+      tabUploadImage?.classList.remove('active');
+      if (panelTextMessage) panelTextMessage.style.display = 'block';
+      if (panelScanLink) panelScanLink.style.display = 'none';
+      if (panelUploadImage) panelUploadImage.style.display = 'none';
       return;
     }
 
@@ -275,18 +277,44 @@ export function initApp() {
   }
 
   tabTextMessage?.addEventListener('click', () => switchTab('TEXT'));
-  tabScanLink?.addEventListener('click', () => switchTab('LINK'));
-  tabUploadImage?.addEventListener('click', () => switchTab('IMAGE'));
+  tabScanLink?.addEventListener('click', (e) => {
+    if (!AuthService.isAuthenticated()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchTab('TEXT');
+      return;
+    }
+    switchTab('LINK');
+  });
+  tabUploadImage?.addEventListener('click', (e) => {
+    if (!AuthService.isAuthenticated()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchTab('TEXT');
+      return;
+    }
+    switchTab('IMAGE');
+  });
 
   menuScanMessage?.addEventListener('click', () => {
     showWorkspaceSubview('subviewScanner');
     switchTab('TEXT');
   });
-  menuScanLink?.addEventListener('click', () => {
+  menuScanLink?.addEventListener('click', (e) => {
+    if (!AuthService.isAuthenticated()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
     showWorkspaceSubview('subviewScanner');
     switchTab('LINK');
   });
-  menuScanImage?.addEventListener('click', () => {
+  menuScanImage?.addEventListener('click', (e) => {
+    if (!AuthService.isAuthenticated()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
     showWorkspaceSubview('subviewScanner');
     switchTab('IMAGE');
   });
@@ -487,9 +515,9 @@ export function initApp() {
 
   function runAnalysis() {
     let rawText = '';
-    if (activeTab === 'LINK') {
+    if (activeTab === 'LINK' || activeTab === 'IMAGE') {
       if (!AuthService.isAuthenticated()) {
-        router.navigate('login');
+        switchTab('TEXT');
         return;
       }
       rawText = urlInput.value.trim();
@@ -1649,10 +1677,52 @@ export function initApp() {
     if (!isAuth) {
       if (lockBadgeLink) lockBadgeLink.style.display = 'inline-flex';
       if (lockBadgeImage) lockBadgeImage.style.display = 'inline-flex';
-      tabScanLink?.classList.add('guest-locked');
-      tabUploadImage?.classList.add('guest-locked');
-      tabScanLink?.setAttribute('title', 'Requires Analyst Sign In');
-      tabUploadImage?.setAttribute('title', 'Requires Analyst Sign In');
+
+      // 1. Physically & visually disable URL Link tab
+      if (tabScanLink) {
+        tabScanLink.disabled = true;
+        tabScanLink.style.pointerEvents = 'none';
+        tabScanLink.style.cursor = 'not-allowed';
+        tabScanLink.style.opacity = '0.35';
+        tabScanLink.classList.remove('active');
+        tabScanLink.classList.add('guest-locked');
+        tabScanLink.setAttribute('aria-disabled', 'true');
+        tabScanLink.setAttribute('title', 'URL Analysis is locked for Guests. Please Sign In.');
+      }
+
+      // 2. Physically & visually disable Upload Image / QR tab
+      if (tabUploadImage) {
+        tabUploadImage.disabled = true;
+        tabUploadImage.style.pointerEvents = 'none';
+        tabUploadImage.style.cursor = 'not-allowed';
+        tabUploadImage.style.opacity = '0.35';
+        tabUploadImage.classList.remove('active');
+        tabUploadImage.classList.add('guest-locked');
+        tabUploadImage.setAttribute('aria-disabled', 'true');
+        tabUploadImage.setAttribute('title', 'Image / QR Analysis is locked for Guests. Please Sign In.');
+      }
+
+      // 3. Disable sidebar scanning items for link & image
+      if (menuScanLink) {
+        menuScanLink.disabled = true;
+        menuScanLink.style.pointerEvents = 'none';
+        menuScanLink.style.opacity = '0.35';
+        menuScanLink.classList.remove('active');
+      }
+      if (menuScanImage) {
+        menuScanImage.disabled = true;
+        menuScanImage.style.pointerEvents = 'none';
+        menuScanImage.style.opacity = '0.35';
+        menuScanImage.classList.remove('active');
+      }
+
+      // 4. Force Text tab ONLY
+      activeTab = 'TEXT';
+      tabTextMessage?.classList.add('active');
+      menuScanMessage?.classList.add('active');
+      if (panelTextMessage) panelTextMessage.style.display = 'block';
+      if (panelScanLink) panelScanLink.style.display = 'none';
+      if (panelUploadImage) panelUploadImage.style.display = 'none';
 
       if (router.getRoute() === 'workspace') {
         startGuestTimer();
@@ -1660,10 +1730,37 @@ export function initApp() {
     } else {
       if (lockBadgeLink) lockBadgeLink.style.display = 'none';
       if (lockBadgeImage) lockBadgeImage.style.display = 'none';
-      tabScanLink?.classList.remove('guest-locked');
-      tabUploadImage?.classList.remove('guest-locked');
-      tabScanLink?.removeAttribute('title');
-      tabUploadImage?.removeAttribute('title');
+
+      if (tabScanLink) {
+        tabScanLink.disabled = false;
+        tabScanLink.style.pointerEvents = '';
+        tabScanLink.style.cursor = '';
+        tabScanLink.style.opacity = '';
+        tabScanLink.removeAttribute('aria-disabled');
+        tabScanLink.classList.remove('guest-locked');
+        tabScanLink.removeAttribute('title');
+      }
+      if (tabUploadImage) {
+        tabUploadImage.disabled = false;
+        tabUploadImage.style.pointerEvents = '';
+        tabUploadImage.style.cursor = '';
+        tabUploadImage.style.opacity = '';
+        tabUploadImage.removeAttribute('aria-disabled');
+        tabUploadImage.classList.remove('guest-locked');
+        tabUploadImage.removeAttribute('title');
+      }
+
+      if (menuScanLink) {
+        menuScanLink.disabled = false;
+        menuScanLink.style.pointerEvents = '';
+        menuScanLink.style.opacity = '';
+      }
+      if (menuScanImage) {
+        menuScanImage.disabled = false;
+        menuScanImage.style.pointerEvents = '';
+        menuScanImage.style.opacity = '';
+      }
+
       if (lockedBanner) lockedBanner.style.display = 'none';
       stopGuestTimer();
     }
@@ -1683,15 +1780,16 @@ export function initApp() {
   });
 
   function updateAuthUi() {
+    const isAuth = AuthService.isAuthenticated();
     const user = AuthService.getUser();
-    if (user && userProfileBadge && btnOpenAuthModal) {
+    if (isAuth && user && userProfileBadge && btnOpenAuthModal) {
       btnOpenAuthModal.style.display = 'none';
       userProfileBadge.style.display = 'flex';
       if (userDisplayName) userDisplayName.textContent = user.name.split(' ')[0] || user.name;
       if (userAvatarIcon) userAvatarIcon.textContent = (user.name[0] || 'U').toUpperCase();
-    } else if (userProfileBadge && btnOpenAuthModal) {
-      btnOpenAuthModal.style.display = 'block';
-      userProfileBadge.style.display = 'none';
+    } else {
+      if (btnOpenAuthModal) btnOpenAuthModal.style.display = 'block';
+      if (userProfileBadge) userProfileBadge.style.display = 'none';
     }
     updateGuestModeUi();
   }

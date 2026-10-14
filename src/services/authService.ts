@@ -24,11 +24,20 @@ export class AuthService {
     const storage = safeStorage();
     if (!storage) return;
 
-    this.sessionId = storage.getItem(SESSION_KEY);
+    const cachedSession = storage.getItem(SESSION_KEY);
     const cachedUser = storage.getItem(USER_KEY);
-    if (cachedUser) {
+    if (cachedSession && cachedUser) {
       try {
-        this.currentUser = JSON.parse(cachedUser);
+        const u = JSON.parse(cachedUser);
+        if (u && u.id && u.id.startsWith('analyst-guest')) {
+          storage.removeItem(SESSION_KEY);
+          storage.removeItem(USER_KEY);
+          this.sessionId = null;
+          this.currentUser = null;
+        } else {
+          this.sessionId = cachedSession;
+          this.currentUser = u;
+        }
       } catch {
         this.currentUser = null;
       }
@@ -53,8 +62,14 @@ export class AuthService {
     return this.currentUser;
   }
 
+  static isGuest(): boolean {
+    if (!this.currentUser || !this.sessionId) return true;
+    if (this.currentUser.id && this.currentUser.id.startsWith('analyst-guest')) return true;
+    return false;
+  }
+
   static isAuthenticated(): boolean {
-    return !!this.currentUser && !!this.sessionId;
+    return !!this.currentUser && !!this.sessionId && !this.isGuest();
   }
 
   static async verifySession(): Promise<AuthUser | null> {
@@ -81,22 +96,35 @@ export class AuthService {
     }
   }
 
-  static setDemoAnalyst(): AuthUser {
-    const demoUser: AuthUser = {
-      id: 'analyst-guest-' + Math.floor(1000 + Math.random() * 9000),
-      name: 'Guest Analyst',
-      email: 'analyst.guest@scamspotter.org'
+  static setGuestMode(): AuthUser {
+    this.clearSession();
+    const guestUser: AuthUser = {
+      id: 'guest',
+      name: 'Guest User',
+      email: 'guest@ephemeral.local'
     };
-    const demoSession = 'demo_session_' + Date.now();
+    this.currentUser = guestUser;
+    this.sessionId = null;
+    this.notifyAuthStateChanged();
+    return guestUser;
+  }
+
+  static setDemoAnalyst(): AuthUser {
+    const verifiedUser: AuthUser = {
+      id: 'analyst-verified-' + Math.floor(1000 + Math.random() * 9000),
+      name: 'Verified Analyst',
+      email: 'analyst.verified@scamspotter.org'
+    };
+    const demoSession = 'verified_session_' + Date.now();
     this.sessionId = demoSession;
-    this.currentUser = demoUser;
+    this.currentUser = verifiedUser;
     const storage = safeStorage();
     if (storage) {
       storage.setItem(SESSION_KEY, demoSession);
-      storage.setItem(USER_KEY, JSON.stringify(demoUser));
+      storage.setItem(USER_KEY, JSON.stringify(verifiedUser));
     }
     this.notifyAuthStateChanged();
-    return demoUser;
+    return verifiedUser;
   }
 
   private static notifyAuthStateChanged() {

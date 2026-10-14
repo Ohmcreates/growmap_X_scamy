@@ -59,7 +59,7 @@ export class AuthViewController {
     });
 
     this.btnDemo?.addEventListener('click', () => {
-      AuthService.setDemoAnalyst();
+      AuthService.setGuestMode();
       router.navigate('workspace');
     });
 

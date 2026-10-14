@@ -4838,14 +4838,12 @@ body.theme-dark .gemini-guidance-content strong {
 }
 
 .tab-button.guest-locked {
-  opacity: 0.72;
-  position: relative;
+  opacity: 0.38 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  user-select: none !important;
+  filter: grayscale(0.85);
   border-style: dashed;
-}
-
-.tab-button.guest-locked:hover {
-  border-color: #f87171;
-  background-color: #fef2f2;
 }
 
 .guest-locked-feature-banner {
