@@ -478,6 +478,10 @@ export function initApp() {
   function runAnalysis() {
     let rawText = '';
     if (activeTab === 'LINK') {
+      if (!AuthService.isAuthenticated()) {
+        openAuthModalWithPrompt('🔒 Sign In Required: URL deep forensics, domain reputation, and lookalike link inspection require an Analyst account. Please sign in to inspect links.');
+        return;
+      }
       rawText = urlInput.value.trim();
       if (rawText && !rawText.startsWith('http')) {
         rawText = `https://${rawText}`;
@@ -1158,9 +1162,18 @@ export function initApp() {
   });
   closeEvalModal?.addEventListener('click', () => evalModal?.classList.remove('open'));
 
-  // Sidebar toggle button (collapse / expand sidebar)
-  document.getElementById('btnSidebarToggle')?.addEventListener('click', () => {
-    document.querySelector('.sidebar')?.classList.toggle('collapsed');
+  // Sidebar toggle button (collapse / expand sidebar with animated hamburger icon)
+  const btnSidebarToggle = document.getElementById('btnSidebarToggle') as HTMLButtonElement | null;
+  const sidebarEl = document.querySelector('.sidebar') as HTMLElement | null;
+
+  btnSidebarToggle?.addEventListener('click', () => {
+    if (!sidebarEl) return;
+    const isCollapsed = sidebarEl.classList.toggle('collapsed');
+    if (isCollapsed) {
+      btnSidebarToggle.classList.remove('is-open');
+    } else {
+      btnSidebarToggle.classList.add('is-open');
+    }
   });
 
   // --------------------------------------------------------------------------
@@ -1296,6 +1309,11 @@ export function initApp() {
   }
 
   async function handleOcrFile(file: File | Blob) {
+    if (!AuthService.isAuthenticated()) {
+      openAuthModalWithPrompt('🔒 Sign In Required: Screenshot OCR, visual receipt inspection, and image analysis require an Analyst account. Please sign in to upload images.');
+      return;
+    }
+
     ocrStatusNotice.style.display = 'block';
     ocrStatusNotice.className = 'ocr-status-notice ocr-loading';
     ocrStatusNotice.innerHTML = '✨ Running Google Gemini Multimodal Vision & Photo OCR...';
@@ -1359,7 +1377,13 @@ export function initApp() {
     }
   }
 
-  btnBrowseOcr?.addEventListener('click', () => ocrFileInput?.click());
+  btnBrowseOcr?.addEventListener('click', () => {
+    if (!AuthService.isAuthenticated()) {
+      openAuthModalWithPrompt('🔒 Sign In Required: Please sign in or create an account to upload screenshots and images.');
+      return;
+    }
+    ocrFileInput?.click();
+  });
   ocrFileInput?.addEventListener('change', () => {
     if (ocrFileInput.files && ocrFileInput.files[0]) {
       handleOcrFile(ocrFileInput.files[0]);
@@ -1421,6 +1445,12 @@ export function initApp() {
     const tierButtons = pricingMount.querySelectorAll('.tier-btn');
     tierButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
+        if (!AuthService.isAuthenticated()) {
+          pricingModal.classList.remove('open');
+          openAuthModalWithPrompt('🔒 Sign In Required: Please sign in or create an account to upgrade your subscription plan.');
+          return;
+        }
+
         const targetBtn = e.currentTarget as HTMLElement;
         const tierId = targetBtn.getAttribute('data-tier');
 
@@ -1520,7 +1550,17 @@ export function initApp() {
     renderHistoryList();
   });
 
-  btnOpenAuthModal?.addEventListener('click', () => {
+  function openAuthModalWithPrompt(promptMessage?: string) {
+    const promptBanner = document.getElementById('authModalPromptBanner');
+    if (promptBanner) {
+      if (promptMessage) {
+        promptBanner.textContent = promptMessage;
+        promptBanner.style.display = 'flex';
+      } else {
+        promptBanner.style.display = 'none';
+        promptBanner.textContent = '';
+      }
+    }
     loginError.style.display = 'none';
     signupError.style.display = 'none';
     formLogin.reset();
@@ -1530,7 +1570,9 @@ export function initApp() {
     formLogin.style.display = 'flex';
     formSignup.style.display = 'none';
     authModal.classList.add('open');
-  });
+  }
+
+  btnOpenAuthModal?.addEventListener('click', () => openAuthModalWithPrompt());
 
   closeAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
 
@@ -1611,6 +1653,21 @@ export function initApp() {
   // History List Management
   // --------------------------------------------------------------------------
   async function renderHistoryList() {
+    if (!AuthService.isAuthenticated()) {
+      historyListMount.innerHTML = `
+        <div class="auth-history-lock-card">
+          <div class="lock-icon">🔒</div>
+          <h4>Scan History Locked</h4>
+          <p>Sign in to your analyst account to securely store, synchronize across devices, and audit all your previous forensic scans.</p>
+          <button id="btnHistoryLockLogin" class="btn-auth-submit" type="button" style="display: inline-block; padding: 10px 22px; font-size: 0.9rem; margin-top: 6px;">Sign In to View History →</button>
+        </div>
+      `;
+      document.getElementById('btnHistoryLockLogin')?.addEventListener('click', () => {
+        openAuthModalWithPrompt('🔒 Sign In Required: Sign in to view and synchronize your past scans.');
+      });
+      return;
+    }
+
     const list = await HistoryService.fetchServerHistory();
     if (list.length === 0) {
       historyListMount.innerHTML =

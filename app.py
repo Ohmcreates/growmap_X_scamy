@@ -56,7 +56,11 @@ def get_authenticated_user():
     if not session_id:
         return None, None
 
-    conn = get_connection()
+    try:
+        conn = get_connection()
+    except Exception:
+        return None, session_id
+
     try:
         with conn.cursor() as cur:
             cur.execute("""
@@ -69,8 +73,13 @@ def get_authenticated_user():
             if row:
                 cur.execute("UPDATE user_sessions SET last_active = NOW() WHERE session_id = %s", (session_id,))
                 return row, session_id
+    except Exception:
+        return None, session_id
     finally:
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass
     return None, session_id
 
 @app.route('/')
@@ -102,7 +111,11 @@ def api_signup():
     if len(password) < 6:
         return jsonify({'error': 'Password must be at least 6 characters.'}), 400
 
-    conn = get_connection()
+    try:
+        conn = get_connection()
+    except Exception as exc:
+        return jsonify({'error': 'Database service currently unavailable. Please verify MySQL is running.'}), 503
+
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT id FROM users WHERE email = %s", (email,))
@@ -134,7 +147,10 @@ def api_signup():
                 }
             }), 201
     finally:
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 @app.route('/api/auth/login', methods=['POST', 'OPTIONS'])
 def api_login():
@@ -148,7 +164,11 @@ def api_login():
     if not email or not password:
         return jsonify({'error': 'Email and password are required.'}), 400
 
-    conn = get_connection()
+    try:
+        conn = get_connection()
+    except Exception as exc:
+        return jsonify({'error': 'Database service currently unavailable. Please verify MySQL is running.'}), 503
+
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT id, email, name, password_hash FROM users WHERE email = %s", (email,))
@@ -174,7 +194,10 @@ def api_login():
                 }
             })
     finally:
-        conn.close()
+        try:
+            conn.close()
+        except Exception:
+            pass
 
 @app.route('/api/auth/me', methods=['GET', 'OPTIONS'])
 def api_auth_me():

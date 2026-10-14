@@ -775,7 +775,11 @@
       <!-- Top Navigation Bar (Fixed Header) -->
       <header class="top-nav" role="banner">
         <div class="nav-left">
-          <button id="btnSidebarToggle" class="sidebar-toggle-btn" type="button" aria-label="Toggle Sidebar" title="Collapse / Expand Sidebar">☰</button>
+          <button id="btnSidebarToggle" class="sidebar-toggle-btn is-open" type="button" aria-label="Toggle Sidebar" title="Collapse / Expand Sidebar">
+            <span class="toggle-bar bar-1"></span>
+            <span class="toggle-bar bar-2"></span>
+            <span class="toggle-bar bar-3"></span>
+          </button>
           <div class="brand-logo">
             <div class="shield-badge">
               <svg width="22" height="26" viewBox="0 0 24 28" fill="none">
@@ -1551,6 +1555,9 @@
           <button id="btnTabLogin" class="auth-tab-btn active" type="button">Sign In</button>
           <button id="btnTabSignup" class="auth-tab-btn" type="button">Create Account</button>
         </div>
+
+        <!-- Dynamic Context Alert Banner (for restricted features) -->
+        <div id="authModalPromptBanner" class="auth-prompt-banner" style="display: none;"></div>
 
         <!-- Sign In Form -->
         <form id="formLogin" class="auth-form-panel">

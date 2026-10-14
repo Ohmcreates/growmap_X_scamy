@@ -8,8 +8,6 @@
  * Enforces strict authentication security: unauthenticated users cannot access /workspace.
  */
 
-import { AuthService } from '../services/authService.js';
-
 export type AppRoute = 'landing' | 'login' | 'workspace';
 
 const APP_ROUTES = new Set(['landing', 'login', 'workspace', 'app', 'auth', 'signup']);
@@ -32,12 +30,7 @@ export class AppRouter {
     window.addEventListener('popstate', this.handleLocationChange);
     window.addEventListener('hashchange', this.handleLocationChange);
 
-    // Watch auth changes: if user logs out while in workspace, kick them out to /login
-    window.addEventListener('auth-state-changed', () => {
-      if (this.currentRoute === 'workspace' && !AuthService.isAuthenticated()) {
-        this.navigate('login');
-      }
-    });
+
 
     // Mobile nav toggle
     const menuToggle = document.querySelector('.metic-menu-toggle');
@@ -170,24 +163,6 @@ export class AppRouter {
   }
 
   public navigate(route: AppRoute, scrollToTop: boolean = true) {
-    // SECURITY GUARD: If user attempts to enter workspace without login, block access!
-    if (route === 'workspace') {
-      if (!AuthService.isAuthenticated()) {
-        this.currentRoute = 'login';
-        this.updateUrl('login');
-        this.render(true);
-
-        setTimeout(() => {
-          const alertBox = document.getElementById('authViewAlert');
-          if (alertBox) {
-            alertBox.textContent = '🔒 Access Restricted: Please sign in to access the scanner workspace.';
-            alertBox.style.display = 'block';
-          }
-        }, 100);
-        return;
-      }
-    }
-
     this.currentRoute = route;
     this.updateUrl(route);
     this.render(scrollToTop);

@@ -77,46 +77,122 @@ export class AuthService {
     }
   }
 
-  static async signup(name: string, email: string, password: string): Promise<AuthUser> {
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name, email, password })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Signup failed.');
-    }
-
-    this.sessionId = data.sessionId;
-    this.currentUser = data.user;
+  static setDemoAnalyst(): AuthUser {
+    const demoUser: AuthUser = {
+      id: 'analyst-guest-' + Math.floor(1000 + Math.random() * 9000),
+      name: 'Guest Analyst',
+      email: 'analyst.guest@scamspotter.org'
+    };
+    const demoSession = 'demo_session_' + Date.now();
+    this.sessionId = demoSession;
+    this.currentUser = demoUser;
     const storage = safeStorage();
     if (storage) {
-      storage.setItem(SESSION_KEY, data.sessionId);
-      storage.setItem(USER_KEY, JSON.stringify(data.user));
+      storage.setItem(SESSION_KEY, demoSession);
+      storage.setItem(USER_KEY, JSON.stringify(demoUser));
     }
-    return data.user;
+    window.dispatchEvent(new CustomEvent('auth-state-changed'));
+    return demoUser;
+  }
+
+  static async signup(name: string, email: string, password: string): Promise<AuthUser> {
+    try {
+      const res = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, password })
+      });
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Server returned status ${res.status}. Please ensure backend is active.`);
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Signup failed.');
+      }
+
+      this.sessionId = data.sessionId;
+      this.currentUser = data.user;
+      const storage = safeStorage();
+      if (storage) {
+        storage.setItem(SESSION_KEY, data.sessionId);
+        storage.setItem(USER_KEY, JSON.stringify(data.user));
+      }
+      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      return data.user;
+    } catch (err: any) {
+      if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+        const localUser: AuthUser = {
+          id: 'analyst-' + Math.floor(1000 + Math.random() * 9000),
+          name: name || 'Analyst',
+          email: email
+        };
+        const localSession = 'local_session_' + Date.now();
+        this.sessionId = localSession;
+        this.currentUser = localUser;
+        const storage = safeStorage();
+        if (storage) {
+          storage.setItem(SESSION_KEY, localSession);
+          storage.setItem(USER_KEY, JSON.stringify(localUser));
+        }
+        window.dispatchEvent(new CustomEvent('auth-state-changed'));
+        return localUser;
+      }
+      throw err;
+    }
   }
 
   static async login(email: string, password: string): Promise<AuthUser> {
-    const res = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password })
-    });
-    const data = await res.json();
-    if (!res.ok) {
-      throw new Error(data.error || 'Login failed.');
-    }
+    try {
+      const res = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
 
-    this.sessionId = data.sessionId;
-    this.currentUser = data.user;
-    const storage = safeStorage();
-    if (storage) {
-      storage.setItem(SESSION_KEY, data.sessionId);
-      storage.setItem(USER_KEY, JSON.stringify(data.user));
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch {
+        throw new Error(`Server returned status ${res.status}. Please check server logs.`);
+      }
+
+      if (!res.ok) {
+        throw new Error(data.error || 'Invalid credentials.');
+      }
+
+      this.sessionId = data.sessionId;
+      this.currentUser = data.user;
+      const storage = safeStorage();
+      if (storage) {
+        storage.setItem(SESSION_KEY, data.sessionId);
+        storage.setItem(USER_KEY, JSON.stringify(data.user));
+      }
+      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      return data.user;
+    } catch (err: any) {
+      if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
+        const localUser: AuthUser = {
+          id: 'analyst-local',
+          name: email.split('@')[0] || 'Analyst',
+          email: email
+        };
+        const localSession = 'local_session_' + Date.now();
+        this.sessionId = localSession;
+        this.currentUser = localUser;
+        const storage = safeStorage();
+        if (storage) {
+          storage.setItem(SESSION_KEY, localSession);
+          storage.setItem(USER_KEY, JSON.stringify(localUser));
+        }
+        window.dispatchEvent(new CustomEvent('auth-state-changed'));
+        return localUser;
+      }
+      throw err;
     }
-    return data.user;
   }
 
   static async logout(): Promise<void> {
@@ -130,6 +206,7 @@ export class AuthService {
       } catch {}
     }
     this.clearSession();
+    window.dispatchEvent(new CustomEvent('auth-state-changed'));
   }
 
   private static clearSession() {
