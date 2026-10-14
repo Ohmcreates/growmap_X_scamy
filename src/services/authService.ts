@@ -33,6 +33,10 @@ export class AuthService {
         this.currentUser = null;
       }
     }
+
+    if (!this.isAuthenticated()) {
+      storage.removeItem('scam_spotter_history_v1');
+    }
   }
 
   static getSessionId(): string | null {
@@ -91,8 +95,16 @@ export class AuthService {
       storage.setItem(SESSION_KEY, demoSession);
       storage.setItem(USER_KEY, JSON.stringify(demoUser));
     }
-    window.dispatchEvent(new CustomEvent('auth-state-changed'));
+    this.notifyAuthStateChanged();
     return demoUser;
+  }
+
+  private static notifyAuthStateChanged() {
+    if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function') {
+      try {
+        window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      } catch {}
+    }
   }
 
   static async signup(name: string, email: string, password: string): Promise<AuthUser> {
@@ -121,7 +133,7 @@ export class AuthService {
         storage.setItem(SESSION_KEY, data.sessionId);
         storage.setItem(USER_KEY, JSON.stringify(data.user));
       }
-      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      this.notifyAuthStateChanged();
       return data.user;
     } catch (err: any) {
       if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
@@ -138,7 +150,7 @@ export class AuthService {
           storage.setItem(SESSION_KEY, localSession);
           storage.setItem(USER_KEY, JSON.stringify(localUser));
         }
-        window.dispatchEvent(new CustomEvent('auth-state-changed'));
+        this.notifyAuthStateChanged();
         return localUser;
       }
       throw err;
@@ -171,7 +183,7 @@ export class AuthService {
         storage.setItem(SESSION_KEY, data.sessionId);
         storage.setItem(USER_KEY, JSON.stringify(data.user));
       }
-      window.dispatchEvent(new CustomEvent('auth-state-changed'));
+      this.notifyAuthStateChanged();
       return data.user;
     } catch (err: any) {
       if (err.message && (err.message.includes('Failed to fetch') || err.message.includes('NetworkError'))) {
@@ -188,7 +200,7 @@ export class AuthService {
           storage.setItem(SESSION_KEY, localSession);
           storage.setItem(USER_KEY, JSON.stringify(localUser));
         }
-        window.dispatchEvent(new CustomEvent('auth-state-changed'));
+        this.notifyAuthStateChanged();
         return localUser;
       }
       throw err;
@@ -206,7 +218,7 @@ export class AuthService {
       } catch {}
     }
     this.clearSession();
-    window.dispatchEvent(new CustomEvent('auth-state-changed'));
+    this.notifyAuthStateChanged();
   }
 
   private static clearSession() {
@@ -216,6 +228,9 @@ export class AuthService {
     if (storage) {
       storage.removeItem(SESSION_KEY);
       storage.removeItem(USER_KEY);
+      storage.removeItem('scam_spotter_history_v1');
+      storage.removeItem('scam_spotter_reports_v1');
+      storage.removeItem('scam_spotter_active_tier');
     }
   }
 }

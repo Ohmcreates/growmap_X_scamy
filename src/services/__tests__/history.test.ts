@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { analyzeMessage } from '../../engine/scorer.js';
 import { HistoryService } from '../history.js';
+import { AuthService } from '../authService.js';
 
 describe('Scam Spotter — Phase 6 Private Scan History & Retention', () => {
   // Mock localStorage for node environment
@@ -16,6 +17,7 @@ describe('Scam Spotter — Phase 6 Private Scan History & Retention', () => {
         removeItem: (key: string) => mockStorage.delete(key),
       },
     };
+    AuthService.setDemoAnalyst();
   });
 
   it('masks phone numbers and card digits in stored preview for privacy', () => {
@@ -39,6 +41,14 @@ describe('Scam Spotter — Phase 6 Private Scan History & Retention', () => {
     expect(history.length).toBe(50);
     // Latest item (index 54) is at the top
     expect(history[0].preview).toContain('Message index 54');
+  });
+
+  it('does NOT save scans or history when user is unauthenticated guest', () => {
+    (AuthService as any).clearSession();
+    const res = analyzeMessage('Guest test message');
+    const saved = HistoryService.saveScan('Guest test message', res);
+    expect(saved).toBeNull();
+    expect(HistoryService.getHistory().length).toBe(0);
   });
 
   it('gracefully handles storage quota exceptions without crashing scan execution', () => {

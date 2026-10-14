@@ -1613,6 +1613,13 @@ export function initApp() {
 
   btnLogout?.addEventListener('click', async () => {
     await AuthService.logout();
+    HistoryService.clearHistory();
+    if (textarea) textarea.value = '';
+    if (urlInput) urlInput.value = '';
+    updateInputMetrics();
+    resetScoreWidgets();
+    if (analysisResultCard) analysisResultCard.style.display = 'none';
+    if (screenAlarmOverlay) screenAlarmOverlay.style.display = 'none';
     updateAuthUi();
     renderHistoryList();
     router.navigate('login');

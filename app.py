@@ -241,6 +241,12 @@ def api_scans():
 
     user, session_id = get_authenticated_user()
 
+    # Strict Privacy & Security: Guests never store data to database and cannot fetch history
+    if not user:
+        if request.method == 'POST':
+            return jsonify({'message': 'Guest mode: In-memory analysis only. No data stored.'}), 200
+        return jsonify({'history': []}), 200
+
     if request.method == 'POST':
         data = request.get_json(silent=True) or {}
         content_preview = (data.get('content') or '').strip()
@@ -254,9 +260,13 @@ def api_scans():
             return jsonify({'error': 'Scan content is required.'}), 400
 
         scan_id = str(uuid.uuid4())
-        user_id = user['user_id'] if user else None
+        user_id = user['user_id']
 
-        conn = get_connection()
+        try:
+            conn = get_connection()
+        except Exception:
+            return jsonify({'error': 'Database unavailable.'}), 503
+
         try:
             with conn.cursor() as cur:
                 cur.execute("""
@@ -280,32 +290,27 @@ def api_scans():
                 'createdAt': datetime.utcnow().isoformat()
             }), 201
         finally:
-            conn.close()
+            try:
+                conn.close()
+            except Exception:
+                pass
 
     if request.method == 'GET':
-        user_id = user['user_id'] if user else None
-        conn = get_connection()
+        user_id = user['user_id']
+        try:
+            conn = get_connection()
+        except Exception:
+            return jsonify({'history': []}), 200
+
         try:
             with conn.cursor() as cur:
-                if user_id:
-                    cur.execute("""
-                        SELECT id, scan_type, content_preview, risk_score, risk_level, headline, rules_fired_json, created_at
-                        FROM scan_records
-                        WHERE user_id = %s
-                        ORDER BY created_at DESC
-                        LIMIT 100
-                    """, (user_id,))
-                elif session_id:
-                    cur.execute("""
-                        SELECT id, scan_type, content_preview, risk_score, risk_level, headline, rules_fired_json, created_at
-                        FROM scan_records
-                        WHERE session_id = %s
-                        ORDER BY created_at DESC
-                        LIMIT 50
-                    """, (session_id,))
-                else:
-                    return jsonify({'history': []})
-
+                cur.execute("""
+                    SELECT id, scan_type, content_preview, risk_score, risk_level, headline, rules_fired_json, created_at
+                    FROM scan_records
+                    WHERE user_id = %s
+                    ORDER BY created_at DESC
+                    LIMIT 100
+                """, (user_id,))
                 rows = cur.fetchall()
                 for row in rows:
                     if row.get('created_at'):
@@ -317,7 +322,10 @@ def api_scans():
                             pass
                 return jsonify({'history': rows})
         finally:
-            conn.close()
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 @app.route('/predict', methods=['POST', 'OPTIONS'])
 def predict():

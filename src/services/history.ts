@@ -33,7 +33,7 @@ export class HistoryService {
   }
 
   static getLocalHistory(): HistoryItem[] {
-    if (!this.isAvailable()) return [];
+    if (!AuthService.isAuthenticated() || !this.isAvailable()) return [];
     try {
       const data = window.localStorage.getItem(STORAGE_KEY);
       if (!data) return [];
@@ -49,6 +49,10 @@ export class HistoryService {
   }
 
   static async fetchServerHistory(): Promise<HistoryItem[]> {
+    if (!AuthService.isAuthenticated()) {
+      return [];
+    }
+
     const session = AuthService.getSessionId();
     if (!session) {
       return this.getLocalHistory();
@@ -88,6 +92,12 @@ export class HistoryService {
     result: ScanResult,
     saveFullText = false
   ): HistoryItem | null {
+    // Strict Privacy & Security:
+    // If not authenticated (Guest), do NOT store to localStorage and do NOT send to server.
+    if (!AuthService.isAuthenticated()) {
+      return null;
+    }
+
     const maskedText = maskSensitiveDigits(rawText.trim());
     const preview = maskedText.length > 60 ? `${maskedText.slice(0, 60)}...` : maskedText;
 
