@@ -411,7 +411,10 @@ def gemini_proxy():
     return jsonify({'error': last_err or 'All Gemini candidate models failed.'}), 502
 
 if __name__ == '__main__':
-    init_db()
+    try:
+        init_db()
+    except Exception as e:
+        print(f"[*] MySQL connection skipped ({e}). Continuing with in-memory/client fallback.")
     port = int(os.environ.get('PORT', 5001))
     print(f"[*] Starting Scam Spotter Full-Stack Backend on http://127.0.0.1:{port}")
     app.run(host='0.0.0.0', port=port, debug=False, threaded=True)

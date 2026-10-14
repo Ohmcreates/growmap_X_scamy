@@ -13,6 +13,7 @@
 import { analyzeMessage } from '../engine/scorer.js';
 import { ScanResult } from '../engine/types.js';
 import { router } from './router.js';
+import { aspectRatioDetector } from './aspectRatio.js';
 
 export interface ThreatAnalysisState {
   hasThreat: boolean;
@@ -87,6 +88,17 @@ export class DraggableMagnifier {
     this.targetX = this.posX;
     this.targetY = this.posY;
     this.updatePosition();
+
+    // Subscribe to auto-detected aspect ratio / device changes
+    aspectRatioDetector.subscribe((_metrics) => {
+      const scale = this.getScale();
+      const maxX = Math.max(0, window.innerWidth - (340 * scale));
+      const maxY = Math.max(0, window.innerHeight - (431 * scale));
+      this.posX = Math.min(this.posX, maxX);
+      this.posY = Math.min(this.posY, maxY);
+      this.updatePosition();
+      this.sampleUnderneath();
+    });
 
     // Drag pointer events on the container
     this.container.addEventListener('pointerdown', (e) => this.handlePointerDown(e));
@@ -164,14 +176,24 @@ export class DraggableMagnifier {
     }
   }
 
+  private getScale(): number {
+    try {
+      const metrics = aspectRatioDetector.getMetrics();
+      return metrics.deviceType === 'mobile' ? 0.72 : (metrics.deviceType === 'tablet' ? 0.85 : 1.0);
+    } catch {
+      return 1.0;
+    }
+  }
+
   private handlePointerMove(e: PointerEvent) {
     if (!this.isDragging) return;
 
-    // Constrain within viewport boundaries
-    const maxX = window.innerWidth - 100;
-    const maxY = window.innerHeight - 100;
+    const scale = this.getScale();
+    // Constrain within viewport boundaries adapted to detected scale
+    const maxX = Math.max(0, window.innerWidth - (340 * scale) + 40);
+    const maxY = Math.max(0, window.innerHeight - (431 * scale) + 40);
 
-    this.targetX = Math.min(maxX, Math.max(-120, e.clientX - this.dragOffsetX));
+    this.targetX = Math.min(maxX, Math.max(-60, e.clientX - this.dragOffsetX));
     this.targetY = Math.min(maxY, Math.max(10, e.clientY - this.dragOffsetY));
 
     this.posX = this.targetX;
@@ -309,7 +331,9 @@ export class DraggableMagnifier {
 
   private updatePosition() {
     if (!this.container) return;
-    this.container.style.transform = `translate3d(${this.posX}px, ${this.posY}px, 0)`;
+    const scale = this.getScale();
+    this.container.style.transformOrigin = 'top left';
+    this.container.style.transform = `translate3d(${this.posX}px, ${this.posY}px, 0) scale(${scale})`;
   }
 
   private startLoop() {
@@ -336,9 +360,10 @@ export class DraggableMagnifier {
   private sampleUnderneath(force: boolean = false) {
     if (!this.container || !this.viewportEl) return;
 
-    // Glass center coordinates on viewport
-    const glassCenterX = this.posX + this.lensCenterOffsetX;
-    const glassCenterY = this.posY + this.lensCenterOffsetY;
+    const scale = this.getScale();
+    // Glass center coordinates on viewport accounting for dynamic device aspect scale
+    const glassCenterX = this.posX + (this.lensCenterOffsetX * scale);
+    const glassCenterY = this.posY + (this.lensCenterOffsetY * scale);
 
     // Temporarily hide pointer events on magnifier so we can sample the real underlying element
     this.container.style.pointerEvents = 'none';

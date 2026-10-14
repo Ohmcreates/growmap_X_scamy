@@ -1,3 +1,4 @@
+import { aspectRatioDetector } from './ui/aspectRatio.js';
 import { draggableMagnifier } from './ui/magnifier.js';
 import { liveDemo } from './ui/liveDemo.js';
 import { progressiveBuild } from './ui/progressiveBuild.js';
@@ -8,6 +9,9 @@ import { authViewController } from './ui/authView.js';
 import { initLandingAuth } from './ui/landingAuth.js';
 
 document.addEventListener('DOMContentLoaded', () => {
+  // 0. Auto-detect aspect ratio & device form-factor (Mobile / Laptop / Tablet / Ultrawide)
+  aspectRatioDetector.init();
+
   // 1. Initialize client-side view router
   router.init();
 

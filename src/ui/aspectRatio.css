@@ -1,0 +1,309 @@
+/* ==========================================================================
+   SCAM SPOTTER — DYNAMIC ASPECT RATIO & DEVICE RESPONSIVE SYSTEM
+   Auto-detects and adapts layouts for Mobile Phones (9:16 / 9:19.5),
+   Tablets (4:3), Laptops (16:9 / 16:10), and Ultrawide displays.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   1. Aspect Ratio Floating Indicator & Simulator Pill
+   -------------------------------------------------------------------------- */
+.aspect-ratio-pill {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  z-index: 9999;
+  font-family: var(--font-body, -apple-system, BlinkMacSystemFont, sans-serif);
+}
+
+.ar-pill-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(15, 23, 42, 0.88);
+  color: #f8fafc;
+  padding: 8px 14px;
+  border-radius: 9999px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  cursor: pointer;
+  font-size: 0.78rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+
+.ar-pill-trigger:hover {
+  background: rgba(15, 23, 42, 0.98);
+  border-color: rgba(239, 68, 68, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.35);
+}
+
+.ar-pill-icon {
+  font-size: 0.95rem;
+}
+
+.ar-pill-label {
+  font-family: var(--font-mono, monospace);
+  color: #38bdf8;
+}
+
+.ar-pill-chevron {
+  font-size: 0.75rem;
+  opacity: 0.7;
+}
+
+.ar-pill-menu {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 0;
+  width: 280px;
+  background: #0f172a;
+  border: 1px solid #334155;
+  border-radius: 14px;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.45);
+  padding: 12px;
+  color: #f8fafc;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  animation: arSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes arSlideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.ar-menu-header {
+  padding-bottom: 10px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #1e293b;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.ar-menu-header strong {
+  font-size: 0.82rem;
+  color: #ffffff;
+}
+
+.ar-menu-sub {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  font-family: var(--font-mono, monospace);
+}
+
+.ar-menu-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ar-menu-opt {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 8px 10px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #cbd5e1;
+  font-size: 0.76rem;
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.15s ease;
+}
+
+.ar-menu-opt:hover {
+  background: #1e293b;
+  color: #ffffff;
+}
+
+.ar-menu-opt.active {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.35);
+  color: #38bdf8;
+  font-weight: 600;
+}
+
+.ar-menu-opt small {
+  font-size: 0.68rem;
+  color: #64748b;
+  font-family: var(--font-mono, monospace);
+}
+
+/* --------------------------------------------------------------------------
+   2. Mobile Phone Layout Adaptations (Portrait / 9:16 / 9:19.5)
+   -------------------------------------------------------------------------- */
+html[data-device-type="mobile"],
+body[data-device-type="mobile"] {
+  /* Prevent side-scrolling and horizontal jitters */
+  overflow-x: hidden;
+  width: 100%;
+}
+
+/* Fluid responsive wrapper */
+html[data-device-type="mobile"] .metic-container,
+html[data-device-type="mobile"] .workspace-container,
+html[data-device-type="mobile"] .metic-hero-section,
+html[data-device-type="mobile"] .metic-build-section {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding-left: var(--app-content-padding, 14px) !important;
+  padding-right: var(--app-content-padding, 14px) !important;
+}
+
+/* Mobile Hero Adaption */
+html[data-device-type="mobile"] .metic-hero-grid {
+  grid-template-columns: 1fr !important;
+  gap: 28px !important;
+}
+
+html[data-device-type="mobile"] .metic-hero-headline {
+  font-size: clamp(2rem, 8vw, 2.6rem) !important;
+  line-height: 1.15 !important;
+}
+
+html[data-device-type="mobile"] .metic-hero-preview {
+  width: 100% !important;
+  max-width: 100% !important;
+}
+
+/* Mobile Navigation */
+html[data-device-type="mobile"] .metic-header-inner {
+  padding: 12px 14px !important;
+}
+
+html[data-device-type="mobile"] .metic-nav-links {
+  display: none;
+}
+
+html[data-device-type="mobile"] .metic-nav-links.mobile-open {
+  display: flex !important;
+  flex-direction: column !important;
+  position: fixed !important;
+  top: 60px !important;
+  left: 0 !important;
+  right: 0 !important;
+  background: rgba(10, 14, 23, 0.98) !important;
+  backdrop-filter: blur(16px) !important;
+  padding: 20px !important;
+  gap: 16px !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+  z-index: 8900 !important;
+}
+
+html[data-device-type="mobile"] .metic-menu-toggle {
+  display: flex !important;
+}
+
+/* Mobile Draggable Magnifier Scaling & Clamping */
+html[data-device-type="mobile"] #draggableMagnifier {
+  transform-origin: top left !important;
+  transform: scale(var(--magnifier-lens-scale, 0.72)) !important;
+  max-width: calc(100vw - 20px) !important;
+}
+
+html[data-device-type="mobile"] #magnifierDockBar {
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  bottom: 74px !important;
+  width: calc(100% - 28px) !important;
+  max-width: 360px !important;
+  justify-content: center !important;
+  padding: 6px 10px !important;
+}
+
+html[data-device-type="mobile"] .dock-btn {
+  font-size: 0.72rem !important;
+  padding: 4px 8px !important;
+}
+
+/* Mobile Workspace Layout */
+html[data-device-type="mobile"] .app-layout {
+  flex-direction: column !important;
+}
+
+html[data-device-type="mobile"] .sidebar {
+  width: 100% !important;
+  position: static !important;
+  border-right: none !important;
+  border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
+}
+
+html[data-device-type="mobile"] .main-body-grid {
+  grid-template-columns: 1fr !important;
+  gap: 16px !important;
+}
+
+html[data-device-type="mobile"] .verdict-primary-grid {
+  grid-template-columns: 1fr !important;
+}
+
+html[data-device-type="mobile"] .verdict-meter-box {
+  border-right: none !important;
+  border-bottom: 1px solid var(--border-color, #e2e8f0) !important;
+  padding-right: 0 !important;
+  padding-bottom: 16px !important;
+}
+
+/* Mobile Touch Actions and Target Heights */
+html[data-device-type="mobile"] .metic-btn-primary,
+html[data-device-type="mobile"] .btn-action-primary,
+html[data-device-type="mobile"] .metic-btn-auth-submit,
+html[data-device-type="mobile"] .metic-btn-auth-demo {
+  min-height: var(--app-btn-touch-height, 48px) !important;
+  font-size: 0.92rem !important;
+  padding: 12px 18px !important;
+}
+
+/* Mobile Login Card Fit */
+html[data-device-type="mobile"] .metic-auth-card {
+  width: 100% !important;
+  max-width: calc(100vw - 28px) !important;
+  margin: 16px auto !important;
+  padding: 24px 18px !important;
+}
+
+/* --------------------------------------------------------------------------
+   3. Laptop & Desktop Layout Adaptations (Landscape / 16:9 / 16:10 / 3:2)
+   -------------------------------------------------------------------------- */
+html[data-device-type="laptop"] .metic-container,
+html[data-device-type="laptop"] .workspace-container {
+  max-width: var(--app-container-max-w, 1320px) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+html[data-device-type="laptop"] .metic-hero-grid {
+  grid-template-columns: 1.1fr 0.9fr !important;
+  align-items: center !important;
+}
+
+html[data-device-type="laptop"] .main-body-grid {
+  grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.9fr) !important;
+}
+
+html[data-device-type="laptop"] #draggableMagnifier {
+  transform-origin: top left !important;
+  transform: scale(1.0) !important;
+}
+
+/* --------------------------------------------------------------------------
+   4. Ultrawide Layout Adaptations (Landscape / 21:9 / 32:9)
+   -------------------------------------------------------------------------- */
+html[data-device-type="ultrawide"] .metic-container,
+html[data-device-type="ultrawide"] .workspace-container {
+  max-width: 1560px !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+
+html[data-device-type="ultrawide"] .metic-hero-headline {
+  font-size: 3.8rem !important;
+}
