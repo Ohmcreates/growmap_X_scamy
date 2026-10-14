@@ -14,6 +14,7 @@ import { predictPhishingMlAsync, MlModelAssessment } from '../engine/phishingMl.
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
 import { GeminiService } from '../services/geminiService.js';
 import { AuthService } from '../services/authService.js';
+import { router } from './router.js';
 
 export function initApp() {
 
@@ -479,7 +480,7 @@ export function initApp() {
     let rawText = '';
     if (activeTab === 'LINK') {
       if (!AuthService.isAuthenticated()) {
-        openAuthModalWithPrompt('🔒 Sign In Required: URL deep forensics, domain reputation, and lookalike link inspection require an Analyst account. Please sign in to inspect links.');
+        router.navigate('login');
         return;
       }
       rawText = urlInput.value.trim();
@@ -1310,7 +1311,7 @@ export function initApp() {
 
   async function handleOcrFile(file: File | Blob) {
     if (!AuthService.isAuthenticated()) {
-      openAuthModalWithPrompt('🔒 Sign In Required: Screenshot OCR, visual receipt inspection, and image analysis require an Analyst account. Please sign in to upload images.');
+      router.navigate('login');
       return;
     }
 
@@ -1379,7 +1380,7 @@ export function initApp() {
 
   btnBrowseOcr?.addEventListener('click', () => {
     if (!AuthService.isAuthenticated()) {
-      openAuthModalWithPrompt('🔒 Sign In Required: Please sign in or create an account to upload screenshots and images.');
+      router.navigate('login');
       return;
     }
     ocrFileInput?.click();
@@ -1447,7 +1448,7 @@ export function initApp() {
       btn.addEventListener('click', (e) => {
         if (!AuthService.isAuthenticated()) {
           pricingModal.classList.remove('open');
-          openAuthModalWithPrompt('🔒 Sign In Required: Please sign in or create an account to upgrade your subscription plan.');
+          router.navigate('login');
           return;
         }
 
@@ -1550,29 +1551,9 @@ export function initApp() {
     renderHistoryList();
   });
 
-  function openAuthModalWithPrompt(promptMessage?: string) {
-    const promptBanner = document.getElementById('authModalPromptBanner');
-    if (promptBanner) {
-      if (promptMessage) {
-        promptBanner.textContent = promptMessage;
-        promptBanner.style.display = 'flex';
-      } else {
-        promptBanner.style.display = 'none';
-        promptBanner.textContent = '';
-      }
-    }
-    loginError.style.display = 'none';
-    signupError.style.display = 'none';
-    formLogin.reset();
-    formSignup.reset();
-    btnTabLogin.classList.add('active');
-    btnTabSignup.classList.remove('active');
-    formLogin.style.display = 'flex';
-    formSignup.style.display = 'none';
-    authModal.classList.add('open');
-  }
-
-  btnOpenAuthModal?.addEventListener('click', () => openAuthModalWithPrompt());
+  btnOpenAuthModal?.addEventListener('click', () => {
+    router.navigate('login');
+  });
 
   closeAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
 
@@ -1629,6 +1610,7 @@ export function initApp() {
     await AuthService.logout();
     updateAuthUi();
     renderHistoryList();
+    router.navigate('login');
   });
 
   // Close modals on backdrop click
@@ -1663,7 +1645,7 @@ export function initApp() {
         </div>
       `;
       document.getElementById('btnHistoryLockLogin')?.addEventListener('click', () => {
-        openAuthModalWithPrompt('🔒 Sign In Required: Sign in to view and synchronize your past scans.');
+        router.navigate('login');
       });
       return;
     }

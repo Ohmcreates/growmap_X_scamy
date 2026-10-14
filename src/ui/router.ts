@@ -245,6 +245,7 @@ export class AppRouter {
     }
 
     if (this.currentRoute === 'landing') {
+      document.body.style.overflow = '';
       this.landingView.style.display = 'block';
       this.landingView.classList.add('active');
       this.authView.style.display = 'none';
@@ -255,6 +256,7 @@ export class AppRouter {
         window.scrollTo({ top: 0, behavior: 'smooth' });
       }
     } else if (this.currentRoute === 'login') {
+      document.body.style.overflow = 'hidden';
       this.landingView.style.display = 'none';
       this.landingView.classList.remove('active');
       this.authView.style.display = 'flex';
@@ -266,6 +268,7 @@ export class AppRouter {
       }
     } else {
       // Main website (/workspace): remove the magnifying glass and dock bar
+      document.body.style.overflow = '';
       this.landingView.style.display = 'none';
       this.landingView.classList.remove('active');
       this.authView.style.display = 'none';
