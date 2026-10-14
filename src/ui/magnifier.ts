@@ -52,6 +52,7 @@ export class DraggableMagnifier {
   private lastSampleTime: number = 0;
   private currentState: ThreatAnalysisState | null = null;
   private isEnabled: boolean = true;
+  private readonly STORAGE_KEY: string = 'scam_spotter_magnifier_state';
 
   public init() {
     this.container = document.getElementById('draggableMagnifier');
@@ -61,6 +62,16 @@ export class DraggableMagnifier {
     this.hintPill = document.getElementById('magnifierDragHint');
 
     if (!this.container || !this.viewportEl) return;
+
+    // Restore remembered on/off state from browser localStorage
+    try {
+      const savedState = localStorage.getItem(this.STORAGE_KEY);
+      if (savedState === 'off') {
+        this.isEnabled = false;
+      } else if (savedState === 'on') {
+        this.isEnabled = true;
+      }
+    } catch {}
 
     // Set initial position: right beside the hero preview card
     const heroPreview = document.getElementById('heroPreviewBox');
@@ -227,18 +238,27 @@ export class DraggableMagnifier {
     return this.isEnabled;
   }
 
+  private saveState(enabled: boolean) {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, enabled ? 'on' : 'off');
+    } catch {}
+  }
+
   public enable() {
     this.isEnabled = true;
+    this.saveState(true);
     this.syncVisibility();
   }
 
   public disable() {
     this.isEnabled = false;
+    this.saveState(false);
     this.syncVisibility();
   }
 
   public toggleEnabled() {
     this.isEnabled = !this.isEnabled;
+    this.saveState(this.isEnabled);
     this.syncVisibility();
   }
 

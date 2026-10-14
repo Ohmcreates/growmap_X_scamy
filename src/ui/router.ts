@@ -244,9 +244,25 @@ export class AppRouter {
       if (cornerToggle) cornerToggle.style.display = 'none';
     } else {
       if (cornerToggle) cornerToggle.style.display = 'flex';
-      const isOff = cornerToggle?.classList.contains('is-off') || cornerToggle?.classList.contains('minimized');
-      if (magnifier) magnifier.style.display = isOff ? 'none' : 'block';
-      if (dockBar) dockBar.style.display = isOff ? 'none' : 'flex';
+      let isOff = false;
+      try {
+        const saved = localStorage.getItem('scam_spotter_magnifier_state');
+        if (saved === 'off') isOff = true;
+        else if (saved === 'on') isOff = false;
+        else isOff = cornerToggle?.classList.contains('is-off') || false;
+      } catch {
+        isOff = cornerToggle?.classList.contains('is-off') || false;
+      }
+
+      if (isOff) {
+        cornerToggle?.classList.add('is-off');
+        if (magnifier) magnifier.style.display = 'none';
+        if (dockBar) dockBar.style.display = 'none';
+      } else {
+        cornerToggle?.classList.remove('is-off');
+        if (magnifier) magnifier.style.display = 'block';
+        if (dockBar) dockBar.style.display = 'flex';
+      }
     }
 
     if (this.currentRoute === 'landing') {
