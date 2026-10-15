@@ -248,6 +248,7 @@ export function initApp() {
   // Sidebar Toggle (Mobile Drawer & Desktop Collapse)
   // --------------------------------------------------------------------------
   const btnSidebarToggle = document.getElementById('btnSidebarToggle') as HTMLButtonElement | null;
+  const btnMobileSidebarToggle = document.getElementById('btnMobileSidebarToggle') as HTMLButtonElement | null;
   const sidebarEl = document.querySelector('.sidebar') as HTMLElement | null;
   const sidebarBackdrop = document.getElementById('sidebarBackdrop') as HTMLElement | null;
   const SIDEBAR_STATE_KEY = 'scam_spotter_sidebar_state';
@@ -279,13 +280,22 @@ export function initApp() {
     sidebarEl?.classList.remove('sidebar-open');
     sidebarBackdrop?.classList.remove('visible');
     if (btnSidebarToggle) btnSidebarToggle.textContent = '☰';
+    if (btnMobileSidebarToggle) btnMobileSidebarToggle.textContent = '☰';
   }
+
+  function toggleMobileSidebar() {
+    const isOpen = sidebarEl?.classList.toggle('sidebar-open');
+    sidebarBackdrop?.classList.toggle('visible', isOpen);
+    const icon = isOpen ? '✕' : '☰';
+    if (btnSidebarToggle) btnSidebarToggle.textContent = icon;
+    if (btnMobileSidebarToggle) btnMobileSidebarToggle.textContent = icon;
+  }
+
+  btnMobileSidebarToggle?.addEventListener('click', toggleMobileSidebar);
 
   btnSidebarToggle?.addEventListener('click', () => {
     if (window.innerWidth <= 1024) {
-      const isOpen = sidebarEl?.classList.toggle('sidebar-open');
-      sidebarBackdrop?.classList.toggle('visible', isOpen);
-      if (btnSidebarToggle) btnSidebarToggle.textContent = isOpen ? '✕' : '☰';
+      toggleMobileSidebar();
     } else {
       if (!sidebarEl) return;
       const isCollapsed = sidebarEl.classList.toggle('collapsed');
