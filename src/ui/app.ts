@@ -12,21 +12,11 @@ import { renderDashboardHtml } from './dashboard.js';
 import { checkWebsiteUrl } from '../engine/websiteChecker.js';
 import { predictPhishingMlAsync, MlModelAssessment } from '../engine/phishingMl.js';
 import { mergeHighlightSpans, renderHighlightedDom } from './highlighter.js';
-import { inspectApkBuffer, createDemoSampleApk, ApkSecurityReport } from '../services/apkInspector.js';
-import {
-  inspectFileVirusTotal,
-  createVirusTotalDemoBuffer,
-  KNOWN_THREAT_HASHES,
-  SECURITY_VENDORS,
-  VirusTotalReport,
-} from '../services/virusTotalInspector.js';
-import { NciiDetector, NciiFullAnalysisReport } from '../services/nciiDetector.js';
 import { GeminiService } from '../services/geminiService.js';
-import { injectSteganographicWatermark } from '../engine/provenance.js';
+import { AuthService } from '../services/authService.js';
+import { router } from './router.js';
 
 export function initApp() {
-  // Covert Provenance & Trademark Fingerprinting
-  injectSteganographicWatermark();
 
   // Navigation & Theme Elements
   const btnThemeToggle = document.getElementById('btnThemeToggle') as HTMLButtonElement;
@@ -40,9 +30,6 @@ export function initApp() {
   const menuScanMessage = document.getElementById('menuScanMessage') as HTMLButtonElement;
   const menuScanLink = document.getElementById('menuScanLink') as HTMLButtonElement;
   const menuScanImage = document.getElementById('menuScanImage') as HTMLButtonElement;
-  const menuScanApk = document.getElementById('menuScanApk') as HTMLButtonElement;
-  const menuScanVt = document.getElementById('menuScanVt') as HTMLButtonElement;
-  const menuScanNcii = document.getElementById('menuScanNcii') as HTMLButtonElement;
   const menuThreatDb = document.getElementById('menuThreatDb') as HTMLButtonElement;
   const menuEvaluation = document.getElementById('menuEvaluation') as HTMLButtonElement;
   const menuHistory = document.getElementById('menuHistory') as HTMLButtonElement;
@@ -54,159 +41,21 @@ export function initApp() {
   const tabTextMessage = document.getElementById('tabTextMessage') as HTMLButtonElement;
   const tabScanLink = document.getElementById('tabScanLink') as HTMLButtonElement;
   const tabUploadImage = document.getElementById('tabUploadImage') as HTMLButtonElement;
-  const tabApkScan = document.getElementById('tabApkScan') as HTMLButtonElement;
-  const tabVtScan = document.getElementById('tabVtScan') as HTMLButtonElement;
-  const tabNciiScan = document.getElementById('tabNciiScan') as HTMLButtonElement;
 
   const panelTextMessage = document.getElementById('panelTextMessage') as HTMLElement;
   const panelScanLink = document.getElementById('panelScanLink') as HTMLElement;
   const panelUploadImage = document.getElementById('panelUploadImage') as HTMLElement;
-  const panelApkScan = document.getElementById('panelApkScan') as HTMLElement;
-  const panelVtScan = document.getElementById('panelVtScan') as HTMLElement;
-  const panelNciiScan = document.getElementById('panelNciiScan') as HTMLElement;
 
   const textarea = document.getElementById('messageInput') as HTMLTextAreaElement;
   const urlInput = document.getElementById('urlInput') as HTMLInputElement;
   const charCounter = document.getElementById('charCounter') as HTMLElement;
   const inlineError = document.getElementById('inlineError') as HTMLElement;
   const ocrStatusNotice = document.getElementById('ocrStatusNotice') as HTMLElement;
-  const apkStatusNotice = document.getElementById('apkStatusNotice') as HTMLElement;
-  const vtStatusNotice = document.getElementById('vtStatusNotice') as HTMLElement;
-  const nciiStatusNotice = document.getElementById('nciiStatusNotice') as HTMLElement;
   const langScriptPill = document.getElementById('langScriptPill') as HTMLElement;
 
   const dropZone = document.getElementById('dropZone') as HTMLElement;
   const btnBrowseOcr = document.getElementById('btnBrowseOcr') as HTMLButtonElement;
   const ocrFileInput = document.getElementById('ocrFileInput') as HTMLInputElement;
-
-  // APK DropZone & Demo Test Buttons
-  const apkDropZone = document.getElementById('apkDropZone') as HTMLElement;
-  const btnBrowseApk = document.getElementById('btnBrowseApk') as HTMLButtonElement;
-  const apkFileInput = document.getElementById('apkFileInput') as HTMLInputElement;
-  const btnApkDemoTrojan = document.getElementById('btnApkDemoTrojan') as HTMLButtonElement;
-  const btnApkDemoClean = document.getElementById('btnApkDemoClean') as HTMLButtonElement;
-
-  // APK Inspector Elements (SpotTheScam 6-Dimensional Model)
-  const apkInspectorCard = document.getElementById('apkInspectorCard') as HTMLElement;
-  const apkNameText = document.getElementById('apkNameText') as HTMLElement;
-  const apkPackageText = document.getElementById('apkPackageText') as HTMLElement;
-  const apkScoreBadge = document.getElementById('apkScoreBadge') as HTMLElement;
-  const apkVerdictBadge = document.getElementById('apkVerdictBadge') as HTMLElement;
-  const apkSha256Text = document.getElementById('apkSha256Text') as HTMLElement;
-  const apkSummaryText = document.getElementById('apkSummaryText') as HTMLElement;
-
-  const dimAppIdScore = document.getElementById('dimAppIdScore') as HTMLElement;
-  const dimAppIdReason = document.getElementById('dimAppIdReason') as HTMLElement;
-  const dimPermScore = document.getElementById('dimPermScore') as HTMLElement;
-  const dimPermReason = document.getElementById('dimPermReason') as HTMLElement;
-  const dimCertScore = document.getElementById('dimCertScore') as HTMLElement;
-  const dimCertReason = document.getElementById('dimCertReason') as HTMLElement;
-  const dimTargetSdkScore = document.getElementById('dimTargetSdkScore') as HTMLElement;
-  const dimTargetSdkReason = document.getElementById('dimTargetSdkReason') as HTMLElement;
-  const dimMinSdkScore = document.getElementById('dimMinSdkScore') as HTMLElement;
-  const dimMinSdkReason = document.getElementById('dimMinSdkReason') as HTMLElement;
-  const dimVersionScore = document.getElementById('dimVersionScore') as HTMLElement;
-  const dimVersionReason = document.getElementById('dimVersionReason') as HTMLElement;
-
-  const apkPermissionsList = document.getElementById('apkPermissionsList') as HTMLElement;
-  const apkRecommendationsList = document.getElementById('apkRecommendationsList') as HTMLElement;
-
-  // VirusTotal File & Hash Scan Elements
-  const vtDropZone = document.getElementById('vtDropZone') as HTMLElement;
-  const btnBrowseVtFile = document.getElementById('btnBrowseVtFile') as HTMLButtonElement;
-  const vtFileInput = document.getElementById('vtFileInput') as HTMLInputElement;
-  const vtHashSearchInput = document.getElementById('vtHashSearchInput') as HTMLInputElement;
-  const btnSearchVtHash = document.getElementById('btnSearchVtHash') as HTMLButtonElement;
-  const btnVtDemoRansomware = document.getElementById('btnVtDemoRansomware') as HTMLButtonElement;
-  const btnVtDemoDropper = document.getElementById('btnVtDemoDropper') as HTMLButtonElement;
-  const btnVtDemoClean = document.getElementById('btnVtDemoClean') as HTMLButtonElement;
-
-  const vtInspectorCard = document.getElementById('vtInspectorCard') as HTMLElement;
-  const vtFileNameText = document.getElementById('vtFileNameText') as HTMLElement;
-  const vtFileMetaText = document.getElementById('vtFileMetaText') as HTMLElement;
-  const vtRatioCircle = document.getElementById('vtRatioCircle') as HTMLElement;
-  const vtRatioScore = document.getElementById('vtRatioScore') as HTMLElement;
-  const vtRatioTotal = document.getElementById('vtRatioTotal') as HTMLElement;
-  const vtVerdictTitle = document.getElementById('vtVerdictTitle') as HTMLElement;
-  const vtClassificationText = document.getElementById('vtClassificationText') as HTMLElement;
-
-  const vtTabDetection = document.getElementById('vtTabDetection') as HTMLButtonElement;
-  const vtTabDetails = document.getElementById('vtTabDetails') as HTMLButtonElement;
-  const vtTabBehavior = document.getElementById('vtTabBehavior') as HTMLButtonElement;
-  const vtTabProtocol = document.getElementById('vtTabProtocol') as HTMLButtonElement;
-
-  const vtPanelDetection = document.getElementById('vtPanelDetection') as HTMLElement;
-  const vtPanelDetails = document.getElementById('vtPanelDetails') as HTMLElement;
-  const vtPanelBehavior = document.getElementById('vtPanelBehavior') as HTMLElement;
-  const vtPanelProtocol = document.getElementById('vtPanelProtocol') as HTMLElement;
-
-  const vtVendorSummaryCounts = document.getElementById('vtVendorSummaryCounts') as HTMLElement;
-  const vtVendorsGrid = document.getElementById('vtVendorsGrid') as HTMLElement;
-
-  const vtMd5Text = document.getElementById('vtMd5Text') as HTMLElement;
-  const vtSha1Text = document.getElementById('vtSha1Text') as HTMLElement;
-  const vtSha256Text = document.getElementById('vtSha256Text') as HTMLElement;
-  const vtFileTypeVal = document.getElementById('vtFileTypeVal') as HTMLElement;
-  const vtMagicVal = document.getElementById('vtMagicVal') as HTMLElement;
-  const vtEntropyFill = document.getElementById('vtEntropyFill') as HTMLElement;
-  const vtEntropyScoreVal = document.getElementById('vtEntropyScoreVal') as HTMLElement;
-  const vtEntropyRatingVal = document.getElementById('vtEntropyRatingVal') as HTMLElement;
-  const vtEntropyExplainVal = document.getElementById('vtEntropyExplainVal') as HTMLElement;
-
-  const vtBehaviorSignalsList = document.getElementById('vtBehaviorSignalsList') as HTMLElement;
-  const vtNetworkList = document.getElementById('vtNetworkList') as HTMLElement;
-  const vtRecommendationsList = document.getElementById('vtRecommendationsList') as HTMLElement;
-
-  // AI-Generated Nude & NCII Deepfake Inspector Elements
-  const nciiDropZone = document.getElementById('nciiDropZone') as HTMLElement;
-  const btnBrowseNciiFile = document.getElementById('btnBrowseNciiFile') as HTMLButtonElement;
-  const nciiFileInput = document.getElementById('nciiFileInput') as HTMLInputElement;
-
-  const btnNciiDemoDiffusion = document.getElementById('btnNciiDemoDiffusion') as HTMLButtonElement;
-  const btnNciiDemoFaceSwap = document.getElementById('btnNciiDemoFaceSwap') as HTMLButtonElement;
-  const btnNciiDemoCompressed = document.getElementById('btnNciiDemoCompressed') as HTMLButtonElement;
-  const btnNciiDemoClean = document.getElementById('btnNciiDemoClean') as HTMLButtonElement;
-
-  const nciiInspectorCard = document.getElementById('nciiInspectorCard') as HTMLElement;
-  const nciiFileNameText = document.getElementById('nciiFileNameText') as HTMLElement;
-  const nciiFileMetaText = document.getElementById('nciiFileMetaText') as HTMLElement;
-  const nciiSha256Text = document.getElementById('nciiSha256Text') as HTMLElement;
-
-  const nciiExplicitBadge = document.getElementById('nciiExplicitBadge') as HTMLElement;
-  const nciiAiBadge = document.getElementById('nciiAiBadge') as HTMLElement;
-  const nciiManipBadge = document.getElementById('nciiManipBadge') as HTMLElement;
-
-  const btnToggleNciiBlur = document.getElementById('btnToggleNciiBlur') as HTMLButtonElement;
-  const nciiBlurShield = document.getElementById('nciiBlurShield') as HTMLElement;
-  const nciiImagePreview = document.getElementById('nciiImagePreview') as HTMLImageElement;
-
-  const nciiAiVerdictPill = document.getElementById('nciiAiVerdictPill') as HTMLElement;
-  const nciiAiSummaryText = document.getElementById('nciiAiSummaryText') as HTMLElement;
-  const nciiDermalVal = document.getElementById('nciiDermalVal') as HTMLElement;
-  const nciiSpectralVal = document.getElementById('nciiSpectralVal') as HTMLElement;
-  const nciiFourierVal = document.getElementById('nciiFourierVal') as HTMLElement;
-  const nciiAiSignaturesList = document.getElementById('nciiAiSignaturesList') as HTMLElement;
-  const nciiAiLimitations = document.getElementById('nciiAiLimitations') as HTMLElement;
-
-  const nciiExplicitVerdictPill = document.getElementById('nciiExplicitVerdictPill') as HTMLElement;
-  const nciiExplicitSummaryText = document.getElementById('nciiExplicitSummaryText') as HTMLElement;
-  const nciiExposureScoreVal = document.getElementById('nciiExposureScoreVal') as HTMLElement;
-  const nciiSkinRatioVal = document.getElementById('nciiSkinRatioVal') as HTMLElement;
-  const nciiRoutingVal = document.getElementById('nciiRoutingVal') as HTMLElement;
-  const nciiExplicitAnatomyList = document.getElementById('nciiExplicitAnatomyList') as HTMLElement;
-
-  const nciiManipVerdictPill = document.getElementById('nciiManipVerdictPill') as HTMLElement;
-  const nciiManipSummaryText = document.getElementById('nciiManipSummaryText') as HTMLElement;
-  const nciiBoundaryVal = document.getElementById('nciiBoundaryVal') as HTMLElement;
-  const nciiColorMismatchVal = document.getElementById('nciiColorMismatchVal') as HTMLElement;
-  const nciiElaVal = document.getElementById('nciiElaVal') as HTMLElement;
-  const nciiManipExplain = document.getElementById('nciiManipExplain') as HTMLElement;
-
-  const nciiProvVerdictPill = document.getElementById('nciiProvVerdictPill') as HTMLElement;
-  const nciiProvSummaryText = document.getElementById('nciiProvSummaryText') as HTMLElement;
-  const nciiC2paVal = document.getElementById('nciiC2paVal') as HTMLElement;
-  const nciiExifVal = document.getElementById('nciiExifVal') as HTMLElement;
-  const nciiWatermarkVal = document.getElementById('nciiWatermarkVal') as HTMLElement;
 
   // Example Buttons (English + Multilingual Hinglish & Hindi)
   const btnExampleSbi = document.getElementById('btnExampleSbi') as HTMLButtonElement;
@@ -271,18 +120,6 @@ export function initApp() {
   const geminiRiskIndicatorsList = document.getElementById('geminiRiskIndicatorsList') as HTMLElement;
   const geminiUserGuidanceText = document.getElementById('geminiUserGuidanceText') as HTMLElement;
 
-  // Google Gemini NCII & Deepfake Forensics Elements (Purpose 4)
-  const geminiNciiCard = document.getElementById('geminiNciiCard') as HTMLElement;
-  const geminiNciiVerdictBadge = document.getElementById('geminiNciiVerdictBadge') as HTMLElement;
-  const geminiNciiExplicitVal = document.getElementById('geminiNciiExplicitVal') as HTMLElement;
-  const geminiNciiAiVal = document.getElementById('geminiNciiAiVal') as HTMLElement;
-  const geminiNciiManipVal = document.getElementById('geminiNciiManipVal') as HTMLElement;
-  const geminiNciiArtifactsBox = document.getElementById('geminiNciiArtifactsBox') as HTMLElement;
-  const geminiNciiArtifactsList = document.getElementById('geminiNciiArtifactsList') as HTMLElement;
-  const geminiNciiManipBox = document.getElementById('geminiNciiManipBox') as HTMLElement;
-  const geminiNciiManipList = document.getElementById('geminiNciiManipList') as HTMLElement;
-  const geminiNciiTripartiteVerdict = document.getElementById('geminiNciiTripartiteVerdict') as HTMLElement;
-  const geminiNciiSafetyAdvice = document.getElementById('geminiNciiSafetyAdvice') as HTMLElement;
 
   // AI Safety Assistant Elements
   const assistantResponseBox = document.getElementById('assistantResponseBox') as HTMLElement;
@@ -331,7 +168,7 @@ export function initApp() {
   const dashboardMount = document.getElementById('dashboardMount') as HTMLElement;
   const threatDbSearchInput = document.getElementById('threatDbSearchInput') as HTMLInputElement;
   const threatDbResultsMount = document.getElementById('threatDbResultsMount') as HTMLElement;
-  const evalMetricsMount = document.getElementById('evalMetricsMount') as HTMLElement;
+  const benchmarkMetricsMount = document.getElementById('benchmarkMetricsMount') as HTMLElement;
   const historyListMount = document.getElementById('historyListMount') as HTMLElement;
   const btnClearHistory = document.getElementById('btnClearHistory') as HTMLButtonElement;
   const pricingMount = document.getElementById('pricingMount') as HTMLElement;
@@ -408,11 +245,35 @@ export function initApp() {
   });
 
   // --------------------------------------------------------------------------
-  // Mobile Sidebar Toggle (Scanner Workspace)
+  // Sidebar Toggle (Mobile Drawer & Desktop Collapse)
   // --------------------------------------------------------------------------
-  const btnSidebarToggle = document.getElementById('btnSidebarToggle') as HTMLButtonElement;
-  const sidebarEl = document.querySelector('.sidebar') as HTMLElement;
-  const sidebarBackdrop = document.getElementById('sidebarBackdrop') as HTMLElement;
+  const btnSidebarToggle = document.getElementById('btnSidebarToggle') as HTMLButtonElement | null;
+  const sidebarEl = document.querySelector('.sidebar') as HTMLElement | null;
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop') as HTMLElement | null;
+  const SIDEBAR_STATE_KEY = 'scam_spotter_sidebar_state';
+
+  function applySidebarState(collapsed: boolean) {
+    if (!sidebarEl || !btnSidebarToggle) return;
+    if (collapsed) {
+      sidebarEl.classList.add('collapsed');
+      btnSidebarToggle.classList.remove('is-open');
+      btnSidebarToggle.setAttribute('aria-expanded', 'false');
+    } else {
+      sidebarEl.classList.remove('collapsed');
+      btnSidebarToggle.classList.add('is-open');
+      btnSidebarToggle.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  // Restore remembered sidebar state from localStorage on page load / refresh
+  try {
+    const savedSidebarState = localStorage.getItem(SIDEBAR_STATE_KEY);
+    if (savedSidebarState === 'collapsed') {
+      applySidebarState(true);
+    } else if (savedSidebarState === 'open') {
+      applySidebarState(false);
+    }
+  } catch {}
 
   function closeSidebar() {
     sidebarEl?.classList.remove('sidebar-open');
@@ -421,9 +282,27 @@ export function initApp() {
   }
 
   btnSidebarToggle?.addEventListener('click', () => {
-    const isOpen = sidebarEl?.classList.toggle('sidebar-open');
-    sidebarBackdrop?.classList.toggle('visible', isOpen);
-    if (btnSidebarToggle) btnSidebarToggle.textContent = isOpen ? '✕' : '☰';
+    if (window.innerWidth <= 1024) {
+      const isOpen = sidebarEl?.classList.toggle('sidebar-open');
+      sidebarBackdrop?.classList.toggle('visible', isOpen);
+      if (btnSidebarToggle) btnSidebarToggle.textContent = isOpen ? '✕' : '☰';
+    } else {
+      if (!sidebarEl) return;
+      const isCollapsed = sidebarEl.classList.toggle('collapsed');
+      if (isCollapsed) {
+        btnSidebarToggle?.classList.remove('is-open');
+        btnSidebarToggle?.setAttribute('aria-expanded', 'false');
+        try {
+          localStorage.setItem(SIDEBAR_STATE_KEY, 'collapsed');
+        } catch {}
+      } else {
+        btnSidebarToggle?.classList.add('is-open');
+        btnSidebarToggle?.setAttribute('aria-expanded', 'true');
+        try {
+          localStorage.setItem(SIDEBAR_STATE_KEY, 'open');
+        } catch {}
+      }
+    }
   });
 
   sidebarBackdrop?.addEventListener('click', closeSidebar);
@@ -448,15 +327,26 @@ export function initApp() {
   // --------------------------------------------------------------------------
   // Tab Switching
   // --------------------------------------------------------------------------
-  function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE' | 'APK' | 'VT' | 'NCII') {
+  function switchTab(tab: 'TEXT' | 'LINK' | 'IMAGE') {
+    if (tab !== 'TEXT' && !AuthService.isAuthenticated()) {
+      activeTab = 'TEXT';
+      tabTextMessage?.classList.add('active');
+      tabScanLink?.classList.remove('active');
+      tabUploadImage?.classList.remove('active');
+      if (panelTextMessage) panelTextMessage.style.display = 'block';
+      if (panelScanLink) panelScanLink.style.display = 'none';
+      if (panelUploadImage) panelUploadImage.style.display = 'none';
+      return;
+    }
+
     activeTab = tab;
 
-    [tabTextMessage, tabScanLink, tabUploadImage, tabApkScan, tabVtScan, tabNciiScan].forEach((t) => t?.classList.remove('active'));
-    [panelTextMessage, panelScanLink, panelUploadImage, panelApkScan, panelVtScan, panelNciiScan].forEach((p) => {
+    [tabTextMessage, tabScanLink, tabUploadImage].forEach((t) => t?.classList.remove('active'));
+    [panelTextMessage, panelScanLink, panelUploadImage].forEach((p) => {
       if (p) p.style.display = 'none';
     });
 
-    [menuScanMessage, menuScanLink, menuScanImage, menuScanApk, menuScanVt, menuScanNcii].forEach((m) => m?.classList.remove('active'));
+    [menuScanMessage, menuScanLink, menuScanImage].forEach((m) => m?.classList.remove('active'));
 
     if (tab === 'TEXT') {
       tabTextMessage?.classList.add('active');
@@ -472,34 +362,84 @@ export function initApp() {
       tabUploadImage?.classList.add('active');
       menuScanImage?.classList.add('active');
       if (panelUploadImage) panelUploadImage.style.display = 'block';
-    } else if (tab === 'APK') {
-      tabApkScan?.classList.add('active');
-      menuScanApk?.classList.add('active');
-      if (panelApkScan) panelApkScan.style.display = 'block';
-    } else if (tab === 'VT') {
-      tabVtScan?.classList.add('active');
-      menuScanVt?.classList.add('active');
-      if (panelVtScan) panelVtScan.style.display = 'block';
-    } else if (tab === 'NCII') {
-      tabNciiScan?.classList.add('active');
-      menuScanNcii?.classList.add('active');
-      if (panelNciiScan) panelNciiScan.style.display = 'block';
     }
   }
 
-  tabTextMessage?.addEventListener('click', () => switchTab('TEXT'));
-  tabScanLink?.addEventListener('click', () => switchTab('LINK'));
-  tabUploadImage?.addEventListener('click', () => switchTab('IMAGE'));
-  tabApkScan?.addEventListener('click', () => switchTab('APK'));
-  tabVtScan?.addEventListener('click', () => switchTab('VT'));
-  tabNciiScan?.addEventListener('click', () => switchTab('NCII'));
+  function showWorkspaceSubview(subviewId: string) {
+    const allSubviews = document.querySelectorAll('.workspace-subview');
+    allSubviews.forEach((v) => {
+      (v as HTMLElement).style.display = 'none';
+      v.classList.remove('active');
+    });
 
-  menuScanMessage?.addEventListener('click', () => switchTab('TEXT'));
-  menuScanLink?.addEventListener('click', () => switchTab('LINK'));
-  menuScanImage?.addEventListener('click', () => switchTab('IMAGE'));
-  menuScanApk?.addEventListener('click', () => switchTab('APK'));
-  menuScanVt?.addEventListener('click', () => switchTab('VT'));
-  menuScanNcii?.addEventListener('click', () => switchTab('NCII'));
+    const target = document.getElementById(subviewId);
+    if (target) {
+      target.style.display = 'flex';
+      target.classList.add('active');
+    }
+
+    const sidebarItems = document.querySelectorAll('.sidebar-item');
+    sidebarItems.forEach((btn) => {
+      if (btn.getAttribute('data-subview') === subviewId) {
+        btn.classList.add('active');
+      } else {
+        btn.classList.remove('active');
+      }
+    });
+
+    if (subviewId === 'subviewThreatDb') {
+      renderThreatDatabase(threatDbSearchInput?.value || '');
+    } else if (subviewId === 'subviewBenchmark') {
+      renderBenchmarkPage();
+    } else if (subviewId === 'subviewHistory') {
+      renderHistoryList();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  tabTextMessage?.addEventListener('click', () => switchTab('TEXT'));
+  tabScanLink?.addEventListener('click', (e) => {
+    if (!AuthService.isAuthenticated()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchTab('TEXT');
+      return;
+    }
+    switchTab('LINK');
+  });
+  tabUploadImage?.addEventListener('click', (e) => {
+    if (!AuthService.isAuthenticated()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      switchTab('TEXT');
+      return;
+    }
+    switchTab('IMAGE');
+  });
+
+  menuScanMessage?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewScanner');
+    switchTab('TEXT');
+  });
+  menuScanLink?.addEventListener('click', (e) => {
+    if (!AuthService.isAuthenticated()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
+    showWorkspaceSubview('subviewScanner');
+    switchTab('LINK');
+  });
+  menuScanImage?.addEventListener('click', (e) => {
+    if (!AuthService.isAuthenticated()) {
+      e.preventDefault();
+      e.stopImmediatePropagation();
+      return;
+    }
+    showWorkspaceSubview('subviewScanner');
+    switchTab('IMAGE');
+  });
 
   // --------------------------------------------------------------------------
   // Multilingual Script Detection & Character Counter
@@ -543,13 +483,7 @@ export function initApp() {
     updateInputMetrics();
     inlineError.style.display = 'none';
     ocrStatusNotice.style.display = 'none';
-    if (apkStatusNotice) apkStatusNotice.style.display = 'none';
-    if (vtStatusNotice) vtStatusNotice.style.display = 'none';
-    if (nciiStatusNotice) nciiStatusNotice.style.display = 'none';
     if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
-    if (apkInspectorCard) apkInspectorCard.style.display = 'none';
-    if (vtInspectorCard) vtInspectorCard.style.display = 'none';
-    if (nciiInspectorCard) nciiInspectorCard.style.display = 'none';
     analysisResultCard.style.display = 'none';
     resetScoreWidgets();
   });
@@ -703,7 +637,11 @@ export function initApp() {
 
   function runAnalysis() {
     let rawText = '';
-    if (activeTab === 'LINK') {
+    if (activeTab === 'LINK' || activeTab === 'IMAGE') {
+      if (!AuthService.isAuthenticated()) {
+        switchTab('TEXT');
+        return;
+      }
       rawText = urlInput.value.trim();
       if (rawText && !rawText.startsWith('http')) {
         rawText = `https://${rawText}`;
@@ -1045,17 +983,8 @@ export function initApp() {
         .join('');
     }
 
-    if (apkInspectorCard) {
-      apkInspectorCard.style.display = 'none';
-    }
 
-    if (vtInspectorCard) {
-      vtInspectorCard.style.display = 'none';
-    }
 
-    if (nciiInspectorCard) {
-      nciiInspectorCard.style.display = 'none';
-    }
 
     // Evidence Highlighting
     const mergedSpans = mergeHighlightSpans(rawText, result.activeEvidence);
@@ -1294,10 +1223,13 @@ export function initApp() {
     } catch {}
   });
 
-  function openModelEvaluationModal() {
+  function renderBenchmarkPage() {
+    const mount = benchmarkMetricsMount || document.getElementById('benchmarkMetricsMount');
+    if (!mount) return;
+
     const metrics = computeBenchmarkMetrics((text) => analyzeMessage(text));
 
-    evalMetricsMount.innerHTML = `
+    mount.innerHTML = `
       <div class="eval-stats-grid">
         <div class="eval-stat-card">
           <div class="eval-stat-num" style="color: #16a34a;">${metrics.precision}%</div>
@@ -1317,7 +1249,7 @@ export function initApp() {
         </div>
       </div>
 
-      <div class="confusion-matrix-box">
+      <div class="confusion-matrix-box" style="margin-top: 24px;">
         <strong>Confusion Matrix (100 Samples: 50 Scams, 50 Benign Controls):</strong>
         <table class="cm-table">
           <thead>
@@ -1342,8 +1274,8 @@ export function initApp() {
         </table>
       </div>
 
-      <div>
-        <h4 style="margin-bottom: 8px;">Standardized Test Corpus Explorer:</h4>
+      <div style="margin-top: 28px;">
+        <h4 style="margin-bottom: 12px; font-weight: 700;">Standardized Test Corpus Explorer:</h4>
         <div class="benchmark-table-wrap">
           <table class="benchmark-samples-table">
             <thead>
@@ -1373,16 +1305,23 @@ export function initApp() {
       </div>
     `;
 
-    evalModal.classList.add('open');
+    // Ensure modal never opens
+    const evalModal = document.getElementById('evalModal');
+    if (evalModal) evalModal.classList.remove('open');
   }
 
-  btnOpenModelEval?.addEventListener('click', openModelEvaluationModal);
-  menuEvaluation?.addEventListener('click', openModelEvaluationModal);
+  btnOpenModelEval?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewBenchmark');
+  });
+  menuEvaluation?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewBenchmark');
+  });
   navEvaluation?.addEventListener('click', (e) => {
     e.preventDefault();
-    openModelEvaluationModal();
+    showWorkspaceSubview('subviewBenchmark');
   });
-  closeEvalModal?.addEventListener('click', () => evalModal.classList.remove('open'));
+  closeEvalModal?.addEventListener('click', () => evalModal?.classList.remove('open'));
+
 
   // --------------------------------------------------------------------------
   // Feature 1: Scam Reporting & Verified Indicator Database
@@ -1449,9 +1388,9 @@ export function initApp() {
   }
 
   function openThreatDatabaseModal() {
-    threatDbSearchInput.value = '';
+    if (threatDbSearchInput) threatDbSearchInput.value = '';
     renderThreatDatabase('');
-    threatDbModal.classList.add('open');
+    showWorkspaceSubview('subviewThreatDb');
   }
 
   threatDbSearchInput?.addEventListener('input', () => {
@@ -1517,6 +1456,11 @@ export function initApp() {
   }
 
   async function handleOcrFile(file: File | Blob) {
+    if (!AuthService.isAuthenticated()) {
+      router.navigate('login');
+      return;
+    }
+
     ocrStatusNotice.style.display = 'block';
     ocrStatusNotice.className = 'ocr-status-notice ocr-loading';
     ocrStatusNotice.innerHTML = '✨ Running Google Gemini Multimodal Vision & Photo OCR...';
@@ -1580,16 +1524,16 @@ export function initApp() {
     }
   }
 
-  btnBrowseOcr?.addEventListener('click', () => ocrFileInput?.click());
+  btnBrowseOcr?.addEventListener('click', () => {
+    if (!AuthService.isAuthenticated()) {
+      router.navigate('login');
+      return;
+    }
+    ocrFileInput?.click();
+  });
   ocrFileInput?.addEventListener('change', () => {
     if (ocrFileInput.files && ocrFileInput.files[0]) {
-      const chosen = ocrFileInput.files[0];
-      if (chosen.name.toLowerCase().endsWith('.apk') || chosen.type.includes('package-archive')) {
-        switchTab('APK');
-        handleApkFile(chosen);
-      } else {
-        handleOcrFile(chosen);
-      }
+      handleOcrFile(ocrFileInput.files[0]);
     }
   });
 
@@ -1604,1271 +1548,9 @@ export function initApp() {
     e.preventDefault();
     dropZone.style.borderColor = 'var(--border-color)';
     if (e.dataTransfer && e.dataTransfer.files[0]) {
-      const droppedFile = e.dataTransfer.files[0];
-      if (droppedFile.name.toLowerCase().endsWith('.apk') || droppedFile.type.includes('package-archive')) {
-        switchTab('APK');
-        handleApkFile(droppedFile);
-      } else {
-        handleOcrFile(droppedFile);
-      }
+      handleOcrFile(e.dataTransfer.files[0]);
     }
   });
-
-  // --------------------------------------------------------------------------
-  // SpotTheScam.in Android APK Security Inspector Flow
-  // --------------------------------------------------------------------------
-  async function renderApkReport(report: ApkSecurityReport) {
-    if (!apkInspectorCard) return;
-
-    // 1. Hide other cards & show APK card
-    if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
-    if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
-    if (vtInspectorCard) vtInspectorCard.style.display = 'none';
-    if (nciiInspectorCard) nciiInspectorCard.style.display = 'none';
-    apkInspectorCard.style.display = 'flex';
-
-    // 2. Populate Identity & Verification Badges
-    apkNameText.textContent = report.appName || report.fileName;
-    apkPackageText.textContent = report.packageName || 'Unknown Package';
-    apkSha256Text.textContent = report.sha256Hash;
-    apkScoreBadge.textContent = `Malware Risk: ${report.overallScore}/100`;
-
-    if (report.verdict === 'CRITICAL_MALWARE_RISK') {
-      apkVerdictBadge.className = 'web-verdict-pill danger';
-      apkVerdictBadge.textContent = '🚨 CRITICAL MALWARE';
-    } else if (report.verdict === 'SUSPICIOUS_RISK') {
-      apkVerdictBadge.className = 'web-verdict-pill warning';
-      apkVerdictBadge.textContent = '⚠️ SUSPICIOUS APK';
-    } else {
-      apkVerdictBadge.className = 'web-verdict-pill success';
-      apkVerdictBadge.textContent = '✅ CLEAN APPLICATION';
-    }
-
-    apkSummaryText.textContent = report.summary;
-
-    // 3. Render 6-Dimensional Security Audit Dimensions (SpotTheScam.in Model)
-    const dims = [
-      { elScore: dimAppIdScore, elReason: dimAppIdReason, data: report.dimensions.appIdentity },
-      { elScore: dimPermScore, elReason: dimPermReason, data: report.dimensions.permissionRisk },
-      { elScore: dimCertScore, elReason: dimCertReason, data: report.dimensions.certificateTrust },
-      { elScore: dimTargetSdkScore, elReason: dimTargetSdkReason, data: report.dimensions.targetSdk },
-      { elScore: dimMinSdkScore, elReason: dimMinSdkReason, data: report.dimensions.minSdk },
-      { elScore: dimVersionScore, elReason: dimVersionReason, data: report.dimensions.versionTag },
-    ];
-
-    dims.forEach(({ elScore, elReason, data }) => {
-      if (elScore && elReason && data) {
-        elScore.className = `dim-score-pill ${
-          data.status === 'CRITICAL' ? 'danger' : data.status === 'WARNING' ? 'warning' : 'safe'
-        }`;
-        elScore.textContent = `${data.status} (${data.score}/100)`;
-        elReason.textContent = data.reason;
-      }
-    });
-
-    // 4. Render Detected Dangerous Permissions
-    if (report.detectedPermissions.length > 0) {
-      apkPermissionsList.innerHTML = report.detectedPermissions
-        .map(
-          (p) => `
-          <div class="apk-perm-item ${p.category.toLowerCase()}">
-            <div class="apk-perm-top">
-              <span class="apk-perm-name">${escapeHtml(p.name)}</span>
-              <span class="apk-perm-badge">${p.category} (+${p.points})</span>
-            </div>
-            <strong style="font-size: 0.8rem; margin: 2px 0;">${escapeHtml(p.riskDescription)}</strong>
-            <p class="apk-trojan-pattern">${escapeHtml(p.trojanPattern)}</p>
-          </div>
-        `
-        )
-        .join('');
-    } else {
-      apkPermissionsList.innerHTML = `
-        <div style="font-size: 0.85rem; color: #16a34a; padding: 6px 0;">
-          ✓ No dangerous or trojan permissions requested. Standard sandboxed capability.
-        </div>
-      `;
-    }
-
-    // 5. Render Emergency Recommendations
-    apkRecommendationsList.innerHTML = report.recommendations
-      .map((rec) => `<li>${escapeHtml(rec)}</li>`)
-      .join('');
-
-    // 6. Sync Original Message box & Warnings table
-    highlightedTextBox.innerHTML = `
-      <div style="font-family: var(--font-mono); font-size: 0.82rem; background: var(--bg-card-subtle); padding: 10px; border-radius: 6px; line-height: 1.6;">
-        <strong>[Android APK Binary Analysis]</strong> ${escapeHtml(report.fileName)} (${(report.fileSizeBytes / 1024).toFixed(1)} KB)<br>
-        <strong>Package:</strong> <code>${escapeHtml(report.packageName)}</code> | <strong>Target SDK:</strong> <code>${report.targetSdkVersion}</code> | <strong>Min SDK:</strong> <code>${report.minSdkVersion}</code><br>
-        <strong>SHA-256 Fingerprint:</strong> <code>${escapeHtml(report.sha256Hash)}</code>
-      </div>
-    `;
-
-    warningSignsMount.innerHTML = report.detectedPermissions
-      .map(
-        (p) => `
-        <div class="warning-sign-row">
-          <div class="sign-left-cluster">
-            <span class="sign-icon">📱</span>
-            <span class="sign-label">${escapeHtml(p.riskDescription)}</span>
-            <span class="sign-evidence-quote">"${escapeHtml(p.name)}"</span>
-          </div>
-          <span class="sign-points-badge">+${p.points}</span>
-        </div>
-      `
-      )
-      .join('');
-
-    // 7. Update Score Gauge & Widgets
-    const fakeScanResult: ScanResult = {
-      score: report.overallScore,
-      riskLevel: report.riskLevel,
-      headline:
-        report.verdict === 'CRITICAL_MALWARE_RISK'
-          ? 'Critical Android Malware Risk Detected'
-          : report.verdict === 'SUSPICIOUS_RISK'
-          ? 'Suspicious Android Application'
-          : 'Clean Android Package',
-      summary: report.summary,
-      breakdown: report.detectedPermissions.map((p) => ({
-        ruleId: p.name,
-        label: `${p.riskDescription} (${p.category})`,
-        group: 'credential' as const,
-        rawPoints: p.points,
-        awardedPoints: p.points,
-        category: 'MALWARE_PERMISSION',
-        cappedByGroup: false,
-        explanation: p.trojanPattern,
-        evidence: [
-          {
-            ruleId: p.name,
-            ruleLabel: p.riskDescription,
-            group: 'credential' as const,
-            matchedText: p.name,
-            startIndex: 0,
-            endIndex: p.name.length,
-            negated: false,
-            category: 'MALWARE_PERMISSION',
-          },
-        ],
-      })),
-      unmatchedRules: [],
-      allEvidence: [],
-      activeEvidence: [],
-      negatedEvidence: [],
-      rawScore: report.overallScore,
-      advice: report.recommendations[0] || 'Inspect application before installation.',
-      floorApplied: report.overallScore >= 67,
-      metadata: {
-        characterCount: report.fileSizeBytes,
-        scannedAt: new Date().toISOString(),
-        engineVersion: '2.4.0-spotthescam',
-        totalChecksRun: 6,
-      },
-    };
-
-    currentResult = fakeScanResult;
-    updateScoreWidgets(fakeScanResult);
-
-    // 8. Save Scan in Private History
-    HistoryService.saveScan(`[APK Scan] ${report.appName} (${report.fileName})`, fakeScanResult);
-
-    // 9. Trigger Full-Screen Blinking Alarm (5–10s, 7s default)
-    if (report.overallScore >= 45) {
-      triggerScreenAlarm('RED', report.overallScore, 7);
-    } else if (report.overallScore >= 21) {
-      triggerScreenAlarm('YELLOW', report.overallScore, 7);
-    } else {
-      triggerScreenAlarm('GREEN', report.overallScore, 7);
-    }
-
-    // 10. Display Analysis Card & Scroll
-    analysisResultCard.style.display = 'flex';
-    analysisResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  async function handleApkFile(file: File) {
-    apkStatusNotice.style.display = 'block';
-    apkStatusNotice.className = 'ocr-status-notice ocr-loading';
-    apkStatusNotice.innerHTML = `⏳ Reading and analyzing APK package <code>${escapeHtml(file.name)}</code> (${(file.size / 1024).toFixed(1)} KB)...`;
-
-    try {
-      const buffer = await file.arrayBuffer();
-      const report = await inspectApkBuffer(buffer, file.name);
-      apkStatusNotice.className = 'ocr-status-notice ocr-success';
-      apkStatusNotice.innerHTML = `✓ APK inspection complete for <code>${escapeHtml(report.appName || report.fileName)}</code>. Displaying SpotTheScam security report.`;
-      await renderApkReport(report);
-    } catch (err: any) {
-      console.error('APK inspection failed:', err);
-      apkStatusNotice.className = 'ocr-status-notice ocr-error';
-      apkStatusNotice.innerHTML = `❌ Failed to inspect APK archive: ${escapeHtml(err.message || 'Invalid ZIP/APK structure')}`;
-    }
-  }
-
-  async function handleDemoApk(type: 'MALICIOUS_SBI_TROJAN' | 'BENIGN_CALCULATOR') {
-    apkStatusNotice.style.display = 'block';
-    apkStatusNotice.className = 'ocr-status-notice ocr-loading';
-    apkStatusNotice.innerHTML = `⏳ Generating and analyzing synthetic ${type === 'MALICIOUS_SBI_TROJAN' ? 'SBI Trojan APK' : 'Clean Calculator APK'} demo package...`;
-
-    try {
-      const buffer = await createDemoSampleApk(type);
-      const fileName = type === 'MALICIOUS_SBI_TROJAN' ? 'SBI_YONO_Update_v2.apk' : 'Simple_Calculator_v1.apk';
-      const report = await inspectApkBuffer(buffer, fileName);
-      apkStatusNotice.className = 'ocr-status-notice ocr-success';
-      apkStatusNotice.innerHTML = `✓ APK inspection complete for <code>${escapeHtml(report.appName)}</code>.`;
-      await renderApkReport(report);
-    } catch (err: any) {
-      console.error('Demo APK failed:', err);
-      apkStatusNotice.className = 'ocr-status-notice ocr-error';
-      apkStatusNotice.innerHTML = `❌ Failed demo APK generation: ${escapeHtml(err.message)}`;
-    }
-  }
-
-  btnBrowseApk?.addEventListener('click', () => apkFileInput?.click());
-  apkFileInput?.addEventListener('change', () => {
-    if (apkFileInput.files && apkFileInput.files[0]) {
-      handleApkFile(apkFileInput.files[0]);
-    }
-  });
-
-  apkDropZone?.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    apkDropZone.style.borderColor = 'var(--accent-red)';
-  });
-  apkDropZone?.addEventListener('dragleave', () => {
-    apkDropZone.style.borderColor = 'var(--border-color)';
-  });
-  apkDropZone?.addEventListener('drop', (e) => {
-    e.preventDefault();
-    apkDropZone.style.borderColor = 'var(--border-color)';
-    if (e.dataTransfer && e.dataTransfer.files[0]) {
-      handleApkFile(e.dataTransfer.files[0]);
-    }
-  });
-
-  btnApkDemoTrojan?.addEventListener('click', () => handleDemoApk('MALICIOUS_SBI_TROJAN'));
-  btnApkDemoClean?.addEventListener('click', () => handleDemoApk('BENIGN_CALCULATOR'));
-
-  // --------------------------------------------------------------------------
-  // VirusTotal Multi-Engine File & Hash Inspector Flow
-  // --------------------------------------------------------------------------
-  function switchVtSubtab(tabName: 'DETECTION' | 'DETAILS' | 'BEHAVIOR' | 'PROTOCOL') {
-    [vtTabDetection, vtTabDetails, vtTabBehavior, vtTabProtocol].forEach((btn) => btn?.classList.remove('active'));
-    [vtPanelDetection, vtPanelDetails, vtPanelBehavior, vtPanelProtocol].forEach((panel) => {
-      if (panel) panel.style.display = 'none';
-    });
-
-    if (tabName === 'DETECTION') {
-      vtTabDetection?.classList.add('active');
-      if (vtPanelDetection) vtPanelDetection.style.display = 'flex';
-    } else if (tabName === 'DETAILS') {
-      vtTabDetails?.classList.add('active');
-      if (vtPanelDetails) vtPanelDetails.style.display = 'flex';
-    } else if (tabName === 'BEHAVIOR') {
-      vtTabBehavior?.classList.add('active');
-      if (vtPanelBehavior) vtPanelBehavior.style.display = 'flex';
-    } else if (tabName === 'PROTOCOL') {
-      vtTabProtocol?.classList.add('active');
-      if (vtPanelProtocol) vtPanelProtocol.style.display = 'flex';
-    }
-  }
-
-  vtTabDetection?.addEventListener('click', () => switchVtSubtab('DETECTION'));
-  vtTabDetails?.addEventListener('click', () => switchVtSubtab('DETAILS'));
-  vtTabBehavior?.addEventListener('click', () => switchVtSubtab('BEHAVIOR'));
-  vtTabProtocol?.addEventListener('click', () => switchVtSubtab('PROTOCOL'));
-
-  async function renderVirusTotalReport(report: VirusTotalReport) {
-    if (!vtInspectorCard) return;
-
-    // 1. Hide other cards & reveal VT Inspector Card
-    if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
-    if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
-    if (apkInspectorCard) apkInspectorCard.style.display = 'none';
-    if (nciiInspectorCard) nciiInspectorCard.style.display = 'none';
-    vtInspectorCard.style.display = 'flex';
-
-    // 2. Populate Header & Detection Radial Meter
-    vtFileNameText.textContent = report.fileName;
-    vtFileMetaText.textContent = `${report.fileType} • ${(report.fileSizeBytes / 1024).toFixed(1)} KB • MIME: ${report.mimeType}`;
-    vtRatioScore.textContent = `${report.stats.malicious}`;
-    vtRatioTotal.textContent = `/ ${report.stats.totalEngines}`;
-
-    vtRatioCircle.className = 'vt-ratio-circle';
-    if (report.verdict === 'MALICIOUS') {
-      vtRatioCircle.classList.add('danger');
-      vtVerdictTitle.textContent = `${report.stats.detectionRatio} Security Vendors Flagged This File`;
-      vtVerdictTitle.style.color = '#b91c1c';
-      vtClassificationText.textContent = report.threatClassification || 'Malware Threat Detected';
-    } else if (report.verdict === 'SUSPICIOUS') {
-      vtRatioCircle.classList.add('warning');
-      vtVerdictTitle.textContent = `${report.stats.detectionRatio} Security Vendors Flagged As Suspicious`;
-      vtVerdictTitle.style.color = '#b45309';
-      vtClassificationText.textContent = report.threatClassification || 'Potentially Unwanted Application (PUA)';
-    } else {
-      vtRatioCircle.classList.add('clean');
-      vtVerdictTitle.textContent = `0 / ${report.stats.totalEngines} Security Vendors Flagged This File`;
-      vtVerdictTitle.style.color = '#15803d';
-      vtClassificationText.textContent = 'Clean Application — No Malicious Traits Found';
-    }
-
-    // 3. Populate Subtab 1: 72 Security Vendors Grid
-    vtVendorSummaryCounts.textContent = `${report.stats.malicious} Malicious • ${report.stats.suspicious} Suspicious • ${report.stats.clean} Undetected`;
-    vtVendorsGrid.innerHTML = report.vendorResults
-      .map(
-        (v) => `
-        <div class="vt-vendor-item">
-          <span class="vt-vendor-name" title="${escapeHtml(v.vendor)}">${escapeHtml(v.vendor)}</span>
-          <span class="vt-vendor-status ${v.category}">
-            ${
-              v.category === 'malicious'
-                ? `🟥 ${escapeHtml(v.result || 'Malicious')}`
-                : v.category === 'suspicious'
-                ? `🟨 ${escapeHtml(v.result || 'Suspicious')}`
-                : '🟩 Clean'
-            }
-          </span>
-        </div>
-      `
-      )
-      .join('');
-
-    // 4. Populate Subtab 2: Hashes, Magic, Entropy
-    vtMd5Text.textContent = report.hashes.md5;
-    vtSha1Text.textContent = report.hashes.sha1;
-    vtSha256Text.textContent = report.hashes.sha256;
-    vtFileTypeVal.textContent = report.fileType;
-    vtMagicVal.textContent = `Magic Header: ${report.magicHeader}`;
-
-    const entropyPercent = Math.min(100, (report.entropy.score / 8) * 100);
-    vtEntropyFill.style.width = `${entropyPercent}%`;
-    vtEntropyScoreVal.textContent = `${report.entropy.score.toFixed(2)} / 8.00 bits/byte`;
-    vtEntropyRatingVal.textContent =
-      report.entropy.rating === 'HIGH_PACKED'
-        ? 'HIGH (Packed / Encrypted)'
-        : report.entropy.rating === 'LOW'
-        ? 'LOW (Uniform/Sparse)'
-        : 'NORMAL (Unpacked)';
-    vtEntropyRatingVal.style.color =
-      report.entropy.rating === 'HIGH_PACKED'
-        ? '#dc2626'
-        : report.entropy.rating === 'LOW'
-        ? '#2563eb'
-        : '#16a34a';
-    vtEntropyExplainVal.textContent = report.entropy.explanation;
-
-    // 5. Populate Subtab 3: Behavior & Sandbox Indicators
-    if (report.behaviorSignals.length > 0) {
-      vtBehaviorSignalsList.innerHTML = report.behaviorSignals
-        .map(
-          (s) => `
-          <div class="apk-perm-item ${s.severity === 'HIGH' ? 'critical' : 'dangerous'}">
-            <div class="apk-perm-top">
-              <span class="apk-perm-name">${escapeHtml(s.title)}</span>
-              <span class="apk-perm-badge">${s.severity}</span>
-            </div>
-            <p class="apk-trojan-pattern">${escapeHtml(s.detail)}</p>
-          </div>
-        `
-        )
-        .join('');
-    } else {
-      vtBehaviorSignalsList.innerHTML = `
-        <div style="font-size: 0.85rem; color: #16a34a; padding: 6px 0;">
-          ✓ No dangerous behavioral API calls or process injection patterns detected.
-        </div>
-      `;
-    }
-
-    const networkCombined = [
-      ...report.extractedStrings.urls.map((u) => `URL: ${u}`),
-      ...report.extractedStrings.ips.map((ip) => `IP: ${ip}`),
-    ];
-    if (networkCombined.length > 0) {
-      vtNetworkList.innerHTML = networkCombined.map((n) => `<div>🔗 ${escapeHtml(n)}</div>`).join('');
-    } else {
-      vtNetworkList.innerHTML = '<span style="color: #16a34a;">✓ No external C2 IP addresses or remote endpoints extracted.</span>';
-    }
-
-    // 6. Populate Subtab 4: Safety Protocol
-    vtRecommendationsList.innerHTML = report.recommendations
-      .map((r) => `<li>${escapeHtml(r)}</li>`)
-      .join('');
-
-    // Default to Detection subtab
-    switchVtSubtab('DETECTION');
-
-    // 7. Sync with Score Donut & History
-    const calculatedScore = Math.min(100, Math.round((report.stats.malicious / report.stats.totalEngines) * 100));
-    const fakeScanResult: ScanResult = {
-      score: calculatedScore,
-      rawScore: calculatedScore,
-      riskLevel: report.riskLevel,
-      headline:
-        report.verdict === 'MALICIOUS'
-          ? `VirusTotal: ${report.stats.detectionRatio} Vendors Flagged Malware`
-          : report.verdict === 'SUSPICIOUS'
-          ? `VirusTotal: ${report.stats.detectionRatio} Vendors Flagged Suspicious`
-          : 'VirusTotal: 0/72 Clean Application',
-      summary: `${report.stats.detectionRatio} security vendors flagged this file. Entropy: ${report.entropy.score} bits/byte (${report.entropy.rating}).`,
-      advice: report.recommendations[0] || 'Inspect file before execution.',
-      breakdown: report.vendorResults
-        .filter((v) => v.category !== 'clean')
-        .slice(0, 10)
-        .map((v) => ({
-          ruleId: v.vendor,
-          label: `${v.vendor}: ${v.result || 'Threat Flag'}`,
-          group: 'credential' as const,
-          rawPoints: 10,
-          awardedPoints: 10,
-          category: 'VIRUSTOTAL_ENGINE',
-          cappedByGroup: false,
-          explanation: `Flagged by security vendor ${v.vendor}.`,
-          evidence: [
-            {
-              ruleId: v.vendor,
-              ruleLabel: v.vendor,
-              group: 'credential' as const,
-              matchedText: v.result || 'Threat',
-              startIndex: 0,
-              endIndex: (v.result || 'Threat').length,
-              negated: false,
-              category: 'VIRUSTOTAL_ENGINE',
-            },
-          ],
-        })),
-      unmatchedRules: [],
-      allEvidence: [],
-      activeEvidence: [],
-      negatedEvidence: [],
-      floorApplied: calculatedScore >= 45,
-      metadata: {
-        characterCount: report.fileSizeBytes,
-        scannedAt: new Date().toISOString(),
-        engineVersion: '2.4.0-virustotal',
-        totalChecksRun: report.stats.totalEngines,
-      },
-    };
-
-    currentResult = fakeScanResult;
-    updateScoreWidgets(fakeScanResult);
-
-    // Save to private local history
-    HistoryService.saveScan(`[VirusTotal] ${report.fileName}`, fakeScanResult);
-
-    // Trigger Blinking Alarm Overlay (7s)
-    if (calculatedScore >= 45) {
-      triggerScreenAlarm('RED', calculatedScore, 7);
-    } else if (calculatedScore >= 21) {
-      triggerScreenAlarm('YELLOW', calculatedScore, 7);
-    } else {
-      triggerScreenAlarm('GREEN', calculatedScore, 7);
-    }
-
-    // Reveal and scroll
-    analysisResultCard.style.display = 'flex';
-    analysisResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  async function handleVirusTotalFile(file: File) {
-    vtStatusNotice.style.display = 'block';
-    vtStatusNotice.className = 'ocr-status-notice ocr-loading';
-    vtStatusNotice.innerHTML = `⏳ Inspecting file <code>${escapeHtml(file.name)}</code> (${(file.size / 1024).toFixed(1)} KB) across 72 antivirus engines...`;
-
-    try {
-      const buffer = await file.arrayBuffer();
-      const report = await inspectFileVirusTotal(buffer, file.name);
-      vtStatusNotice.className = 'ocr-status-notice ocr-success';
-      vtStatusNotice.innerHTML = `✓ Multi-engine scan complete for <code>${escapeHtml(file.name)}</code> (${report.stats.detectionRatio} flagged).`;
-      await renderVirusTotalReport(report);
-    } catch (err: any) {
-      console.error('VirusTotal inspection failed:', err);
-      vtStatusNotice.className = 'ocr-status-notice ocr-error';
-      vtStatusNotice.innerHTML = `❌ Failed file inspection: ${escapeHtml(err.message || 'File read error')}`;
-    }
-  }
-
-  async function handleVirusTotalDemo(type: 'RANSOMWARE_PAYLOAD' | 'SUSPICIOUS_DROPPER' | 'CLEAN_TOOL') {
-    vtStatusNotice.style.display = 'block';
-    vtStatusNotice.className = 'ocr-status-notice ocr-loading';
-    vtStatusNotice.innerHTML = '⏳ Generating and analyzing synthetic VirusTotal test payload...';
-
-    try {
-      const { buffer, fileName } = createVirusTotalDemoBuffer(type);
-      const report = await inspectFileVirusTotal(buffer, fileName);
-      vtStatusNotice.className = 'ocr-status-notice ocr-success';
-      vtStatusNotice.innerHTML = `✓ Scan complete for <code>${escapeHtml(fileName)}</code> (${report.stats.detectionRatio} flagged).`;
-      await renderVirusTotalReport(report);
-    } catch (err: any) {
-      console.error('VirusTotal demo failed:', err);
-      vtStatusNotice.className = 'ocr-status-notice ocr-error';
-      vtStatusNotice.innerHTML = `❌ Failed demo generation: ${escapeHtml(err.message)}`;
-    }
-  }
-
-  async function handleVirusTotalHashSearch(hashQuery: string) {
-    const q = hashQuery.trim().toLowerCase();
-    if (!q) return;
-
-    vtStatusNotice.style.display = 'block';
-    vtStatusNotice.className = 'ocr-status-notice ocr-loading';
-    vtStatusNotice.innerHTML = `🔍 Querying threat intelligence database for hash <code>${escapeHtml(q)}</code>...`;
-
-    setTimeout(async () => {
-      const known = KNOWN_THREAT_HASHES[q];
-      if (known) {
-        // Construct report from verified threat match
-        const dummyBuffer = new TextEncoder().encode(`KNOWN_HASH_SAMPLE:${q}`).buffer as ArrayBuffer;
-        const report = await inspectFileVirusTotal(dummyBuffer, `${known.name}.bin`);
-        report.hashes.sha256 = q.length === 64 ? q : report.hashes.sha256;
-        report.hashes.md5 = q.length === 32 ? q : report.hashes.md5;
-        report.hashes.sha1 = q.length === 40 ? q : report.hashes.sha1;
-        report.threatClassification = known.classification;
-        report.stats.malicious = known.maliciousVendors;
-        report.stats.clean = SECURITY_VENDORS.length - known.maliciousVendors;
-        report.stats.detectionRatio = `${known.maliciousVendors} / ${SECURITY_VENDORS.length}`;
-        report.verdict = 'MALICIOUS';
-        report.riskLevel = 'HIGH';
-
-        vtStatusNotice.className = 'ocr-status-notice ocr-success';
-        vtStatusNotice.innerHTML = `✓ Threat match identified for hash: <strong>${escapeHtml(known.name)}</strong> (${known.maliciousVendors}/${SECURITY_VENDORS.length} vendors).`;
-        await renderVirusTotalReport(report);
-      } else {
-        // Hash not in known database
-        const dummyBuffer = new TextEncoder().encode(`HASH_INQUIRY:${q}`).buffer as ArrayBuffer;
-        const report = await inspectFileVirusTotal(dummyBuffer, `HashSearch_${q.slice(0, 8)}.dat`);
-        if (q.length === 64) report.hashes.sha256 = q;
-        if (q.length === 32) report.hashes.md5 = q;
-        if (q.length === 40) report.hashes.sha1 = q;
-
-        vtStatusNotice.className = 'ocr-status-notice ocr-success';
-        vtStatusNotice.innerHTML = `✓ Hash query evaluated: <code>${escapeHtml(q)}</code> (No verified public threat intelligence matches).`;
-        await renderVirusTotalReport(report);
-      }
-    }, 400);
-  }
-
-  // Copy mini-buttons inside VirusTotal Details
-  document.querySelectorAll('.vt-copy-mini-btn').forEach((btn) => {
-    btn.addEventListener('click', async (e) => {
-      const targetId = (e.currentTarget as HTMLElement).getAttribute('data-copy');
-      if (targetId) {
-        const el = document.getElementById(targetId);
-        if (el && el.textContent) {
-          try {
-            await navigator.clipboard.writeText(el.textContent);
-            const orig = (e.currentTarget as HTMLElement).textContent;
-            (e.currentTarget as HTMLElement).textContent = '✓';
-            setTimeout(() => {
-              (e.currentTarget as HTMLElement).textContent = orig;
-            }, 1500);
-          } catch {}
-        }
-      }
-    });
-  });
-
-  btnBrowseVtFile?.addEventListener('click', () => vtFileInput?.click());
-  vtFileInput?.addEventListener('change', () => {
-    if (vtFileInput.files && vtFileInput.files[0]) {
-      handleVirusTotalFile(vtFileInput.files[0]);
-    }
-  });
-
-  vtDropZone?.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    vtDropZone.style.borderColor = 'var(--accent-red)';
-  });
-  vtDropZone?.addEventListener('dragleave', () => {
-    vtDropZone.style.borderColor = 'var(--border-color)';
-  });
-  vtDropZone?.addEventListener('drop', (e) => {
-    e.preventDefault();
-    vtDropZone.style.borderColor = 'var(--border-color)';
-    if (e.dataTransfer && e.dataTransfer.files[0]) {
-      handleVirusTotalFile(e.dataTransfer.files[0]);
-    }
-  });
-
-  btnSearchVtHash?.addEventListener('click', () => {
-    handleVirusTotalHashSearch(vtHashSearchInput.value);
-  });
-  vtHashSearchInput?.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      e.preventDefault();
-      handleVirusTotalHashSearch(vtHashSearchInput.value);
-    }
-  });
-
-  btnVtDemoRansomware?.addEventListener('click', () => handleVirusTotalDemo('RANSOMWARE_PAYLOAD'));
-  btnVtDemoDropper?.addEventListener('click', () => handleVirusTotalDemo('SUSPICIOUS_DROPPER'));
-  btnVtDemoClean?.addEventListener('click', () => handleVirusTotalDemo('CLEAN_TOOL'));
-
-  // --------------------------------------------------------------------------
-  // AI-Generated Nude & NCII Deepfake Forensics Flow (Privacy Shield)
-  // --------------------------------------------------------------------------
-  let isNciiBlurred = true;
-
-  btnToggleNciiBlur?.addEventListener('click', () => {
-    isNciiBlurred = !isNciiBlurred;
-    if (isNciiBlurred) {
-      nciiBlurShield.style.display = 'flex';
-      nciiImagePreview.classList.add('blurred');
-      btnToggleNciiBlur.textContent = '👁️ Toggle Privacy Blur';
-    } else {
-      nciiBlurShield.style.display = 'none';
-      nciiImagePreview.classList.remove('blurred');
-      btnToggleNciiBlur.textContent = '🔒 Enable Privacy Shield';
-    }
-  });
-
-  function createDemoPreviewDataUrl(title: string, color: string, badge: string): string {
-    const canvas = document.createElement('canvas');
-    canvas.width = 480;
-    canvas.height = 480;
-    const ctx = canvas.getContext('2d');
-    if (ctx) {
-      ctx.fillStyle = '#0f172a';
-      ctx.fillRect(0, 0, 480, 480);
-
-      // Top color accent bar
-      const grad = ctx.createLinearGradient(0, 0, 480, 0);
-      grad.addColorStop(0, color);
-      grad.addColorStop(1, '#6366f1');
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, 480, 8);
-
-      // Icon & watermarking grid
-      ctx.font = '72px system-ui';
-      ctx.textAlign = 'center';
-      ctx.fillText('🔞', 240, 190);
-
-      ctx.font = 'bold 22px system-ui';
-      ctx.fillStyle = '#f8fafc';
-      ctx.fillText(title, 240, 245);
-
-      ctx.font = '14px system-ui';
-      ctx.fillStyle = '#94a3b8';
-      ctx.fillText(badge, 240, 280);
-
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
-      ctx.fillRect(40, 330, 400, 44);
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 1;
-      ctx.strokeRect(40, 330, 400, 44);
-
-      ctx.font = 'bold 12px monospace';
-      ctx.fillStyle = color;
-      ctx.fillText('FORENSIC LAB BENCHMARK SPECIMEN', 240, 357);
-    }
-    return canvas.toDataURL('image/png');
-  }
-
-  async function renderNciiReport(report: NciiFullAnalysisReport, previewDataUrl?: string) {
-    if (!nciiInspectorCard) return;
-
-    // 1. Hide other cards & reveal NCII Inspector Card
-    if (websiteInspectorCard) websiteInspectorCard.style.display = 'none';
-    if (scamArchetypeBanner) scamArchetypeBanner.style.display = 'none';
-    if (apkInspectorCard) apkInspectorCard.style.display = 'none';
-    if (vtInspectorCard) vtInspectorCard.style.display = 'none';
-    nciiInspectorCard.style.display = 'flex';
-
-    // 2. Populate Header & File Metadata
-    nciiFileNameText.textContent = report.fileName;
-    nciiFileMetaText.textContent = `${report.mimeType} • ${report.imageDimensions.width}x${report.imageDimensions.height} • ${(report.fileSizeBytes / 1024).toFixed(1)} KB`;
-    nciiSha256Text.textContent = report.sha256Hash;
-
-    // Badges
-    if (report.explicitScreening.isExplicitDetected) {
-      nciiExplicitBadge.className = 'ncii-status-pill danger';
-      nciiExplicitBadge.textContent = `🔞 Intimate Content (${report.explicitScreening.exposureScore}/100)`;
-    } else {
-      nciiExplicitBadge.className = 'ncii-status-pill safe';
-      nciiExplicitBadge.textContent = '🛡️ Non-Explicit Imagery';
-    }
-
-    if (report.aiGeneration.calibratedVerdict === 'HIGH_PROBABILITY_AI' || report.aiGeneration.isAiGenerated === true) {
-      nciiAiBadge.className = 'ncii-status-pill danger';
-      nciiAiBadge.textContent = `🤖 AI Generated (${report.aiGeneration.aiConfidenceScore}%)`;
-    } else if (report.aiGeneration.calibratedVerdict === 'INCONCLUSIVE' || report.aiGeneration.isAiGenerated === 'INCONCLUSIVE') {
-      nciiAiBadge.className = 'ncii-status-pill warning';
-      nciiAiBadge.textContent = '❔ AI Inconclusive';
-    } else {
-      nciiAiBadge.className = 'ncii-status-pill safe';
-      nciiAiBadge.textContent = '📷 Real Camera Optics';
-    }
-
-    if (report.manipulation.manipulationVerdict === 'SUSPECTED_DEEPFAKE_SWAP') {
-      nciiManipBadge.className = 'ncii-status-pill danger';
-      nciiManipBadge.textContent = `🎭 Suspected Face-Swap (${report.manipulation.manipulationScore}%)`;
-    } else if (report.manipulation.manipulationVerdict === 'LOCALIZED_ALTERATION') {
-      nciiManipBadge.className = 'ncii-status-pill warning';
-      nciiManipBadge.textContent = '✏️ Localized Editing';
-    } else if (report.manipulation.manipulationVerdict === 'INCONCLUSIVE') {
-      nciiManipBadge.className = 'ncii-status-pill warning';
-      nciiManipBadge.textContent = '❔ Manipulation Inconclusive';
-    } else {
-      nciiManipBadge.className = 'ncii-status-pill safe';
-      nciiManipBadge.textContent = '✅ Authentic Composition';
-    }
-
-    // 3. Privacy Shield & Image Preview
-    if (previewDataUrl) {
-      nciiImagePreview.src = previewDataUrl;
-      nciiImagePreview.style.display = 'block';
-    } else {
-      nciiImagePreview.src = createDemoPreviewDataUrl(report.fileName, '#6366f1', 'Image Inspection Specimen');
-      nciiImagePreview.style.display = 'block';
-    }
-
-    // Default to Privacy Blur for intimate protection
-    isNciiBlurred = true;
-    nciiBlurShield.style.display = 'flex';
-    nciiImagePreview.classList.add('blurred');
-    btnToggleNciiBlur.textContent = '👁️ Toggle Privacy Blur';
-
-    // 4. Dimension 1: AI-Generation Forensics
-    nciiAiVerdictPill.textContent =
-      report.aiGeneration.calibratedVerdict === 'HIGH_PROBABILITY_AI'
-        ? 'High Probability AI'
-        : report.aiGeneration.calibratedVerdict === 'PROBABLE_AI'
-        ? 'Probable AI'
-        : report.aiGeneration.calibratedVerdict === 'INCONCLUSIVE'
-        ? 'Inconclusive'
-        : 'Authentic Camera';
-    nciiAiVerdictPill.className = `dim-score-pill ${
-      report.aiGeneration.calibratedVerdict === 'HIGH_PROBABILITY_AI'
-        ? 'danger'
-        : report.aiGeneration.calibratedVerdict === 'INCONCLUSIVE'
-        ? 'warning'
-        : 'safe'
-    }`;
-    nciiAiSummaryText.textContent = `Confidence: ${report.aiGeneration.aiConfidenceScore}%. Calibrated evaluation on diffusion and GAN models.`;
-    nciiDermalVal.textContent = `${report.aiGeneration.dermalSmoothnessIndex} / 100 (${report.aiGeneration.dermalSmoothnessIndex > 70 ? 'Unnatural Smoothing' : 'Natural Cellular Grain'})`;
-    nciiSpectralVal.textContent = `${report.aiGeneration.frequencyDomainAnalysis.highFrequencyFalloff} dB (${report.aiGeneration.frequencyDomainAnalysis.spectralArtifactAnomaly ? 'Spectral Anomaly' : 'Normal Optical Roll-off'})`;
-    nciiFourierVal.textContent = `${report.aiGeneration.frequencyDomainAnalysis.fourierSymmetryScore} / 100`;
-    nciiAiSignaturesList.innerHTML = report.aiGeneration.generatorSignaturesDetected.map((sig) => `<li>${escapeHtml(sig)}</li>`).join('');
-    nciiAiLimitations.textContent = report.aiGeneration.limitationsNotice;
-
-    // 5. Dimension 2: Explicit Content Safety Screening
-    nciiExplicitVerdictPill.textContent = report.explicitScreening.isExplicitDetected ? 'Explicit Detected' : 'Non-Explicit';
-    nciiExplicitVerdictPill.className = `dim-score-pill ${report.explicitScreening.isExplicitDetected ? 'danger' : 'safe'}`;
-    nciiExplicitSummaryText.textContent = report.explicitScreening.recommendation;
-    nciiExposureScoreVal.textContent = `${report.explicitScreening.exposureScore} / 100`;
-    nciiSkinRatioVal.textContent = `${Math.round(report.explicitScreening.skinExposureRatio * 100)}% of Total Pixels`;
-    nciiRoutingVal.textContent = report.explicitScreening.privacyRouting === 'SHIELD_BLUR_APPLIED' ? 'Shield Blur Applied' : 'Safe Non-Explicit';
-    nciiRoutingVal.style.color = report.explicitScreening.privacyRouting === 'SHIELD_BLUR_APPLIED' ? '#dc2626' : '#16a34a';
-    nciiExplicitAnatomyList.innerHTML = report.explicitScreening.anatomicalRegionsDetected.map((r) => `<li>${escapeHtml(r)}</li>`).join('');
-
-    // 6. Dimension 3: Manipulation & Face-Swap
-    nciiManipVerdictPill.textContent =
-      report.manipulation.manipulationVerdict === 'SUSPECTED_DEEPFAKE_SWAP'
-        ? 'Suspected Deepfake'
-        : report.manipulation.manipulationVerdict === 'LOCALIZED_ALTERATION'
-        ? 'Altered Region'
-        : report.manipulation.manipulationVerdict === 'INCONCLUSIVE'
-        ? 'Inconclusive'
-        : 'Clean Composition';
-    nciiManipVerdictPill.className = `dim-score-pill ${
-      report.manipulation.manipulationVerdict === 'SUSPECTED_DEEPFAKE_SWAP'
-        ? 'danger'
-        : report.manipulation.manipulationVerdict === 'INCONCLUSIVE'
-        ? 'warning'
-        : 'safe'
-    }`;
-    nciiManipSummaryText.textContent = `Manipulation score: ${report.manipulation.manipulationScore}/100. Evaluates face-swap boundary seams, lighting, and compression levels.`;
-    nciiBoundaryVal.textContent = report.manipulation.faceSwapIndicators.boundaryBlendingArtifacts ? 'Anomalous Mask Edge' : 'Natural Boundary';
-    nciiColorMismatchVal.textContent = report.manipulation.faceSwapIndicators.colorTemperatureMismatch ? 'Discrepancy (+14%)' : 'Consistent Palettes';
-    nciiElaVal.textContent = `${report.manipulation.errorLevelAnalysis.compressionDiscrepancy}% Compression Divergence`;
-    nciiManipExplain.textContent =
-      report.manipulation.manipulationVerdict === 'SUSPECTED_DEEPFAKE_SWAP'
-        ? 'Strong evidence of composite head/face splicing. Distinct compression discrepancies between the facial region and background indicate a deepfake swap.'
-        : report.manipulation.manipulationVerdict === 'INCONCLUSIVE'
-        ? 'Compression artifacts prevent reliable seam detection.'
-        : 'No localized boundary blending or resaved block anomalies detected.';
-
-    // 7. Dimension 4: Provenance & C2PA Credentials
-    nciiProvVerdictPill.textContent = report.provenance.hasProvenanceCredentials ? 'Verified Origin' : 'Unsigned';
-    nciiProvVerdictPill.className = `dim-score-pill ${report.provenance.hasProvenanceCredentials ? 'safe' : 'warning'}`;
-    nciiProvSummaryText.textContent = report.provenance.provenanceSummary;
-    nciiC2paVal.textContent = report.provenance.c2paManifestFound ? `C2PA Manifest (${report.provenance.c2paClaimGenerator || 'Active'})` : 'None Present';
-    nciiExifVal.textContent = report.provenance.exifSoftwareTags.length > 0 ? report.provenance.exifSoftwareTags.join(', ') : 'None';
-    nciiWatermarkVal.textContent = report.provenance.watermarkDetected ? (report.provenance.watermarkType || 'Watermark Present') : 'None Detected';
-
-    // 8. Sync with Score Gauges & Original Message Section
-    let overallRiskScore = 15;
-    if (report.explicitScreening.isExplicitDetected && (report.aiGeneration.isAiGenerated === true || report.manipulation.isManipulated)) {
-      overallRiskScore = 92;
-    } else if (report.explicitScreening.isExplicitDetected) {
-      overallRiskScore = 75;
-    } else if (report.aiGeneration.isAiGenerated === true || report.manipulation.isManipulated) {
-      overallRiskScore = 70;
-    } else if (report.aiGeneration.isAiGenerated === 'INCONCLUSIVE' || report.manipulation.manipulationVerdict === 'INCONCLUSIVE') {
-      overallRiskScore = 45;
-    }
-
-    const fakeScanResult: ScanResult = {
-      score: overallRiskScore,
-      rawScore: overallRiskScore,
-      riskLevel: overallRiskScore >= 45 ? 'HIGH' : overallRiskScore >= 21 ? 'MEDIUM' : 'LOW',
-      headline: report.overallSummary,
-      summary: report.overallSummary,
-      advice: report.explicitScreening.isExplicitDetected
-        ? 'Do not redistribute potentially intimate imagery without consent. Use StopNCII.org or National Cyber Helpline 1930.'
-        : 'Image evaluated across tripartite forensics (Explicit screening, AI generation, and Manipulation).',
-      breakdown: [
-        {
-          ruleId: 'NCII_EXPLICIT_SCREENING',
-          label: `Explicit Content: ${report.explicitScreening.isExplicitDetected ? 'Intimate Exposure Detected' : 'Non-Explicit'}`,
-          group: 'pressure' as const,
-          rawPoints: report.explicitScreening.isExplicitDetected ? 35 : 0,
-          awardedPoints: report.explicitScreening.isExplicitDetected ? 35 : 0,
-          category: 'NCII_EXPLICIT',
-          cappedByGroup: false,
-          explanation: report.explicitScreening.recommendation,
-          evidence: [],
-        },
-        {
-          ruleId: 'NCII_AI_GENERATION',
-          label: `AI Forensics: ${report.aiGeneration.calibratedVerdict} (${report.aiGeneration.aiConfidenceScore}%)`,
-          group: 'credential' as const,
-          rawPoints: report.aiGeneration.isAiGenerated === true ? 35 : 0,
-          awardedPoints: report.aiGeneration.isAiGenerated === true ? 35 : 0,
-          category: 'AI_SYNTHETIC',
-          cappedByGroup: false,
-          explanation: report.aiGeneration.limitationsNotice,
-          evidence: [],
-        },
-        {
-          ruleId: 'NCII_MANIPULATION',
-          label: `Manipulation Forensics: ${report.manipulation.manipulationVerdict} (${report.manipulation.manipulationScore}%)`,
-          group: 'link' as const,
-          rawPoints: report.manipulation.isManipulated ? 30 : 0,
-          awardedPoints: report.manipulation.isManipulated ? 30 : 0,
-          category: 'DEEPFAKE_MANIPULATION',
-          cappedByGroup: false,
-          explanation: report.manipulation.errorLevelAnalysis.suspiciousResavedRegions ? 'ELA compression divergence detected' : 'Standard compression',
-          evidence: [],
-        },
-      ],
-      unmatchedRules: [],
-      allEvidence: [],
-      activeEvidence: [],
-      negatedEvidence: [],
-      floorApplied: overallRiskScore >= 45,
-      metadata: {
-        characterCount: report.fileSizeBytes,
-        scannedAt: new Date().toISOString(),
-        engineVersion: '2.4.0-ncii-forensics',
-        totalChecksRun: 4,
-      },
-    };
-
-    currentResult = fakeScanResult;
-    updateScoreWidgets(fakeScanResult);
-
-    // Sync Original Message box
-    highlightedTextBox.innerHTML = `
-      <div style="font-family: var(--font-mono); font-size: 0.82rem; background: var(--bg-card-subtle); padding: 10px; border-radius: 6px; line-height: 1.6;">
-        <strong>[AI-Generated Nude & NCII Forensics]</strong> ${escapeHtml(report.fileName)} (${(report.fileSizeBytes / 1024).toFixed(1)} KB)<br>
-        <strong>Dimensions:</strong> ${report.imageDimensions.width}x${report.imageDimensions.height} | <strong>MIME:</strong> <code>${escapeHtml(report.mimeType)}</code><br>
-        <strong>SHA-256 Fingerprint:</strong> <code>${escapeHtml(report.sha256Hash)}</code><br>
-        <span style="color: #16a34a;">🔒 ${escapeHtml(report.privacyNotice)}</span>
-      </div>
-    `;
-
-    warningSignsMount.innerHTML = fakeScanResult.breakdown
-      .filter((b) => b.awardedPoints > 0)
-      .map(
-        (b) => `
-        <div class="warning-sign-row">
-          <div class="sign-left-cluster">
-            <span class="sign-icon">🛡️</span>
-            <span class="sign-label">${escapeHtml(b.label)}</span>
-            <span class="sign-evidence-quote">"${escapeHtml(b.explanation)}"</span>
-          </div>
-          <span class="sign-points-badge">+${b.awardedPoints}</span>
-        </div>
-      `
-      )
-      .join('');
-
-    // Save scan to private history
-    HistoryService.saveScan(`[NCII Forensic Shield] ${report.fileName}`, fakeScanResult);
-
-    // Trigger full-screen blinking alarm (7s)
-    if (overallRiskScore >= 45) {
-      triggerScreenAlarm('RED', overallRiskScore, 7);
-    } else if (overallRiskScore >= 21) {
-      triggerScreenAlarm('YELLOW', overallRiskScore, 7);
-    } else {
-      triggerScreenAlarm('GREEN', overallRiskScore, 7);
-    }
-
-    // Scroll to results
-    analysisResultCard.style.display = 'flex';
-    analysisResultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-  }
-
-  async function handleNciiFile(file: File) {
-    nciiStatusNotice.style.display = 'block';
-    nciiStatusNotice.className = 'ocr-status-notice ocr-loading';
-    nciiStatusNotice.innerHTML = `⏳ Reading image <code>${escapeHtml(file.name)}</code> (${(file.size / 1024).toFixed(1)} KB) and running client-side multi-layer forensics...`;
-
-    try {
-      const buffer = new Uint8Array(await file.arrayBuffer());
-      let width = 1024;
-      let height = 1024;
-      let previewUrl = '';
-      try {
-        previewUrl = URL.createObjectURL(file);
-        const img = new Image();
-        img.src = previewUrl;
-        await new Promise<void>((resolve) => {
-          img.onload = () => {
-            width = img.width || 1024;
-            height = img.height || 1024;
-            resolve();
-          };
-          img.onerror = () => resolve();
-        });
-      } catch {}
-
-      const report = await NciiDetector.analyzeImage({
-        name: file.name,
-        size: file.size,
-        type: file.type || 'image/jpeg',
-        width,
-        height,
-        buffer,
-      });
-
-      const base64Data = await readBlobAsBase64(file);
-      nciiStatusNotice.className = 'ocr-status-notice ocr-success';
-      nciiStatusNotice.innerHTML = `✓ Forensic analysis complete for <code>${escapeHtml(file.name)}</code>. Four distinct dimensions evaluated.`;
-      await renderNciiReport(report, previewUrl);
-
-      // Purpose 4: Multimodal Forensics with Gemini
-      triggerGeminiNciiForensics(base64Data, file.type || 'image/jpeg');
-    } catch (err: any) {
-      console.error('NCII inspection failed:', err);
-      nciiStatusNotice.className = 'ocr-status-notice ocr-error';
-      nciiStatusNotice.innerHTML = `❌ Failed to inspect image: ${escapeHtml(err.message || 'Image decode error')}`;
-    }
-  }
-
-  async function handleNciiDemo(type: 'AI_DIFFUSION_NUDE' | 'DEEPFAKE_FACE_SWAP' | 'COMPRESSED_SUSPICIOUS' | 'CONSENTED_REAL_PHOTO') {
-    nciiStatusNotice.style.display = 'block';
-    nciiStatusNotice.className = 'ocr-status-notice ocr-loading';
-    nciiStatusNotice.innerHTML = '⏳ Initializing client-side forensic test specimen...';
-
-    try {
-      let fileName = '';
-      let previewTitle = '';
-      let previewColor = '';
-      let previewBadge = '';
-      let sampleSize = 420000;
-
-      if (type === 'AI_DIFFUSION_NUDE') {
-        fileName = 'ai_synth_leak_sample.png';
-        previewTitle = 'AI Diffusion Synthetic Nude';
-        previewColor = '#ef4444';
-        previewBadge = 'Stable Diffusion Latent VAE Signatures';
-        sampleSize = 512000;
-      } else if (type === 'DEEPFAKE_FACE_SWAP') {
-        fileName = 'deepfake_faceswap_video_frame.jpg';
-        previewTitle = 'Deepfake Face-Swap Composite';
-        previewColor = '#f59e0b';
-        previewBadge = 'Boundary Seam Blending & ELA Discrepancy';
-        sampleSize = 384000;
-      } else if (type === 'COMPRESSED_SUSPICIOUS') {
-        fileName = 'compressed_whatsapp_forward.jpg';
-        previewTitle = 'Degraded / Compressed Image';
-        previewColor = '#64748b';
-        previewBadge = 'Low PRNU Signal — Inconclusive State';
-        sampleSize = 128000;
-      } else {
-        fileName = 'authentic_portrait_camera.jpg';
-        previewTitle = 'Authentic Consented Photo';
-        previewColor = '#22c55e';
-        previewBadge = 'Natural Cellular Pore Grain & Glass Optics';
-        sampleSize = 840000;
-      }
-
-      const previewUrl = createDemoPreviewDataUrl(previewTitle, previewColor, previewBadge);
-      const dummyBuffer = new Uint8Array(2048);
-      for (let i = 0; i < dummyBuffer.length; i++) {
-        dummyBuffer[i] = (i * 37) % 256;
-      }
-
-      const report = await NciiDetector.analyzeImage({
-        name: fileName,
-        size: sampleSize,
-        type: fileName.endsWith('.png') ? 'image/png' : 'image/jpeg',
-        width: 1024,
-        height: 1024,
-        buffer: dummyBuffer,
-        mockCategory: type,
-      });
-
-      nciiStatusNotice.className = 'ocr-status-notice ocr-success';
-      nciiStatusNotice.innerHTML = `✓ Forensic test complete for <code>${escapeHtml(fileName)}</code>.`;
-      await renderNciiReport(report, previewUrl);
-      triggerGeminiNciiMockDemo(type);
-    } catch (err: any) {
-      console.error('NCII demo failed:', err);
-      nciiStatusNotice.className = 'ocr-status-notice ocr-error';
-      nciiStatusNotice.innerHTML = `❌ Failed demo generation: ${escapeHtml(err.message)}`;
-    }
-  }
-
-  async function triggerGeminiNciiForensics(base64Data: string, mimeType: string) {
-    if (!geminiNciiCard) return;
-
-    geminiNciiCard.style.display = 'flex';
-    if (geminiNciiVerdictBadge) {
-      geminiNciiVerdictBadge.className = 'gemini-verdict-badge';
-      geminiNciiVerdictBadge.textContent = 'ANALYZING...';
-    }
-    if (geminiNciiExplicitVal) geminiNciiExplicitVal.textContent = 'Screening...';
-    if (geminiNciiAiVal) geminiNciiAiVal.textContent = 'Analyzing Diffusion...';
-    if (geminiNciiManipVal) geminiNciiManipVal.textContent = 'Checking Splicing...';
-    if (geminiNciiArtifactsBox) geminiNciiArtifactsBox.style.display = 'none';
-    if (geminiNciiManipBox) geminiNciiManipBox.style.display = 'none';
-    if (geminiNciiTripartiteVerdict) {
-      geminiNciiTripartiteVerdict.textContent = 'Executing Google Gemini Multimodal Intimate Forensics...';
-    }
-    if (geminiNciiSafetyAdvice) {
-      geminiNciiSafetyAdvice.textContent = 'Validating forensic evidence across 3 distinct dimensions...';
-    }
-
-    try {
-      const g = await GeminiService.analyzeIntimateImageForensics(base64Data, mimeType);
-
-      if (geminiNciiExplicitVal) {
-        geminiNciiExplicitVal.textContent = g.explicitClassification;
-        geminiNciiExplicitVal.style.color = g.isExplicitDetected ? '#dc2626' : '#16a34a';
-      }
-
-      if (geminiNciiAiVal) {
-        if (g.isAiGenerated === true) {
-          geminiNciiAiVal.textContent = `DETECTED (${g.aiConfidenceScore}%)`;
-          geminiNciiAiVal.style.color = '#dc2626';
-        } else if (g.isAiGenerated === false) {
-          geminiNciiAiVal.textContent = 'FALSE (Natural)';
-          geminiNciiAiVal.style.color = '#16a34a';
-        } else {
-          geminiNciiAiVal.textContent = 'INCONCLUSIVE';
-          geminiNciiAiVal.style.color = '#d97706';
-        }
-      }
-
-      if (geminiNciiManipVal) {
-        if (g.isManipulated === true) {
-          geminiNciiManipVal.textContent = `MANIPULATION (${g.manipulationScore}%)`;
-          geminiNciiManipVal.style.color = '#dc2626';
-        } else if (g.isManipulated === false) {
-          geminiNciiManipVal.textContent = 'CLEAN';
-          geminiNciiManipVal.style.color = '#16a34a';
-        } else {
-          geminiNciiManipVal.textContent = 'INCONCLUSIVE';
-          geminiNciiManipVal.style.color = '#d97706';
-        }
-      }
-
-      const isThreat = g.isExplicitDetected && (g.isAiGenerated === true || g.isManipulated === true);
-      if (geminiNciiVerdictBadge) {
-        geminiNciiVerdictBadge.className = `gemini-verdict-badge ${isThreat ? 'scam' : g.isExplicitDetected || g.isAiGenerated === true ? 'suspicious' : 'safe'}`;
-        geminiNciiVerdictBadge.textContent = isThreat
-          ? 'AI INTIMATE IMAGE'
-          : g.isManipulated === true
-          ? 'DEEPFAKE DETECTED'
-          : g.isAiGenerated === true
-          ? 'AI GENERATED'
-          : 'AUTHENTIC';
-      }
-
-      if (geminiNciiArtifactsBox && geminiNciiArtifactsList) {
-        if (g.aiArtifacts && g.aiArtifacts.length > 0) {
-          geminiNciiArtifactsBox.style.display = 'block';
-          geminiNciiArtifactsList.innerHTML = g.aiArtifacts.map((a) => `<li>🔍 ${escapeHtml(a)}</li>`).join('');
-        } else {
-          geminiNciiArtifactsBox.style.display = 'none';
-        }
-      }
-
-      if (geminiNciiManipBox && geminiNciiManipList) {
-        if (g.manipulationTechniques && g.manipulationTechniques.length > 0) {
-          geminiNciiManipBox.style.display = 'block';
-          geminiNciiManipList.innerHTML = g.manipulationTechniques.map((m) => `<li>🎭 ${escapeHtml(m)}</li>`).join('');
-        } else {
-          geminiNciiManipBox.style.display = 'none';
-        }
-      }
-
-      if (geminiNciiTripartiteVerdict) {
-        geminiNciiTripartiteVerdict.textContent = g.tripartiteVerdict || 'Tripartite evaluation complete.';
-      }
-      if (geminiNciiSafetyAdvice) {
-        geminiNciiSafetyAdvice.textContent = g.safetyAdvice || 'Do not share unverified intimate images. Report non-consensual imagery to 1930 / StopNCII.org.';
-      }
-    } catch (err) {
-      console.warn('Gemini NCII forensics fallback:', err);
-    }
-  }
-
-  function triggerGeminiNciiMockDemo(type: string) {
-    if (!geminiNciiCard) return;
-    geminiNciiCard.style.display = 'flex';
-
-    if (type === 'AI_DIFFUSION_NUDE') {
-      if (geminiNciiVerdictBadge) {
-        geminiNciiVerdictBadge.className = 'gemini-verdict-badge scam';
-        geminiNciiVerdictBadge.textContent = 'AI INTIMATE IMAGE';
-      }
-      if (geminiNciiExplicitVal) {
-        geminiNciiExplicitVal.textContent = 'EXPLICIT_INTIMATE';
-        geminiNciiExplicitVal.style.color = '#dc2626';
-      }
-      if (geminiNciiAiVal) {
-        geminiNciiAiVal.textContent = 'DETECTED (96%)';
-        geminiNciiAiVal.style.color = '#dc2626';
-      }
-      if (geminiNciiManipVal) {
-        geminiNciiManipVal.textContent = 'CLEAN (Full Synthesis)';
-        geminiNciiManipVal.style.color = '#16a34a';
-      }
-
-      if (geminiNciiArtifactsBox && geminiNciiArtifactsList) {
-        geminiNciiArtifactsBox.style.display = 'block';
-        geminiNciiArtifactsList.innerHTML = `
-          <li>🔍 High-frequency spectral roll-off characteristic of latent VAE decoder (-31.2 dB)</li>
-          <li>🔍 Anatomical dermal texture uniformity exceeding human photographic variance (94/100)</li>
-          <li>🔍 Sub-surface light scattering divergence on torso perimeter</li>
-        `;
-      }
-      if (geminiNciiManipBox) geminiNciiManipBox.style.display = 'none';
-      if (geminiNciiTripartiteVerdict) {
-        geminiNciiTripartiteVerdict.textContent = 'AI-Generated Intimate Imagery: Complete synthetic diffusion generation detected with high confidence.';
-      }
-      if (geminiNciiSafetyAdvice) {
-        geminiNciiSafetyAdvice.textContent = 'Do not circulate. Deepfake intimate images violate IT Act Sec 66E / 67A. Hash via StopNCII.org.';
-      }
-    } else if (type === 'DEEPFAKE_FACE_SWAP') {
-      if (geminiNciiVerdictBadge) {
-        geminiNciiVerdictBadge.className = 'gemini-verdict-badge scam';
-        geminiNciiVerdictBadge.textContent = 'DEEPFAKE DETECTED';
-      }
-      if (geminiNciiExplicitVal) {
-        geminiNciiExplicitVal.textContent = 'EXPLICIT_INTIMATE';
-        geminiNciiExplicitVal.style.color = '#dc2626';
-      }
-      if (geminiNciiAiVal) {
-        geminiNciiAiVal.textContent = 'INCONCLUSIVE';
-        geminiNciiAiVal.style.color = '#d97706';
-      }
-      if (geminiNciiManipVal) {
-        geminiNciiManipVal.textContent = 'MANIPULATION (91%)';
-        geminiNciiManipVal.style.color = '#dc2626';
-      }
-
-      if (geminiNciiArtifactsBox) geminiNciiArtifactsBox.style.display = 'none';
-      if (geminiNciiManipBox && geminiNciiManipList) {
-        geminiNciiManipBox.style.display = 'block';
-        geminiNciiManipList.innerHTML = `
-          <li>🎭 Facial boundary mask feathering anomaly around jawline and hairline</li>
-          <li>🎭 Error Level Analysis (ELA) divergence (+42.6% compression delta between face and torso)</li>
-          <li>🎭 Chromatic aberration and color temperature shift (+14%) on head composite</li>
-        `;
-      }
-      if (geminiNciiTripartiteVerdict) {
-        geminiNciiTripartiteVerdict.textContent = 'Deepfake Face-Swap Composite: Real anatomical torso spliced with donor head using autoencoder swap.';
-      }
-      if (geminiNciiSafetyAdvice) {
-        geminiNciiSafetyAdvice.textContent = 'File immediate preservation request with cyber police helpline 1930 and submit hash to Take It Down / StopNCII.';
-      }
-    } else if (type === 'COMPRESSED_SUSPICIOUS') {
-      if (geminiNciiVerdictBadge) {
-        geminiNciiVerdictBadge.className = 'gemini-verdict-badge suspicious';
-        geminiNciiVerdictBadge.textContent = 'INCONCLUSIVE';
-      }
-      if (geminiNciiExplicitVal) {
-        geminiNciiExplicitVal.textContent = 'SUGGESTIVE';
-        geminiNciiExplicitVal.style.color = '#d97706';
-      }
-      if (geminiNciiAiVal) {
-        geminiNciiAiVal.textContent = 'INCONCLUSIVE (Heavy JPEG Recompression)';
-        geminiNciiAiVal.style.color = '#d97706';
-      }
-      if (geminiNciiManipVal) {
-        geminiNciiManipVal.textContent = 'INCONCLUSIVE';
-        geminiNciiManipVal.style.color = '#d97706';
-      }
-
-      if (geminiNciiArtifactsBox) geminiNciiArtifactsBox.style.display = 'none';
-      if (geminiNciiManipBox) geminiNciiManipBox.style.display = 'none';
-      if (geminiNciiTripartiteVerdict) {
-        geminiNciiTripartiteVerdict.textContent = 'Low-Resolution Inconclusive: Repeated social media forwarding stripped high-frequency PRNU forensic cues.';
-      }
-      if (geminiNciiSafetyAdvice) {
-        geminiNciiSafetyAdvice.textContent = 'Obtain uncompressed original container (e.g. direct camera upload or RAW file) for definitive forensics.';
-      }
-    } else {
-      if (geminiNciiVerdictBadge) {
-        geminiNciiVerdictBadge.className = 'gemini-verdict-badge safe';
-        geminiNciiVerdictBadge.textContent = 'AUTHENTIC';
-      }
-      if (geminiNciiExplicitVal) {
-        geminiNciiExplicitVal.textContent = 'NON_EXPLICIT';
-        geminiNciiExplicitVal.style.color = '#16a34a';
-      }
-      if (geminiNciiAiVal) {
-        geminiNciiAiVal.textContent = 'FALSE (Organic Optics)';
-        geminiNciiAiVal.style.color = '#16a34a';
-      }
-      if (geminiNciiManipVal) {
-        geminiNciiManipVal.textContent = 'CLEAN';
-        geminiNciiManipVal.style.color = '#16a34a';
-      }
-
-      if (geminiNciiArtifactsBox) geminiNciiArtifactsBox.style.display = 'none';
-      if (geminiNciiManipBox) geminiNciiManipBox.style.display = 'none';
-      if (geminiNciiTripartiteVerdict) {
-        geminiNciiTripartiteVerdict.textContent = 'Authentic Natural Capture: Natural sensor noise, optical glass bokeh, and organic skin pore grain verified.';
-      }
-      if (geminiNciiSafetyAdvice) {
-        geminiNciiSafetyAdvice.textContent = 'No synthetic manipulation or non-consensual indicators detected.';
-      }
-    }
-  }
-
-  btnBrowseNciiFile?.addEventListener('click', () => nciiFileInput?.click());
-  nciiFileInput?.addEventListener('change', () => {
-    if (nciiFileInput.files && nciiFileInput.files[0]) {
-      handleNciiFile(nciiFileInput.files[0]);
-    }
-  });
-
-  nciiDropZone?.addEventListener('dragover', (e) => {
-    e.preventDefault();
-    nciiDropZone.style.borderColor = 'var(--accent-red)';
-  });
-  nciiDropZone?.addEventListener('dragleave', () => {
-    nciiDropZone.style.borderColor = 'var(--border-color)';
-  });
-  nciiDropZone?.addEventListener('drop', (e) => {
-    e.preventDefault();
-    nciiDropZone.style.borderColor = 'var(--border-color)';
-    if (e.dataTransfer && e.dataTransfer.files[0]) {
-      handleNciiFile(e.dataTransfer.files[0]);
-    }
-  });
-
-  btnNciiDemoDiffusion?.addEventListener('click', () => handleNciiDemo('AI_DIFFUSION_NUDE'));
-  btnNciiDemoFaceSwap?.addEventListener('click', () => handleNciiDemo('DEEPFAKE_FACE_SWAP'));
-  btnNciiDemoCompressed?.addEventListener('click', () => handleNciiDemo('COMPRESSED_SUSPICIOUS'));
-  btnNciiDemoClean?.addEventListener('click', () => handleNciiDemo('CONSENTED_REAL_PHOTO'));
 
   textarea.addEventListener('paste', (e: ClipboardEvent) => {
     if (e.clipboardData && e.clipboardData.items) {
@@ -2877,11 +1559,7 @@ export function initApp() {
           e.preventDefault();
           const file = item.getAsFile();
           if (file) {
-            if (activeTab === 'NCII') {
-              handleNciiFile(file);
-            } else {
-              handleOcrFile(file);
-            }
+            handleOcrFile(file);
           }
           break;
         }
@@ -2899,8 +1577,7 @@ export function initApp() {
   closeDashboardModal?.addEventListener('click', () => dashboardModal.classList.remove('open'));
 
   menuHistory?.addEventListener('click', () => {
-    renderHistoryList();
-    historyModal.classList.add('open');
+    showWorkspaceSubview('subviewHistory');
   });
   closeHistoryModal?.addEventListener('click', () => historyModal.classList.remove('open'));
 
@@ -2915,6 +1592,12 @@ export function initApp() {
     const tierButtons = pricingMount.querySelectorAll('.tier-btn');
     tierButtons.forEach((btn) => {
       btn.addEventListener('click', (e) => {
+        if (!AuthService.isAuthenticated()) {
+          pricingModal.classList.remove('open');
+          router.navigate('login');
+          return;
+        }
+
         const targetBtn = e.currentTarget as HTMLElement;
         const tierId = targetBtn.getAttribute('data-tier');
 
@@ -2940,21 +1623,344 @@ export function initApp() {
   closePricingModal?.addEventListener('click', () => pricingModal.classList.remove('open'));
 
   menuReport?.addEventListener('click', () => {
-    reportSuccess.style.display = 'none';
-    reportForm.reset();
-    reportModal.classList.add('open');
+    showWorkspaceSubview('subviewReport');
   });
   closeReportModal?.addEventListener('click', () => reportModal.classList.remove('open'));
 
-  menuLearn?.addEventListener('click', () => learnModal.classList.add('open'));
+  menuLearn?.addEventListener('click', () => {
+    showWorkspaceSubview('subviewLearn');
+  });
   navHowItWorks?.addEventListener('click', (e) => {
     e.preventDefault();
-    learnModal.classList.add('open');
+    showWorkspaceSubview('subviewLearn');
   });
   closeLearnModal?.addEventListener('click', () => learnModal.classList.remove('open'));
 
+  // Technical Forensic Details Accordion Toggle
+  const btnToggleTechDetails = document.getElementById('btnToggleTechDetails') as HTMLButtonElement | null;
+  const techDetailsAccordion = document.getElementById('techDetailsAccordion') as HTMLElement | null;
+  const accordionArrow = document.getElementById('accordionArrow') as HTMLElement | null;
+
+  btnToggleTechDetails?.addEventListener('click', () => {
+    if (!techDetailsAccordion) return;
+    const isVisible = techDetailsAccordion.style.display === 'flex' || techDetailsAccordion.style.display === 'block';
+    if (isVisible) {
+      techDetailsAccordion.style.display = 'none';
+      if (accordionArrow) accordionArrow.textContent = '▾';
+    } else {
+      techDetailsAccordion.style.display = 'flex';
+      if (accordionArrow) accordionArrow.textContent = '▴';
+    }
+  });
+
+
+
+  
+  // Auth DOM Elements
+  const authModal = document.getElementById('authModal') as HTMLElement;
+  const closeAuthModal = document.getElementById('closeAuthModal') as HTMLButtonElement;
+  const btnOpenAuthModal = document.getElementById('btnOpenAuthModal') as HTMLButtonElement;
+  const btnTabLogin = document.getElementById('btnTabLogin') as HTMLButtonElement;
+  const btnTabSignup = document.getElementById('btnTabSignup') as HTMLButtonElement;
+  const formLogin = document.getElementById('formLogin') as HTMLFormElement;
+  const formSignup = document.getElementById('formSignup') as HTMLFormElement;
+  const loginEmail = document.getElementById('loginEmail') as HTMLInputElement;
+  const loginPassword = document.getElementById('loginPassword') as HTMLInputElement;
+  const signupName = document.getElementById('signupName') as HTMLInputElement;
+  const signupEmail = document.getElementById('signupEmail') as HTMLInputElement;
+  const signupPassword = document.getElementById('signupPassword') as HTMLInputElement;
+  const loginError = document.getElementById('loginError') as HTMLElement;
+  const signupError = document.getElementById('signupError') as HTMLElement;
+  const userProfileBadge = document.getElementById('userProfileBadge') as HTMLElement;
+  const userAvatarIcon = document.getElementById('userAvatarIcon') as HTMLElement;
+  const userDisplayName = document.getElementById('userDisplayName') as HTMLElement;
+  const btnLogout = document.getElementById('btnLogout') as HTMLButtonElement;
+
+  // --------------------------------------------------------------------------
+  // 5-Minute Guest Mode Countdown Timer & Tab Restrictions
+  // --------------------------------------------------------------------------
+  let guestTimerInterval: any = null;
+
+  function startGuestTimer() {
+    if (AuthService.isAuthenticated()) {
+      stopGuestTimer();
+      return;
+    }
+
+    const secLeft = AuthService.initOrGetGuestExpiry();
+    if (secLeft <= 0) {
+      stopGuestTimer();
+      alert('⏱️ Your 5-minute guest session has already expired.\n\nPlease sign in or create an account to continue using Scam Spotter without time restrictions.');
+      router.navigate('login');
+      return;
+    }
+
+    const timerBar = document.getElementById('guestSessionTimerBar');
+    const timerCount = document.getElementById('guestTimerCount');
+    if (timerBar) timerBar.style.display = 'flex';
+
+    if (guestTimerInterval) return;
+
+    function renderTime(seconds: number) {
+      if (!timerCount) return;
+      const valid = Math.max(0, seconds);
+      const m = Math.floor(valid / 60);
+      const s = valid % 60;
+      timerCount.textContent = `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
+      if (valid <= 60) {
+        timerCount.classList.add('urgent-pulse');
+      } else {
+        timerCount.classList.remove('urgent-pulse');
+      }
+    }
+
+    renderTime(secLeft);
+
+    guestTimerInterval = setInterval(() => {
+      if (AuthService.isAuthenticated()) {
+        stopGuestTimer();
+        return;
+      }
+
+      const remaining = AuthService.getGuestRemainingSeconds();
+      if (remaining <= 0) {
+        stopGuestTimer();
+        if (textarea) textarea.value = '';
+        if (urlInput) urlInput.value = '';
+        updateInputMetrics();
+        resetScoreWidgets();
+        if (analysisResultCard) analysisResultCard.style.display = 'none';
+        if (screenAlarmOverlay) screenAlarmOverlay.style.display = 'none';
+
+        alert('⏱️ Guest session expired (5-minute limit reached).\n\nPlease sign in or create an account to continue using Scam Spotter without time restrictions and save your scans.');
+        router.navigate('login');
+        return;
+      }
+
+      renderTime(remaining);
+    }, 1000);
+  }
+
+  function stopGuestTimer() {
+    if (guestTimerInterval) {
+      clearInterval(guestTimerInterval);
+      guestTimerInterval = null;
+    }
+    const timerBar = document.getElementById('guestSessionTimerBar');
+    if (timerBar) timerBar.style.display = 'none';
+    const timerCount = document.getElementById('guestTimerCount');
+    if (timerCount) {
+      timerCount.textContent = '05:00';
+      timerCount.classList.remove('urgent-pulse');
+    }
+  }
+
+  function updateGuestModeUi() {
+    const isAuth = AuthService.isAuthenticated();
+    const lockBadgeLink = document.getElementById('lockBadgeLink');
+    const lockBadgeImage = document.getElementById('lockBadgeImage');
+    const lockedBanner = document.getElementById('guestLockedFeatureBanner');
+
+    if (!isAuth) {
+      if (lockBadgeLink) lockBadgeLink.style.display = 'inline-flex';
+      if (lockBadgeImage) lockBadgeImage.style.display = 'inline-flex';
+
+      // 1. Physically & visually disable URL Link tab
+      if (tabScanLink) {
+        tabScanLink.disabled = true;
+        tabScanLink.style.pointerEvents = 'none';
+        tabScanLink.style.cursor = 'not-allowed';
+        tabScanLink.style.opacity = '0.35';
+        tabScanLink.classList.remove('active');
+        tabScanLink.classList.add('guest-locked');
+        tabScanLink.setAttribute('aria-disabled', 'true');
+        tabScanLink.setAttribute('title', 'URL Analysis is locked for Guests. Please Sign In.');
+      }
+
+      // 2. Physically & visually disable Upload Image / QR tab
+      if (tabUploadImage) {
+        tabUploadImage.disabled = true;
+        tabUploadImage.style.pointerEvents = 'none';
+        tabUploadImage.style.cursor = 'not-allowed';
+        tabUploadImage.style.opacity = '0.35';
+        tabUploadImage.classList.remove('active');
+        tabUploadImage.classList.add('guest-locked');
+        tabUploadImage.setAttribute('aria-disabled', 'true');
+        tabUploadImage.setAttribute('title', 'Image / QR Analysis is locked for Guests. Please Sign In.');
+      }
+
+      // 3. Disable sidebar scanning items for link & image
+      if (menuScanLink) {
+        menuScanLink.disabled = true;
+        menuScanLink.style.pointerEvents = 'none';
+        menuScanLink.style.opacity = '0.35';
+        menuScanLink.classList.remove('active');
+      }
+      if (menuScanImage) {
+        menuScanImage.disabled = true;
+        menuScanImage.style.pointerEvents = 'none';
+        menuScanImage.style.opacity = '0.35';
+        menuScanImage.classList.remove('active');
+      }
+
+      // 4. Force Text tab ONLY
+      activeTab = 'TEXT';
+      tabTextMessage?.classList.add('active');
+      menuScanMessage?.classList.add('active');
+      if (panelTextMessage) panelTextMessage.style.display = 'block';
+      if (panelScanLink) panelScanLink.style.display = 'none';
+      if (panelUploadImage) panelUploadImage.style.display = 'none';
+
+      if (router.getRoute() === 'workspace') {
+        startGuestTimer();
+      }
+    } else {
+      if (lockBadgeLink) lockBadgeLink.style.display = 'none';
+      if (lockBadgeImage) lockBadgeImage.style.display = 'none';
+
+      if (tabScanLink) {
+        tabScanLink.disabled = false;
+        tabScanLink.style.pointerEvents = '';
+        tabScanLink.style.cursor = '';
+        tabScanLink.style.opacity = '';
+        tabScanLink.removeAttribute('aria-disabled');
+        tabScanLink.classList.remove('guest-locked');
+        tabScanLink.removeAttribute('title');
+      }
+      if (tabUploadImage) {
+        tabUploadImage.disabled = false;
+        tabUploadImage.style.pointerEvents = '';
+        tabUploadImage.style.cursor = '';
+        tabUploadImage.style.opacity = '';
+        tabUploadImage.removeAttribute('aria-disabled');
+        tabUploadImage.classList.remove('guest-locked');
+        tabUploadImage.removeAttribute('title');
+      }
+
+      if (menuScanLink) {
+        menuScanLink.disabled = false;
+        menuScanLink.style.pointerEvents = '';
+        menuScanLink.style.opacity = '';
+      }
+      if (menuScanImage) {
+        menuScanImage.disabled = false;
+        menuScanImage.style.pointerEvents = '';
+        menuScanImage.style.opacity = '';
+      }
+
+      if (lockedBanner) lockedBanner.style.display = 'none';
+      stopGuestTimer();
+    }
+  }
+
+  document.getElementById('btnDismissLockedBanner')?.addEventListener('click', () => {
+    const banner = document.getElementById('guestLockedFeatureBanner');
+    if (banner) banner.style.display = 'none';
+  });
+
+  window.addEventListener('route-changed', (e: any) => {
+    if (e.detail?.route === 'workspace') {
+      updateGuestModeUi();
+    } else {
+      stopGuestTimer();
+    }
+  });
+
+  function updateAuthUi() {
+    const isAuth = AuthService.isAuthenticated();
+    const user = AuthService.getUser();
+    if (isAuth && user && userProfileBadge && btnOpenAuthModal) {
+      btnOpenAuthModal.style.display = 'none';
+      userProfileBadge.style.display = 'flex';
+      if (userDisplayName) userDisplayName.textContent = user.name.split(' ')[0] || user.name;
+      if (userAvatarIcon) userAvatarIcon.textContent = (user.name[0] || 'U').toUpperCase();
+    } else {
+      if (btnOpenAuthModal) btnOpenAuthModal.style.display = 'block';
+      if (userProfileBadge) userProfileBadge.style.display = 'none';
+    }
+    updateGuestModeUi();
+  }
+
+  // Check existing session
+  AuthService.verifySession().then(() => updateAuthUi());
+
+  window.addEventListener('auth-state-changed', () => {
+    updateAuthUi();
+    renderHistoryList();
+  });
+
+  btnOpenAuthModal?.addEventListener('click', () => {
+    router.navigate('login');
+  });
+
+  closeAuthModal?.addEventListener('click', () => authModal.classList.remove('open'));
+
+  btnTabLogin?.addEventListener('click', () => {
+    btnTabLogin.classList.add('active');
+    btnTabSignup.classList.remove('active');
+    formLogin.style.display = 'flex';
+    formSignup.style.display = 'none';
+    loginError.style.display = 'none';
+  });
+
+  btnTabSignup?.addEventListener('click', () => {
+    btnTabSignup.classList.add('active');
+    btnTabLogin.classList.remove('active');
+    formSignup.style.display = 'flex';
+    formLogin.style.display = 'none';
+    signupError.style.display = 'none';
+  });
+
+  formLogin?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.style.display = 'none';
+    const email = loginEmail.value.trim();
+    const pw = loginPassword.value;
+    try {
+      await AuthService.login(email, pw);
+      updateAuthUi();
+      authModal.classList.remove('open');
+      renderHistoryList();
+    } catch (err: any) {
+      loginError.textContent = err.message || 'Login failed.';
+      loginError.style.display = 'block';
+    }
+  });
+
+  formSignup?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    signupError.style.display = 'none';
+    const name = signupName.value.trim();
+    const email = signupEmail.value.trim();
+    const pw = signupPassword.value;
+    try {
+      await AuthService.signup(name, email, pw);
+      updateAuthUi();
+      authModal.classList.remove('open');
+      renderHistoryList();
+    } catch (err: any) {
+      signupError.textContent = err.message || 'Signup failed.';
+      signupError.style.display = 'block';
+    }
+  });
+
+  btnLogout?.addEventListener('click', async () => {
+    stopGuestTimer();
+    await AuthService.logout();
+    HistoryService.clearHistory();
+    if (textarea) textarea.value = '';
+    if (urlInput) urlInput.value = '';
+    updateInputMetrics();
+    resetScoreWidgets();
+    if (analysisResultCard) analysisResultCard.style.display = 'none';
+    if (screenAlarmOverlay) screenAlarmOverlay.style.display = 'none';
+    updateAuthUi();
+    renderHistoryList();
+    router.navigate('login');
+  });
+
   // Close modals on backdrop click
-  [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal].forEach((m) => {
+  [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal, authModal].forEach((m) => {
     m?.addEventListener('click', (e) => {
       if (e.target === m) m.classList.remove('open');
     });
@@ -2964,17 +1970,33 @@ export function initApp() {
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       dismissScreenAlarm();
-      [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal].forEach((m) =>
+      [dashboardModal, threatDbModal, evalModal, historyModal, pricingModal, reportModal, learnModal, authModal].forEach((m) =>
         m?.classList.remove('open')
       );
     }
   });
 
+
   // --------------------------------------------------------------------------
   // History List Management
   // --------------------------------------------------------------------------
-  function renderHistoryList() {
-    const list = HistoryService.getHistory();
+  async function renderHistoryList() {
+    if (!AuthService.isAuthenticated()) {
+      historyListMount.innerHTML = `
+        <div class="auth-history-lock-card">
+          <div class="lock-icon">🔒</div>
+          <h4>Scan History Locked</h4>
+          <p>Sign in to your analyst account to securely store, synchronize across devices, and audit all your previous forensic scans.</p>
+          <button id="btnHistoryLockLogin" class="btn-auth-submit" type="button" style="display: inline-block; padding: 10px 22px; font-size: 0.9rem; margin-top: 6px;">Sign In to View History →</button>
+        </div>
+      `;
+      document.getElementById('btnHistoryLockLogin')?.addEventListener('click', () => {
+        router.navigate('login');
+      });
+      return;
+    }
+
+    const list = await HistoryService.fetchServerHistory();
     if (list.length === 0) {
       historyListMount.innerHTML =
         '<p style="color: var(--text-muted); font-size: 0.9rem;">No saved scans found on this device.</p>';

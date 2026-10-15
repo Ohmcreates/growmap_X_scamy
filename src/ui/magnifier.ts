@@ -51,6 +51,8 @@ export class DraggableMagnifier {
   // Sampling throttle
   private lastSampleTime: number = 0;
   private currentState: ThreatAnalysisState | null = null;
+  private isEnabled: boolean = true;
+  private readonly STORAGE_KEY: string = 'scam_spotter_magnifier_state';
 
   public init() {
     this.container = document.getElementById('draggableMagnifier');
@@ -60,6 +62,16 @@ export class DraggableMagnifier {
     this.hintPill = document.getElementById('magnifierDragHint');
 
     if (!this.container || !this.viewportEl) return;
+
+    // Restore remembered on/off state from browser localStorage
+    try {
+      const savedState = localStorage.getItem(this.STORAGE_KEY);
+      if (savedState === 'off') {
+        this.isEnabled = false;
+      } else if (savedState === 'on') {
+        this.isEnabled = true;
+      }
+    } catch {}
 
     // Set initial position: right beside the hero preview card
     const heroPreview = document.getElementById('heroPreviewBox');
@@ -113,10 +125,20 @@ export class DraggableMagnifier {
       }
     });
 
+    // Floating circular corner toggle
+    document.getElementById('btnMagnifierCornerToggle')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.toggleEnabled();
+    });
+
+    // Dock bar toggle button
     document.getElementById('btnToggleMagnifier')?.addEventListener('click', (e) => {
       e.preventDefault();
-      this.toggleVisibility();
+      this.toggleEnabled();
     });
+
+    // Sync initial visibility
+    this.syncVisibility();
 
     // Start continuous sampling loop
     this.startLoop();
@@ -212,26 +234,76 @@ export class DraggableMagnifier {
     requestAnimationFrame(step);
   }
 
+  public isGlassEnabled(): boolean {
+    return this.isEnabled;
+  }
+
+  private saveState(enabled: boolean) {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, enabled ? 'on' : 'off');
+    } catch {}
+  }
+
+  public enable() {
+    this.isEnabled = true;
+    this.saveState(true);
+    this.syncVisibility();
+  }
+
+  public disable() {
+    this.isEnabled = false;
+    this.saveState(false);
+    this.syncVisibility();
+  }
+
+  public toggleEnabled() {
+    this.isEnabled = !this.isEnabled;
+    this.saveState(this.isEnabled);
+    this.syncVisibility();
+  }
+
   public show() {
-    if (this.container) this.container.style.display = 'block';
-    const dockBar = document.getElementById('magnifierDockBar');
-    if (dockBar) dockBar.style.display = 'flex';
-    this.sampleUnderneath(true);
+    this.enable();
   }
 
   public hide() {
-    if (this.container) this.container.style.display = 'none';
-    const dockBar = document.getElementById('magnifierDockBar');
-    if (dockBar) dockBar.style.display = 'none';
+    this.disable();
   }
 
   public toggleVisibility() {
-    if (!this.container) return;
-    const isHidden = this.container.style.display === 'none';
-    if (isHidden) {
-      this.show();
+    this.toggleEnabled();
+  }
+
+  public syncVisibility() {
+    const isLanding = router.getRoute() === 'landing';
+    const cornerToggle = document.getElementById('btnMagnifierCornerToggle');
+    const dockBar = document.getElementById('magnifierDockBar');
+
+    if (!isLanding) {
+      if (this.container) this.container.style.display = 'none';
+      if (dockBar) dockBar.style.display = 'none';
+      if (cornerToggle) cornerToggle.style.display = 'none';
+      return;
+    }
+
+    // On landing page:
+    if (cornerToggle) cornerToggle.style.display = 'flex';
+
+    if (this.isEnabled) {
+      if (this.container) this.container.style.display = 'block';
+      if (dockBar) dockBar.style.display = 'flex';
+      if (cornerToggle) {
+        cornerToggle.classList.remove('is-off');
+        cornerToggle.title = 'Click to disable Forensic Magnifier';
+      }
+      this.sampleUnderneath(true);
     } else {
-      this.hide();
+      if (this.container) this.container.style.display = 'none';
+      if (dockBar) dockBar.style.display = 'none';
+      if (cornerToggle) {
+        cornerToggle.classList.add('is-off');
+        cornerToggle.title = 'Click to enable Forensic Magnifier';
+      }
     }
   }
 

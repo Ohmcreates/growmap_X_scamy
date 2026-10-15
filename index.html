@@ -41,6 +41,14 @@
       <button id="btnToggleMagnifier" class="dock-btn" type="button" title="Hide or show the magnifying glass">👁️ Toggle Glass</button>
     </div>
 
+    <!-- Floating Circular Bottom-Right Corner Toggle for Magnifier -->
+    <button id="btnMagnifierCornerToggle" class="magnifier-circular-toggle" type="button" title="Toggle Forensic Magnifier" aria-label="Toggle Forensic Magnifier">
+      <div class="circular-toggle-inner">
+        <img src="/assets/magnifying_glass.png" alt="Forensic Magnifier" class="circular-toggle-icon-img" draggable="false" />
+        <span class="circular-toggle-slash" id="circularToggleSlash"></span>
+      </div>
+    </button>
+
     <!-- ==========================================================================
          SCAM SPOTTER — EDITORIAL LANDING PAGE (#landingView)
          Inspired by metic.studio: Minimalist, Architectural, Handcrafted
@@ -61,19 +69,69 @@
             </a>
 
             <nav class="metic-nav-links" id="meticNavLinks" aria-label="Editorial Navigation">
-              <li><a href="#how-it-works">How It Works</a></li>
-              <li><a href="#features">Features</a></li>
-              <li><a href="#build">Inspection</a></li>
-              <li><a href="#live-demo">Live Demo</a></li>
-              <li><a href="#link-security">Link Security</a></li>
-              <li><a href="#trust">Safety & Trust</a></li>
+              <a href="#heroSection" class="nav-section-item active" data-section-target="heroSection">
+                <span class="nav-item-primary">
+                  <span class="nav-num">00</span>
+                  <span class="nav-label">Engine</span>
+                </span>
+                <span class="nav-sub-fade">Fraud Forensics Engine</span>
+              </a>
+              <a href="#build" class="nav-section-item" data-section-target="build">
+                <span class="nav-item-primary">
+                  <span class="nav-num">01</span>
+                  <span class="nav-label">Inspection</span>
+                </span>
+                <span class="nav-sub-fade">Transparent Heuristics</span>
+              </a>
+              <a href="#features" class="nav-section-item" data-section-target="features">
+                <span class="nav-item-primary">
+                  <span class="nav-num">02</span>
+                  <span class="nav-label">Features</span>
+                </span>
+                <span class="nav-sub-fade">Core Capabilities</span>
+              </a>
+              <a href="#how-it-works" class="nav-section-item" data-section-target="how-it-works">
+                <span class="nav-item-primary">
+                  <span class="nav-num">03</span>
+                  <span class="nav-label">How It Works</span>
+                </span>
+                <span class="nav-sub-fade">Forensic Pipeline</span>
+              </a>
+              <a href="#live-demo" class="nav-section-item" data-section-target="live-demo">
+                <span class="nav-item-primary">
+                  <span class="nav-num">04</span>
+                  <span class="nav-label">Live Demo</span>
+                </span>
+                <span class="nav-sub-fade">Working Demonstration</span>
+              </a>
+              <a href="#link-security" class="nav-section-item" data-section-target="link-security">
+                <span class="nav-item-primary">
+                  <span class="nav-num">05</span>
+                  <span class="nav-label">Link Security</span>
+                </span>
+                <span class="nav-sub-fade">URL Forensics &amp; Integrity</span>
+              </a>
+              <a href="#trust" class="nav-section-item" data-section-target="trust">
+                <span class="nav-item-primary">
+                  <span class="nav-num">06</span>
+                  <span class="nav-label">Safety &amp; Trust</span>
+                </span>
+                <span class="nav-sub-fade">Integrity &amp; Privacy</span>
+              </a>
             </nav>
 
             <div class="metic-header-actions">
               <button id="btnLandingThemeToggle" class="metic-theme-toggle" type="button" aria-label="Toggle Theme" title="Toggle Theme">☀️</button>
-              <a href="#login" class="metic-btn-ghost" data-route-to="login">Sign In</a>
-              <a href="#login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
+              <div id="landingGuestAuthCluster" class="landing-auth-group">
+                <a href="/login" class="metic-btn-ghost" data-route-to="login" data-auth-mode="signin">Sign In</a>
+                <a href="/login" class="metic-btn-ghost" data-route-to="login" data-auth-mode="signup">Sign Up</a>
+                <a href="/login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
+              </div>
+              <div id="landingUserAuthCluster" class="landing-user-group" style="display: none;">
+                <a href="/workspace" class="metic-btn-solid" data-route-to="workspace">Open Workspace →</a>
+              </div>
               <button class="metic-menu-toggle" id="btnLandingMenuToggle" type="button" aria-label="Toggle Navigation Menu">☰</button>
+            </div>
             </div>
           </div>
         </div>
@@ -83,7 +141,7 @@
         <!-- ====================================================================
              HERO SECTION
              ==================================================================== -->
-        <section class="metic-hero-section">
+        <section id="heroSection" class="metic-hero-section">
           <div class="metic-container">
             <div class="metic-hero-grid">
               <div class="metic-hero-content">
@@ -95,8 +153,8 @@
                   Suspicious message, unfamiliar link, or unexpected payment request? Understand the warning signs before you act.
                 </p>
                 <div class="metic-hero-ctas">
-                  <a href="#login" class="metic-btn-primary" data-route-to="login">
-                    <span>Check a Message</span>
+                  <a id="heroPrimaryCta" href="#login" class="metic-btn-primary" data-route-to="login">
+                    <span id="heroPrimaryCtaText">Check a Message</span>
                     <span>→</span>
                   </a>
                   <a href="#how-it-works" class="metic-btn-secondary">
@@ -546,8 +604,8 @@
             <p class="metic-cta-sub">
               Verify suspicious messages, links, and payment requests with zero guesswork. Protect your finances and personal identity now.
             </p>
-            <a href="#login" class="metic-btn-cta-large" data-route-to="login">
-              <span>Scan a Suspicious Message</span>
+            <a id="landingFinalCta" href="#login" class="metic-btn-cta-large" data-route-to="login">
+              <span id="landingFinalCtaText">Scan a Suspicious Message</span>
               <span>→</span>
             </a>
           </div>
@@ -585,11 +643,9 @@
             <div class="footer-nav-col">
               <h4>FORENSICS</h4>
               <ul>
-                <li><a href="#login" data-route-to="login">Message Scanner</a></li>
-                <li><a href="#login" data-route-to="login">URL Deconstruction</a></li>
-                <li><a href="#login" data-route-to="login">OCR Receipt Audit</a></li>
-                <li><a href="#login" data-route-to="login">APK Static Sandbox</a></li>
-                <li><a href="#login" data-route-to="login">VirusTotal File Scan</a></li>
+                <li><a id="footerLinkScanner" href="#login" data-route-to="login">Message Scanner</a></li>
+                <li><a id="footerLinkUrl" href="#login" data-route-to="login">URL Deconstruction</a></li>
+                <li><a id="footerLinkOcr" href="#login" data-route-to="login">OCR Receipt Audit</a></li>
               </ul>
             </div>
 
@@ -619,36 +675,77 @@
     <div id="authView" class="view-panel" style="display: none;">
       <div class="metic-auth-container">
         <div class="metic-auth-card">
+          <!-- Segmented Tab Switcher (Sign In vs Sign Up) -->
+          <div class="metic-auth-tabs" role="tablist">
+            <button type="button" id="authViewTabSignIn" class="metic-auth-tab active" role="tab" aria-selected="true">
+              Sign In
+            </button>
+            <button type="button" id="authViewTabSignUp" class="metic-auth-tab" role="tab" aria-selected="false">
+              Create Account
+            </button>
+          </div>
+
           <div class="metic-auth-header">
-            <div class="auth-editorial-tag">01 // ACCESS CONTROL</div>
-            <h2 class="auth-title">Analyst Sign In</h2>
-            <p class="auth-subtitle">
-              Sign in to access the full Scam Spotter Intelligence Workspace.
+            <div id="authViewEditorialTag" class="auth-editorial-tag">01 // ACCESS CONTROL</div>
+            <h2 id="authViewTitle" class="auth-title">Analyst Sign In</h2>
+            <p id="authViewSubtitle" class="auth-subtitle">
+              Sign in to access your scam detection history & analysis workspace.
             </p>
           </div>
 
-          <form id="authForm" class="metic-auth-form">
+          <!-- Alert / Feedback Message Box -->
+          <div id="authViewAlert" class="auth-view-alert" style="display: none;" role="alert"></div>
+
+          <!-- SIGN IN FORM -->
+          <form id="authFormSignIn" class="metic-auth-form">
             <div class="auth-form-group">
-              <label for="authEmail">Email Address</label>
-              <input id="authEmail" type="email" value="analyst@scamspotter.org" required />
+              <label for="authSignInEmail">Email Address</label>
+              <input id="authSignInEmail" type="email" placeholder="name@example.com" required autocomplete="email" />
             </div>
 
             <div class="auth-form-group">
-              <label for="authPassword">Security Key / Password</label>
-              <input id="authPassword" type="password" value="••••••••••••" required />
+              <label for="authSignInPassword">Security Key / Password</label>
+              <input id="authSignInPassword" type="password" placeholder="••••••••••••" required autocomplete="current-password" />
             </div>
 
-            <button type="submit" class="metic-btn-auth-submit">
-              Enter Workspace →
+            <button type="submit" id="btnSubmitSignIn" class="metic-btn-auth-submit">
+              Sign In & Enter Workspace →
             </button>
           </form>
+
+          <!-- SIGN UP FORM -->
+          <form id="authFormSignUp" class="metic-auth-form" style="display: none;">
+            <div class="auth-form-group">
+              <label for="authSignUpName">Full Name</label>
+              <input id="authSignUpName" type="text" placeholder="e.g. Subham Moharana" required autocomplete="name" />
+            </div>
+
+            <div class="auth-form-group">
+              <label for="authSignUpEmail">Email Address</label>
+              <input id="authSignUpEmail" type="email" placeholder="name@example.com" required autocomplete="email" />
+            </div>
+
+            <div class="auth-form-group">
+              <label for="authSignUpPassword">Security Key / Password</label>
+              <input id="authSignUpPassword" type="password" placeholder="At least 6 characters" minlength="6" required autocomplete="new-password" />
+            </div>
+
+            <button type="submit" id="btnSubmitSignUp" class="metic-btn-auth-submit">
+              Create Account & Enter →
+            </button>
+          </form>
+
+          <div class="metic-auth-toggle-hint">
+            <span id="authToggleHintText">Don't have an account?</span>
+            <button type="button" id="btnToggleAuthMode" class="btn-auth-toggle-link">Create an account</button>
+          </div>
 
           <div class="metic-auth-divider">
             <span>OR CONTINUE DIRECTLY</span>
           </div>
 
           <button id="btnAuthDemo" class="metic-btn-auth-demo" type="button">
-            Instant Access (Guest Analyst)
+            Try in Guest Mode (5 min limit • Text Analysis Only)
           </button>
 
           <a href="#landing" class="metic-auth-back" data-route-to="landing">
@@ -677,39 +774,58 @@
         </div>
       </div>
 
-      <!-- Top Navigation Bar -->
+      <!-- Top Navigation Bar (Fixed Header) -->
       <header class="top-nav" role="banner">
         <div class="nav-left">
-          <a href="#landing" class="nav-return-landing-btn" data-route-to="landing">← Landing Page</a>
+          <button id="btnSidebarToggle" class="sidebar-toggle-btn is-open" type="button" aria-label="Toggle Sidebar" title="Collapse / Expand Sidebar">
+            <span class="toggle-bar bar-1"></span>
+            <span class="toggle-bar bar-2"></span>
+            <span class="toggle-bar bar-3"></span>
+          </button>
           <div class="brand-logo">
-          <div class="shield-badge">
-            <svg width="22" height="26" viewBox="0 0 24 28" fill="none">
-              <path d="M12 2L3 6V13C3 19.5 7.5 24.5 12 26C16.5 24.5 21 19.5 21 13V6L12 2Z" fill="#dc2626" stroke="#0f172a" stroke-width="2"/>
-              <path d="M12 7V21M7.5 12.5L12 17L16.5 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </div>
-          <div class="brand-text">
-            <h1 class="brand-title">Scamy<span class="gw-tm-anchor" style="position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none; font-size: 0;" aria-hidden="true">&#8203;&#8204;&#8204;&#8203;&#8203;&#8204;&#8204;&#8204;&#8203;&#8204;&#8204;&#8204;&#8203;&#8203;&#8204;&#8203;&#8203;&#8204;&#8204;&#8203;&#8204;&#8204;&#8204;&#8204;&#8203;&#8204;&#8204;&#8204;&#8203;&#8204;&#8204;&#8204;&#8203;&#8204;&#8204;&#8203;&#8204;&#8204;&#8203;&#8204;&#8203;&#8204;&#8204;&#8203;&#8203;&#8203;&#8203;&#8204;&#8203;&#8204;&#8204;&#8204;&#8203;&#8203;&#8203;&#8203;</span></h1>
-            <span class="brand-tagline">Protect privacy with Scamy</span>
+            <div class="shield-badge">
+              <svg width="22" height="26" viewBox="0 0 24 28" fill="none">
+                <path d="M12 2L3 6V13C3 19.5 7.5 24.5 12 26C16.5 24.5 21 19.5 21 13V6L12 2Z" fill="#dc2626" stroke="#0f172a" stroke-width="2"/>
+                <path d="M12 7V21M7.5 12.5L12 17L16.5 10" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="brand-text">
+              <h1 class="brand-title">Scamy<span class="gw-tm-anchor" style="position: absolute; width: 0; height: 0; overflow: hidden; opacity: 0; pointer-events: none; font-size: 0;" aria-hidden="true">&#8203;&#8204;&#8204;&#8203;&#8203;&#8204;&#8204;&#8204;&#8203;&#8204;&#8204;&#8204;&#8203;&#8203;&#8204;&#8203;&#8203;&#8204;&#8204;&#8203;&#8204;&#8204;&#8204;&#8204;&#8203;&#8204;&#8204;&#8204;&#8203;&#8204;&#8204;&#8204;&#8203;&#8204;&#8204;&#8203;&#8204;&#8204;&#8203;&#8204;&#8203;&#8204;&#8204;&#8203;&#8203;&#8203;&#8203;&#8204;&#8203;&#8204;&#8204;&#8204;&#8203;&#8203;&#8203;&#8203;</span></h1>
+              <span class="brand-tagline">Protect privacy with Scamy</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <nav class="nav-center" aria-label="Main Navigation">
-        <a href="#" class="nav-link active">Home</a>
-        <a href="#" id="navThreatDb" class="nav-link">Threat DB</a>
-        <a href="#" id="navEvaluation" class="nav-link">Model Benchmark</a>
-        <a href="#" id="navHowItWorks" class="nav-link">How it works</a>
-        <a href="#" id="navPricing" class="nav-link">Pricing</a>
-      </nav>
-
-      <div class="nav-right">
-        <button class="sidebar-hamburger" id="btnSidebarToggle" type="button" aria-label="Toggle Menu">☰</button>
-        <button id="btnThemeToggle" class="icon-nav-btn" title="Toggle Theme" aria-label="Toggle Theme">☀️</button>
-        <button id="btnSearchNav" class="icon-nav-btn" title="Threat Analytics Dashboard" aria-label="Analytics Dashboard">📊</button>
-        <div class="user-avatar" title="Verified Safe Profile">P</div>
-      </div>
+        <div class="nav-right">
+          <button class="sidebar-hamburger" id="btnSidebarToggle" type="button" aria-label="Toggle Menu">☰</button>
+          <button id="btnThemeToggle" class="icon-nav-btn" title="Toggle Theme" aria-label="Toggle Theme">☀️</button>
+          <button id="btnSearchNav" class="icon-nav-btn" title="Threat Analytics Dashboard" aria-label="Analytics Dashboard">📊</button>
+          <div id="authNavCluster" class="auth-nav-cluster">
+            <button id="btnOpenAuthModal" class="btn-auth-signin" type="button">Sign In</button>
+            <div id="userProfileBadge" class="user-profile-badge" style="display: none;">
+              <div id="userAvatarIcon" class="user-avatar" title="Logged In">U</div>
+              <div class="user-meta-drop">
+                <span id="userDisplayName" class="user-name-text">User</span>
+                <button id="btnLogout" class="btn-logout-link" type="button" title="Sign Out">Logout</button>
+              </div>
+            </div>
+          </div>
+        </div>
     </header>
+
+    <!-- Sticky Guest Session Countdown Timer Bar (Active only in Guest Mode) -->
+    <div id="guestSessionTimerBar" class="guest-session-timer-bar" style="display: none;">
+      <div class="guest-timer-content">
+        <span class="guest-timer-badge">⏱️ GUEST TRIAL</span>
+        <span class="guest-timer-clock">Session expires in: <strong id="guestTimerCount">05:00</strong></span>
+        <span class="guest-timer-note">• Text Analysis only • In-memory evaluation (Zero Saved Data)</span>
+      </div>
+      <div class="guest-timer-actions">
+        <a href="/login" data-route-to="login" class="btn-guest-upgrade">
+          🔑 Sign In for Full Access & Unlimited Time →
+        </a>
+      </div>
+    </div>
 
     <!-- Main Application Layout with Left Sidebar -->
     <div class="app-layout">
@@ -717,50 +833,32 @@
       <!-- Left Sidebar Navigation -->
       <aside class="sidebar" role="navigation" aria-label="Sidebar Navigation">
         <nav class="sidebar-menu">
-          <button id="menuScanMessage" class="sidebar-item active" type="button">
+          <button id="menuScanMessage" class="sidebar-item active" type="button" data-subview="subviewScanner">
             <span class="sidebar-icon">💬</span>
-            <span class="sidebar-label">Scan Message</span>
+            <span class="sidebar-label">Scanner</span>
           </button>
-          <button id="menuScanLink" class="sidebar-item" type="button">
-            <span class="sidebar-icon">🔗</span>
-            <span class="sidebar-label">Scan Link</span>
-          </button>
-          <button id="menuScanImage" class="sidebar-item" type="button">
-            <span class="sidebar-icon">🖼️</span>
-            <span class="sidebar-label">Scan Image / QR</span>
-          </button>
-          <button id="menuScanApk" class="sidebar-item" type="button">
-            <span class="sidebar-icon">📱</span>
-            <span class="sidebar-label">Scan APK File</span>
-          </button>
-          <button id="menuScanVt" class="sidebar-item" type="button">
-            <span class="sidebar-icon">🛡️</span>
-            <span class="sidebar-label">VirusTotal File Scan</span>
-          </button>
-          <button id="menuScanNcii" class="sidebar-item" type="button">
-            <span class="sidebar-icon">🔞</span>
-            <span class="sidebar-label">AI Nude & Deepfake</span>
-          </button>
-          <button id="menuThreatDb" class="sidebar-item" type="button">
+          <button id="menuThreatDb" class="sidebar-item" type="button" data-subview="subviewThreatDb">
             <span class="sidebar-icon">🛡️</span>
             <span class="sidebar-label">Threat Database</span>
           </button>
-          <button id="menuEvaluation" class="sidebar-item" type="button">
+          <button id="menuEvaluation" class="sidebar-item" type="button" data-subview="subviewBenchmark">
             <span class="sidebar-icon">📊</span>
-            <span class="sidebar-label">Model Evaluation</span>
+            <span class="sidebar-label">Model Benchmark</span>
           </button>
-          <button id="menuHistory" class="sidebar-item" type="button">
+          <button id="menuHistory" class="sidebar-item" type="button" data-subview="subviewHistory">
             <span class="sidebar-icon">🕒</span>
-            <span class="sidebar-label">History</span>
+            <span class="sidebar-label">Scan History</span>
           </button>
-          <button id="menuLearn" class="sidebar-item" type="button">
+          <button id="menuLearn" class="sidebar-item" type="button" data-subview="subviewLearn">
             <span class="sidebar-icon">📖</span>
-            <span class="sidebar-label">Learn</span>
+            <span class="sidebar-label">How It Works</span>
           </button>
-          <button id="menuReport" class="sidebar-item" type="button">
+          <button id="menuReport" class="sidebar-item" type="button" data-subview="subviewReport">
             <span class="sidebar-icon">🚩</span>
-            <span class="sidebar-label">Report Scam</span>
+            <span class="sidebar-label">Report Threat</span>
           </button>
+          <button id="menuScanLink" style="display: none;" type="button" data-subview="subviewScanner"></button>
+          <button id="menuScanImage" style="display: none;" type="button" data-subview="subviewScanner"></button>
         </nav>
 
         <!-- Sidebar Promo Cards -->
@@ -786,35 +884,21 @@
         </div>
       </aside>
 
-      <!-- Main Two-Column Content Grid -->
-      <main class="main-body-grid">
-        <!-- Center Column (Hero, Input, and Analysis Result) -->
-        <div class="center-column">
-          <!-- Hero Section -->
-          <section class="hero-banner">
-            <div class="hero-text-block">
-              <h2 class="hero-heading">Check if it’s a <span class="text-accent-red">Scam</span></h2>
-              <p class="hero-subtitle">
-                Paste a suspicious message, email or link. We’ll find the warning signs, show the risk level, and tell you what to do next.
-              </p>
-            </div>
-            <div class="hero-illustration-card" aria-hidden="true">
-              <div class="phone-illustration">
-                <div class="phone-screen-graphic">
-                  <span class="phone-alert-symbol">⚠️</span>
-                </div>
-              </div>
-              <div class="hero-illustration-text">
-                <span>Be alert.</span>
-                <span>Verify.</span>
-                <span>Stay safe.</span>
-              </div>
-            </div>
-          </section>
+      <!-- Main Workspace Container with Dedicated Subviews -->
+      <main class="workspace-main-content">
+        <!-- ================================================================
+             1. SCANNER SUBVIEW (Single Card Focus Zone + Unified Result)
+             ================================================================ -->
+        <section id="subviewScanner" class="workspace-subview active" aria-label="Scanner Workspace">
+          <div class="subview-header">
+            <h2 class="subview-title">Scam Spotter <span class="text-accent-red">Intelligence</span></h2>
+            <p class="subview-subtitle">
+              Paste any suspicious SMS, bank alert, courier message, or URL. Our explainable rule engine and AI forensics calculate the risk score (0–100), highlight exact evidence, and provide safe next steps.
+            </p>
+          </div>
 
-          <!-- Input Card -->
-          <section class="card-box input-card" aria-label="Input Section">
-            <!-- Tabs & Language Script Pill -->
+          <!-- Single-Card Clean Input Focus Zone -->
+          <div class="card-box input-card single-focus-scanner-card" aria-label="Input Section">
             <div class="input-header-row">
               <div class="input-tabs-bar" role="tablist">
                 <button id="tabTextMessage" class="tab-button active" role="tab" aria-selected="true" type="button">
@@ -822,24 +906,32 @@
                 </button>
                 <button id="tabScanLink" class="tab-button" role="tab" aria-selected="false" type="button">
                   <span class="tab-icon">🔗</span> URL / Link
+                  <span id="lockBadgeLink" class="guest-tab-lock-badge" style="display: none;">🔒 Locked</span>
                 </button>
                 <button id="tabUploadImage" class="tab-button" role="tab" aria-selected="false" type="button">
                   <span class="tab-icon">🖼️</span> Upload Image / QR
-                </button>
-                <button id="tabApkScan" class="tab-button" role="tab" aria-selected="false" type="button">
-                  <span class="tab-icon">📱</span> APK File Scan
-                </button>
-                <button id="tabVtScan" class="tab-button" role="tab" aria-selected="false" type="button">
-                  <span class="tab-icon">🛡️</span> Multi-Engine File Scan
-                </button>
-                <button id="tabNciiScan" class="tab-button" role="tab" aria-selected="false" type="button">
-                  <span class="tab-icon">🔞</span> AI Nude & Deepfake
+                  <span id="lockBadgeImage" class="guest-tab-lock-badge" style="display: none;">🔒 Locked</span>
                 </button>
               </div>
 
               <!-- Multilingual Script Detector Pill -->
               <div id="langScriptPill" class="lang-script-badge" title="Real-time script detection">
                 🌐 Script: Latin (English)
+              </div>
+            </div>
+
+            <!-- In-place Locked Feature Banner for Guests -->
+            <div id="guestLockedFeatureBanner" class="guest-locked-feature-banner" style="display: none;" role="alert">
+              <div class="locked-banner-text">
+                <span class="locked-banner-icon">🔒</span>
+                <div>
+                  <strong>Analyst Account Required:</strong>
+                  <span>URL link security inspection and QR/Image malware analysis are restricted to registered analysts. Sign in or create an account to unlock these features, or continue with Text Analysis in guest mode.</span>
+                </div>
+              </div>
+              <div class="locked-banner-actions">
+                <a href="/login" data-route-to="login" class="btn-locked-banner-signin">Sign In to Unlock →</a>
+                <button id="btnDismissLockedBanner" type="button" class="btn-dismiss-locked-banner" title="Dismiss">✕</button>
               </div>
             </div>
 
@@ -893,71 +985,7 @@
                   <button id="btnBrowseOcr" class="btn-browse-file" type="button">
                     Select File
                   </button>
-                  <input type="file" id="ocrFileInput" accept="image/png, image/jpeg, image/webp, .apk, application/vnd.android.package-archive" style="display: none;" />
-                </div>
-              </div>
-
-              <!-- APK File Scan Panel (Reverse Engineered from SpotTheScam.in) -->
-              <div id="panelApkScan" class="tab-panel" style="display: none;">
-                <div id="apkDropZone" class="upload-dropzone">
-                  <div class="dropzone-icon">📱</div>
-                  <strong>Upload Android Package File (.APK)</strong>
-                  <p>Reverse-engineered client-side APK inspector (SpotTheScam.in standard). 100% private, zero upload.</p>
-                  <button id="btnBrowseApk" class="btn-browse-file" type="button">
-                    Select .APK File
-                  </button>
-                  <input type="file" id="apkFileInput" accept=".apk,application/vnd.android.package-archive" style="display: none;" />
-                </div>
-                <div class="apk-demo-chips-row">
-                  <span class="chips-intro">SpotTheScam Test Samples:</span>
-                  <button id="btnApkDemoTrojan" class="chip-item chip-danger" type="button">🚨 Test SBI Banking Trojan APK</button>
-                  <button id="btnApkDemoClean" class="chip-item chip-lang" type="button">✅ Test Clean Calculator APK</button>
-                </div>
-              </div>
-
-              <!-- VirusTotal Multi-Engine File & Hash Scan Panel -->
-              <div id="panelVtScan" class="tab-panel" style="display: none;">
-                <div id="vtDropZone" class="upload-dropzone">
-                  <div class="dropzone-icon">🛡️</div>
-                  <strong>Upload Any File (VirusTotal 72-Vendor Antivirus Inspection)</strong>
-                  <p>Client-side multi-engine detection, SHA-256 / SHA-1 / MD5 hashes, Shannon Entropy & Sandbox indicators.</p>
-                  <button id="btnBrowseVtFile" class="btn-browse-file" type="button">
-                    Select Any File
-                  </button>
-                  <input type="file" id="vtFileInput" style="display: none;" />
-                </div>
-
-                <div class="vt-hash-search-container">
-                  <input id="vtHashSearchInput" type="text" placeholder="Or search by File Hash (SHA-256, SHA-1, MD5)..." class="vt-hash-search-field" />
-                  <button id="btnSearchVtHash" class="btn-vt-search" type="button">🔍 Search Hash</button>
-                </div>
-
-                <div class="apk-demo-chips-row">
-                  <span class="chips-intro">VirusTotal Demo Tests:</span>
-                  <button id="btnVtDemoRansomware" class="chip-item chip-danger" type="button">🚨 Test Ransomware Payload (LockBit)</button>
-                  <button id="btnVtDemoDropper" class="chip-item chip-danger" type="button">⚠️ Test Dropper Script</button>
-                  <button id="btnVtDemoClean" class="chip-item chip-lang" type="button">✅ Test Clean Utility</button>
-                </div>
-              </div>
-
-              <!-- AI-Generated Nude & Intimate Image Detection Panel (NCII Shield) -->
-              <div id="panelNciiScan" class="tab-panel" style="display: none;">
-                <div id="nciiDropZone" class="upload-dropzone">
-                  <div class="dropzone-icon">🔞</div>
-                  <strong>Upload Image for Deepfake & Intimate Image Forensics (NCII Shield)</strong>
-                  <p>100% Client-Side Privacy: Detects AI generation, deepfake face-swaps, and explicit exposure. Zero server upload.</p>
-                  <button id="btnBrowseNciiFile" class="btn-browse-file" type="button">
-                    Select Image (JPG, PNG, WEBP)
-                  </button>
-                  <input type="file" id="nciiFileInput" accept="image/png, image/jpeg, image/webp" style="display: none;" />
-                </div>
-
-                <div class="apk-demo-chips-row">
-                  <span class="chips-intro">NCII & AI Deepfake Tests:</span>
-                  <button id="btnNciiDemoDiffusion" class="chip-item chip-danger" type="button">🚨 Test AI Diffusion Nude</button>
-                  <button id="btnNciiDemoFaceSwap" class="chip-item chip-danger" type="button">⚠️ Test Deepfake Face-Swap</button>
-                  <button id="btnNciiDemoCompressed" class="chip-item" type="button">❔ Test Compressed / Inconclusive</button>
-                  <button id="btnNciiDemoClean" class="chip-item chip-lang" type="button">✅ Test Real Consented Photo</button>
+                  <input type="file" id="ocrFileInput" accept="image/png, image/jpeg, image/webp" style="display: none;" />
                 </div>
               </div>
 
@@ -965,9 +993,6 @@
                 Please enter a message, URL, or upload a file first.
               </div>
               <div id="ocrStatusNotice" class="ocr-status-notice" style="display: none;"></div>
-              <div id="apkStatusNotice" class="ocr-status-notice" style="display: none;"></div>
-              <div id="vtStatusNotice" class="ocr-status-notice" style="display: none;"></div>
-              <div id="nciiStatusNotice" class="ocr-status-notice" style="display: none;"></div>
 
               <!-- Bottom Action Row: Examples & Analyze Button -->
               <div class="input-actions-row">
@@ -989,866 +1014,455 @@
                 </div>
               </div>
             </div>
-          </section>
+          </div>
 
-          <!-- Analysis Result Card -->
-          <section id="analysisResultCard" class="card-box analysis-result-card" style="display: none;" aria-live="polite">
+          <!-- Integrated Single-Page Analysis Result -->
+          <div id="analysisResultCard" class="card-box analysis-result-card" style="display: none;" aria-live="polite">
             <div class="result-card-header">
               <div class="result-card-title">
                 <span class="result-icon-doc">📄</span>
-                <h3>Analysis Result</h3>
+                <h3>Analysis Verdict</h3>
               </div>
+              <button id="btnShareScore" class="icon-tool-btn" title="Copy / Share Score" type="button">🔗 Share</button>
             </div>
 
-            <!-- Specialized Scam Archetype Classifier Banner (Phase 5) -->
-            <div id="scamArchetypeBanner" class="scam-archetype-card" style="display: none;">
-              <div class="archetype-header">
-                <span id="archetypeIcon" class="archetype-icon">🚨</span>
-                <div>
-                  <h4 id="archetypeName" class="archetype-title">Identified Scam Pattern</h4>
-                  <p id="archetypeDesc" class="archetype-desc"></p>
+            <!-- Primary Verdict Showcase (Donut Meter + Why It Matters + Next Steps in one clean open grid) -->
+            <div class="verdict-primary-grid">
+              <!-- Left: Risk Meter Box -->
+              <div class="verdict-meter-box">
+                <div class="donut-chart-container">
+                  <svg class="donut-svg" viewBox="0 0 100 100" aria-hidden="true">
+                    <circle class="donut-track" cx="50" cy="50" r="40" />
+                    <circle id="donutArc" class="donut-meter" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
+                  </svg>
+                  <div class="donut-value-center">
+                    <span id="gaugeScoreNum" class="gauge-big-num">0</span>
+                    <span class="gauge-denom">/100</span>
+                  </div>
+                </div>
+
+                <div class="verdict-badge-block">
+                  <div id="riskLevelPill" class="risk-badge-pill low">Low Risk</div>
+                  <p id="riskSummaryText" class="risk-summary-copy">
+                    Paste a message and click Analyze to view verified warning signs and score.
+                  </p>
+                </div>
+
+                <!-- 3-Zone Threshold Bar -->
+                <div class="scale-bar-wrapper">
+                  <div class="scale-bar-track">
+                    <div class="scale-segment low"></div>
+                    <div class="scale-segment medium"></div>
+                    <div class="scale-segment high"></div>
+                  </div>
+                  <div class="scale-labels-row">
+                    <div class="scale-col"><strong>Low</strong> <small>0–29</small></div>
+                    <div class="scale-col"><strong>Med</strong> <small>30–59</small></div>
+                    <div class="scale-col"><strong>High</strong> <small>60–100</small></div>
+                  </div>
                 </div>
               </div>
-              <div id="archetypeAdvice" class="archetype-mitigation-box"></div>
-            </div>
 
-            <!-- Google Gemini AI Cybersecurity Advisory Card (Purpose 1 & 2: Message & URL Checker) -->
-            <div id="geminiAdvisoryCard" class="gemini-advisory-card" style="display: none;">
-              <div class="gemini-advisory-header">
-                <div class="gemini-brand-cluster">
-                  <span class="gemini-sparkle-icon">✨</span>
-                  <div>
-                    <div class="gemini-title-row">
-                      <h4 class="gemini-title">Google Gemini Cybersecurity Advisory</h4>
-                      <span id="geminiModelBadge" class="gemini-model-badge">Gemini 3.5 Flash</span>
+              <!-- Right: Plain-Language Guidance & Next Steps -->
+              <div class="verdict-guidance-box">
+                <div class="verdict-guidance-section">
+                  <h4 class="verdict-subheading">💡 Why It Matters</h4>
+                  <p id="whyMattersText" class="why-matters-body">
+                    Scammers use urgent wording, fake account threats, and suspicious links to create fear and trick you into sharing sensitive information like OTPs or passwords.
+                  </p>
+                </div>
+
+                <div class="verdict-guidance-section">
+                  <h4 class="verdict-subheading">🛡️ Safe Next Steps</h4>
+                  <div id="safeNextStepsMount" class="safe-steps-stack">
+                    <div class="safe-step-item">
+                      <span class="step-num-badge">1</span>
+                      <div class="step-text">Do not click the link and do not share the OTP.</div>
                     </div>
-                    <span class="gemini-subtitle">AI-Powered Fraud, Phishing & Social Engineering Forensics</span>
-                  </div>
-                </div>
-                <div class="gemini-verdict-cluster">
-                  <span id="geminiThreatBadge" class="gemini-threat-badge low">LOW THREAT</span>
-                  <span id="geminiVerdictBadge" class="gemini-verdict-badge safe">SAFE</span>
-                </div>
-              </div>
-
-              <!-- Metrics & Entities Row -->
-              <div class="gemini-metrics-grid">
-                <div class="gemini-metric-cell">
-                  <span class="g-metric-label">Targeted Brand / Entity</span>
-                  <strong id="geminiTargetedBrand" class="g-metric-val">None</strong>
-                </div>
-                <div class="gemini-metric-cell">
-                  <span class="g-metric-label">Scam Category</span>
-                  <strong id="geminiCategory" class="g-metric-val">Legitimate/None</strong>
-                </div>
-                <div class="gemini-metric-cell">
-                  <span class="g-metric-label">Confidence Score</span>
-                  <strong id="geminiConfidenceScore" class="g-metric-val">95%</strong>
-                </div>
-              </div>
-
-              <!-- Risk Indicators List -->
-              <div class="gemini-indicators-container">
-                <span class="gemini-section-tag">DETECTED RED FLAGS & RISK INDICATORS:</span>
-                <ul id="geminiRiskIndicatorsList" class="gemini-indicators-list">
-                  <!-- Populated dynamically -->
-                </ul>
-              </div>
-
-              <!-- User Guidance Advice Box -->
-              <div class="gemini-guidance-box">
-                <span class="gemini-guidance-icon">🛡️</span>
-                <div class="gemini-guidance-content">
-                  <strong>Safe Action Recommendation:</strong>
-                  <p id="geminiUserGuidanceText">No action needed.</p>
-                </div>
-              </div>
-            </div>
-
-            <!-- Website & URL Safety Inspector Card (Reverse Engineered from IsThisSpam) -->
-            <div id="websiteInspectorCard" class="website-inspector-card" style="display: none;">
-              <div class="web-inspector-header">
-                <div class="web-domain-pill">
-                  <span class="web-globe-icon">🌐</span>
-                  <span id="webDomainText" class="web-domain-name">example.com</span>
-                </div>
-                <div class="web-verdict-cluster">
-                  <span id="webConfidenceBadge" class="web-confidence-pill">Confidence: 96%</span>
-                  <span id="webVerdictBadge" class="web-verdict-pill danger">🚨 SCAM WEBSITE</span>
-                </div>
-              </div>
-              <div class="web-summary-banner">
-                <p id="webSummaryText" class="web-summary-desc"></p>
-              </div>
-
-              <!-- Domain Diagnostics & Security Signals Grid -->
-              <div class="web-metrics-grid">
-                <div class="web-metric-cell">
-                  <span class="metric-label">Domain Age & Registration</span>
-                  <strong id="webMetricAge" class="metric-val">&lt; 30 Days (Disposable Risk)</strong>
-                </div>
-                <div class="web-metric-cell">
-                  <span class="metric-label">TLD Extension Risk</span>
-                  <strong id="webMetricTld" class="metric-val">High-Risk Disposable (.xyz)</strong>
-                </div>
-                <div class="web-metric-cell">
-                  <span class="metric-label">SSL Padlock Status</span>
-                  <strong id="webMetricSsl" class="metric-val">Active Free TLS (Let's Encrypt)</strong>
-                </div>
-                <div class="web-metric-cell">
-                  <span class="metric-label">Hosting & Blacklist DB</span>
-                  <strong id="webMetricBlacklist" class="metric-val">Flagged in Threat Intel Feed</strong>
-                </div>
-              </div>
-
-              <!-- Key Warning on HTTPS / Padlock -->
-              <div id="webSslNotice" class="web-ssl-notice-box">
-                <span class="ssl-notice-icon">🔒</span>
-                <div>
-                  <strong>The HTTPS Padlock Fallacy:</strong>
-                  <span>A padlock icon only means traffic is encrypted — it says NOTHING about whether the website owner is honest. Scammers acquire free automated SSL certificates in under 5 minutes.</span>
-                </div>
-              </div>
-
-              <!-- Machine Learning Phishing URL Forensics (Random Forest 10-Feature Vector) -->
-              <div id="webMlSection" class="web-ml-section">
-                <div class="web-ml-header">
-                  <div class="web-ml-badge-cluster">
-                    <span class="web-ml-pill-tag">🤖 ML PHISHING FORENSICS</span>
-                    <span id="webMlModelName" class="web-ml-model-name">RandomForestClassifier (100 Trees)</span>
-                    <span id="webMlSourceBadge" class="web-ml-source-badge">Dual-Pipeline (Flask API + Client ML)</span>
-                  </div>
-                  <div class="web-ml-verdict-cluster">
-                    <span id="webMlProbability" class="web-ml-prob-pill">ML Phishing Risk: 100%</span>
-                    <span id="webMlVerdictPill" class="web-ml-verdict-pill danger">🚨 PHISHING DETECTED</span>
-                  </div>
-                </div>
-
-                <div class="web-ml-body">
-                  <div class="web-ml-intro">
-                    <span>10-Dimensional Numerical Cybersecurity Feature Vector:</span>
-                    <span class="web-ml-sub">scikit-learn & tldextract telemetry</span>
-                  </div>
-                  <div id="webMlFeaturesGrid" class="web-ml-features-grid">
-                    <!-- Populated dynamically with the 10 features -->
-                  </div>
-                </div>
-              <!-- Production Heuristic Ruleset (LEX / SEM / NET) -->
-              <div id="webHeuristicsSection" class="web-heuristics-section">
-                <div class="web-heuristics-header">
-                  <div class="web-heuristics-badge-cluster">
-                    <span class="web-heuristics-pill-tag">⚡ PRODUCTION HEURISTICS</span>
-                    <span class="web-heuristics-subtitle">15 Concrete Cybersecurity Rules</span>
-                    <span id="webHeuristicsScoreBadge" class="web-heuristics-score-badge">Threat Score: 0/100</span>
-                  </div>
-                  <div class="web-heuristics-verdict-cluster">
-                    <span id="webHeuristicsRiskPill" class="web-heuristics-risk-pill low">0–25: Low Risk (Likely Safe)</span>
-                  </div>
-                </div>
-
-                <!-- Three-Zone Threshold Bar (0-25 Low, 26-55 Medium, 56+ High) -->
-                <div class="web-heuristics-threshold-bar">
-                  <div class="threshold-segment seg-low active" title="0–25: Low Risk (Likely Safe)">
-                    <span class="threshold-dot"></span>
-                    <span class="threshold-label">0–25 Low Risk (Safe)</span>
-                  </div>
-                  <div class="threshold-segment seg-med" title="26–55: Medium Risk (Suspicious)">
-                    <span class="threshold-dot"></span>
-                    <span class="threshold-label">26–55 Medium Risk (Suspicious)</span>
-                  </div>
-                  <div class="threshold-segment seg-high" title="56+: High Risk (Likely Phishing / Scam)">
-                    <span class="threshold-dot"></span>
-                    <span class="threshold-label">56+ High Risk (Scam / Phishing)</span>
-                  </div>
-                </div>
-
-                <div class="web-heuristics-body">
-                  <div class="web-heuristics-subhead">
-                    <span>Fired Heuristic Rule Triggers & Point Allocations:</span>
-                    <span id="webHeuristicsRulesCount" class="heuristics-count-tag">0 Rules Fired</span>
-                  </div>
-                  <div id="webHeuristicsRulesList" class="web-heuristics-rules-list">
-                    <!-- Populated dynamically -->
-                  </div>
-                </div>
-              </div>
-
-              <!-- Detected Domain Threat Signals -->
-              <div id="webThreatsContainer" class="web-threats-container">
-                <h4 class="web-threats-title">Detected Domain Threat Signals</h4>
-                <div id="webThreatsList" class="web-threats-list"></div>
-              </div>
-
-              <!-- Recommendations -->
-              <div id="webRecommendationsContainer" class="web-recommendations-container">
-                <h4 class="web-threats-title">🛡️ Consumer Safety Protocol & Next Steps</h4>
-                <ul id="webRecommendationsList" class="web-recs-list"></ul>
-              </div>
-            </div>
-
-            <!-- APK Security Inspector Card (Reverse Engineered from SpotTheScam.in) -->
-            <div id="apkInspectorCard" class="apk-inspector-card" style="display: none;">
-              <div class="apk-inspector-header">
-                <div class="apk-identity-pill">
-                  <span class="apk-app-icon">📱</span>
-                  <div>
-                    <strong id="apkNameText" class="apk-app-title">SBI YONO Update</strong>
-                    <div id="apkPackageText" class="apk-pkg-mono">com.sbi.kyc.update.official</div>
-                  </div>
-                </div>
-                <div class="apk-verdict-cluster">
-                  <span id="apkScoreBadge" class="web-confidence-pill">Malware Risk: 95/100</span>
-                  <span id="apkVerdictBadge" class="web-verdict-pill danger">🚨 CRITICAL MALWARE</span>
-                </div>
-              </div>
-
-              <div class="apk-hash-banner">
-                <span class="hash-label">SHA-256:</span>
-                <code id="apkSha256Text" class="apk-hash-code">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>
-              </div>
-
-              <div class="web-summary-banner">
-                <p id="apkSummaryText" class="web-summary-desc"></p>
-              </div>
-
-              <!-- SpotTheScam 6-Dimensional Metric Grid -->
-              <h4 class="apk-section-title">SpotTheScam 6-Dimensional Security Audit</h4>
-              <div class="apk-dimensions-grid">
-                <div class="apk-dim-cell" id="dimCellAppIdentity">
-                  <div class="dim-head">
-                    <span class="dim-label">1. App Identity</span>
-                    <span id="dimAppIdScore" class="dim-score-pill danger">Critical</span>
-                  </div>
-                  <p id="dimAppIdReason" class="dim-reason"></p>
-                </div>
-
-                <div class="apk-dim-cell" id="dimCellPermissionRisk">
-                  <div class="dim-head">
-                    <span class="dim-label">2. Permission Risk</span>
-                    <span id="dimPermScore" class="dim-score-pill danger">Critical</span>
-                  </div>
-                  <p id="dimPermReason" class="dim-reason"></p>
-                </div>
-
-                <div class="apk-dim-cell" id="dimCellCertificate">
-                  <div class="dim-head">
-                    <span class="dim-label">3. Certificate Trust</span>
-                    <span id="dimCertScore" class="dim-score-pill danger">Critical</span>
-                  </div>
-                  <p id="dimCertReason" class="dim-reason"></p>
-                </div>
-
-                <div class="apk-dim-cell" id="dimCellTargetSdk">
-                  <div class="dim-head">
-                    <span class="dim-label">4. Target SDK Evasion</span>
-                    <span id="dimTargetSdkScore" class="dim-score-pill danger">Critical</span>
-                  </div>
-                  <p id="dimTargetSdkReason" class="dim-reason"></p>
-                </div>
-
-                <div class="apk-dim-cell" id="dimCellMinSdk">
-                  <div class="dim-head">
-                    <span class="dim-label">5. Minimum SDK</span>
-                    <span id="dimMinSdkScore" class="dim-score-pill safe">Safe</span>
-                  </div>
-                  <p id="dimMinSdkReason" class="dim-reason"></p>
-                </div>
-
-                <div class="apk-dim-cell" id="dimCellVersion">
-                  <div class="dim-head">
-                    <span class="dim-label">6. Version Tag</span>
-                    <span id="dimVersionScore" class="dim-score-pill safe">Safe</span>
-                  </div>
-                  <p id="dimVersionReason" class="dim-reason"></p>
-                </div>
-              </div>
-
-              <!-- Detected Dangerous Permissions with Trojan Tactics -->
-              <div id="apkPermissionsContainer" class="apk-permissions-container">
-                <h4 class="apk-section-title">Detected Critical & Dangerous Permissions</h4>
-                <div id="apkPermissionsList" class="apk-permissions-list"></div>
-              </div>
-
-              <!-- Recommendations -->
-              <div id="apkRecommendationsContainer" class="web-recommendations-container">
-                <h4 class="web-threats-title">🛡️ Emergency Malware Incident Protocol</h4>
-                <ul id="apkRecommendationsList" class="web-recs-list"></ul>
-              </div>
-            </div>
-
-            <!-- VirusTotal Multi-Engine File & Hash Inspector Card -->
-            <div id="vtInspectorCard" class="vt-inspector-card" style="display: none;">
-              <div class="vt-header-row">
-                <div class="vt-file-info">
-                  <span class="vt-file-icon">🛡️</span>
-                  <div>
-                    <strong id="vtFileNameText" class="vt-file-name">LockBit_Invoice_Payment.pdf.exe</strong>
-                    <div id="vtFileMetaText" class="vt-file-meta">Win32 / PE Executable • 520 KB</div>
-                  </div>
-                </div>
-
-                <div class="vt-ratio-cluster">
-                  <div id="vtRatioCircle" class="vt-ratio-circle danger">
-                    <span id="vtRatioScore" class="vt-ratio-score">58</span>
-                    <span id="vtRatioTotal" class="vt-ratio-total">/ 72</span>
-                  </div>
-                  <div>
-                    <div id="vtVerdictTitle" class="vt-verdict-title" style="color: #b91c1c;">58 / 72 Security Vendors Flagged This File</div>
-                    <p id="vtClassificationText" class="vt-verdict-desc">Trojan:Win32/AgentTesla.Injector</p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- VirusTotal Subtabs: Detection / Details / Behavior / Recommendations -->
-              <div class="vt-nav-tabs" role="tablist">
-                <button id="vtTabDetection" class="vt-subtab-btn active" type="button">🔍 Detection (72 Vendors)</button>
-                <button id="vtTabDetails" class="vt-subtab-btn" type="button">📋 Details & Hashes</button>
-                <button id="vtTabBehavior" class="vt-subtab-btn" type="button">⚙️ Behavior & Sandbox</button>
-                <button id="vtTabProtocol" class="vt-subtab-btn" type="button">🛡️ Safety Protocol</button>
-              </div>
-
-              <!-- Subtab 1: Detection (72 Antivirus Vendors Grid) -->
-              <div id="vtPanelDetection" class="vt-tab-content-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.82rem; color: var(--text-muted); margin-top: 4px;">
-                  <span>Antivirus Security Vendors & Classification:</span>
-                  <span id="vtVendorSummaryCounts">58 Malicious • 0 Suspicious • 14 Undetected</span>
-                </div>
-                <div id="vtVendorsGrid" class="vt-vendors-grid"></div>
-              </div>
-
-              <!-- Subtab 2: Details (Hashes, Magic Header, Shannon Entropy) -->
-              <div id="vtPanelDetails" class="vt-tab-content-panel" style="display: none;">
-                <div class="vt-details-grid">
-                  <div class="vt-prop-card">
-                    <span class="vt-prop-label">MD5 Checksum</span>
-                    <div class="vt-hash-row">
-                      <code id="vtMd5Text">9e107d9d372bb6826bd81d3542a419d6</code>
-                      <button class="vt-copy-mini-btn" data-copy="vtMd5Text" title="Copy MD5" type="button">📋</button>
+                    <div class="safe-step-item">
+                      <span class="step-num-badge">2</span>
+                      <div class="step-text">Contact the bank only through its official app, website or the number printed on your card or passbook.</div>
                     </div>
                   </div>
 
-                  <div class="vt-prop-card">
-                    <span class="vt-prop-label">SHA-1 Checksum</span>
-                    <div class="vt-hash-row">
-                      <code id="vtSha1Text">2ef7bde608ce5404e97d5f042f95f89f1c232871</code>
-                      <button class="vt-copy-mini-btn" data-copy="vtSha1Text" title="Copy SHA-1" type="button">📋</button>
-                    </div>
+                  <div class="emergency-action-buttons">
+                    <a href="tel:1930" class="btn-helpline-dial">📞 Call Helpline: 1930</a>
+                    <a href="https://cybercrime.gov.in" target="_blank" rel="noopener" class="btn-portal-link">🌐 cybercrime.gov.in</a>
                   </div>
-
-                  <div class="vt-prop-card" style="grid-column: 1 / -1;">
-                    <span class="vt-prop-label">SHA-256 Cryptographic Fingerprint</span>
-                    <div class="vt-hash-row">
-                      <code id="vtSha256Text">24d004a104d4d54034dbcffc2a4b19a11f39008a575aa614ea04703480b1022c</code>
-                      <button class="vt-copy-mini-btn" data-copy="vtSha256Text" title="Copy SHA-256" type="button">📋</button>
-                    </div>
-                  </div>
-
-                  <div class="vt-prop-card">
-                    <span class="vt-prop-label">File Type & Header Magic</span>
-                    <strong id="vtFileTypeVal" style="font-size: 0.85rem; color: var(--text-main);">Win32 / PE Executable</strong>
-                    <div id="vtMagicVal" style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">Magic: MZ (4D 5A 90 00)</div>
-                  </div>
-
-                  <div class="vt-prop-card">
-                    <span class="vt-prop-label">Shannon Entropy (0 – 8 bits/byte)</span>
-                    <div class="vt-entropy-wrapper">
-                      <div class="vt-entropy-bar-track">
-                        <div id="vtEntropyFill" class="vt-entropy-bar-fill" style="width: 95%;"></div>
-                      </div>
-                      <div class="vt-entropy-readout">
-                        <strong id="vtEntropyScoreVal">7.85 bits/byte</strong>
-                        <span id="vtEntropyRatingVal" style="color: #dc2626; font-weight: 700;">HIGH (Packed / Encrypted)</span>
-                      </div>
-                    </div>
-                    <p id="vtEntropyExplainVal" style="font-size: 0.75rem; color: var(--text-muted); margin: 0;"></p>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Subtab 3: Behavior & Sandbox Indicators -->
-              <div id="vtPanelBehavior" class="vt-tab-content-panel" style="display: none;">
-                <div id="vtBehaviorSignalsList" class="apk-permissions-list"></div>
-                
-                <div style="margin-top: 8px;">
-                  <h5 style="font-size: 0.82rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 6px;">Network Callouts (Extracted C2 URLs & IPs):</h5>
-                  <div id="vtNetworkList" style="font-family: var(--font-mono); font-size: 0.78rem; background: var(--bg-card-subtle); padding: 10px; border-radius: 6px; border: 1px solid var(--border-color);"></div>
-                </div>
-              </div>
-
-              <!-- Subtab 4: Safety Protocol -->
-              <div id="vtPanelProtocol" class="vt-tab-content-panel" style="display: none;">
-                <div class="web-recommendations-container" style="margin: 0;">
-                  <h4 class="web-threats-title">🛡️ Antivirus Threat Response Protocol</h4>
-                  <ul id="vtRecommendationsList" class="web-recs-list"></ul>
                 </div>
               </div>
             </div>
 
-            <!-- AI-Generated Nude & Intimate Image Forensics Card (NCII Shield) -->
-            <div id="nciiInspectorCard" class="ncii-inspector-card" style="display: none;">
-              <!-- Header Row -->
-              <div class="ncii-header-row">
-                <div class="ncii-file-info">
-                  <span class="ncii-shield-icon">🔞</span>
+            <!-- Accordion Toggle Button for Technical Evidence -->
+            <button id="btnToggleTechDetails" class="btn-toggle-tech-details" type="button">
+              <span id="accordionArrow">▾</span>
+              <span>Inspect Technical Evidence, Rules & Forensic Telemetry</span>
+              <span class="tech-toggle-pill">Forensics</span>
+            </button>
+
+            <!-- Collapsible Technical Forensic Details Body (Initially Hidden) -->
+            <div id="techDetailsAccordion" class="tech-details-accordion" style="display: none;">
+              <!-- Specialized Scam Archetype Classifier Banner (Phase 5) -->
+              <div id="scamArchetypeBanner" class="scam-archetype-card" style="display: none;">
+                <div class="archetype-header">
+                  <span id="archetypeIcon" class="archetype-icon">🚨</span>
                   <div>
-                    <strong id="nciiFileNameText" class="ncii-file-name">suspicious_leak.jpg</strong>
-                    <div id="nciiFileMetaText" class="ncii-file-meta">JPEG Image • 1024x1024 • 420 KB</div>
+                    <h4 id="archetypeName" class="archetype-title">Identified Scam Pattern</h4>
+                    <p id="archetypeDesc" class="archetype-desc"></p>
                   </div>
                 </div>
-
-                <div class="ncii-verdict-pills-row">
-                  <span id="nciiExplicitBadge" class="ncii-status-pill danger">🔞 Intimate Content (Shielded)</span>
-                  <span id="nciiAiBadge" class="ncii-status-pill warning">🤖 AI Generated (94%)</span>
-                  <span id="nciiManipBadge" class="ncii-status-pill danger">🎭 Suspected Face-Swap</span>
-                </div>
+                <div id="archetypeAdvice" class="archetype-mitigation-box"></div>
               </div>
 
-              <!-- Cryptographic Hash & Client-Side Privacy Guarantee -->
-              <div class="ncii-hash-banner">
-                <span class="hash-label">SHA-256 Fingerprint:</span>
-                <code id="nciiSha256Text" class="apk-hash-code">e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855</code>
-                <span class="ncii-privacy-guarantee">🔒 100% In-Memory Canvas — Zero Server Upload</span>
-              </div>
-
-              <!-- Privacy Shield Curtain / Image Preview Area -->
-              <div class="ncii-preview-container">
-                <div class="ncii-preview-header">
-                  <div class="ncii-preview-title">
-                    <strong>🛡️ Privacy Protection Shield</strong>
-                    <small>Intimate images are shielded by default to prevent non-consensual visual exposure.</small>
-                  </div>
-                  <button id="btnToggleNciiBlur" class="btn-toggle-blur" type="button">👁️ Toggle Privacy Blur</button>
-                </div>
-                <div id="nciiImageContainer" class="ncii-image-shield-box">
-                  <div id="nciiBlurShield" class="privacy-blur-curtain">
-                    <span class="curtain-icon">🔒</span>
-                    <strong>Image Shielded for Privacy & Dignity</strong>
-                    <p>Protected under NCII & deepfake safety protocol. Click "Toggle Privacy Blur" above to inspect if authorized.</p>
-                  </div>
-                  <img id="nciiImagePreview" class="ncii-rendered-preview" alt="Forensic inspection preview" style="display: none;" />
-                </div>
-              </div>
-
-              <!-- Google Gemini AI Nude & Deepfake Forensics Panel (Purpose 4) -->
-              <div id="geminiNciiCard" class="gemini-ncii-banner" style="display: none;">
-                <div class="gemini-ncii-header">
+              <!-- Google Gemini AI Advisory Card -->
+              <div id="geminiAdvisoryCard" class="gemini-advisory-card" style="display: none;">
+                <div class="gemini-advisory-header">
                   <div class="gemini-brand-cluster">
                     <span class="gemini-sparkle-icon">✨</span>
                     <div>
                       <div class="gemini-title-row">
-                        <h4 class="gemini-title">Google Gemini NCII & Deepfake Forensics</h4>
-                        <span class="gemini-model-badge">Gemini 3.5 Flash</span>
+                        <h4 class="gemini-title">Google Gemini Cybersecurity Advisory</h4>
+                        <span id="geminiModelBadge" class="gemini-model-badge">Gemini 3.5 Flash</span>
                       </div>
-                      <span class="gemini-subtitle">Multimodal Forensic Analysis (Explicit Safety, Diffusion Artifacts & Seam Splicing)</span>
+                      <span class="gemini-subtitle">AI-Powered Fraud, Phishing & Social Engineering Forensics</span>
                     </div>
                   </div>
-                  <span id="geminiNciiVerdictBadge" class="gemini-verdict-badge safe">AUTHENTIC</span>
-                </div>
-
-                <div class="gemini-ncii-grid">
-                  <div class="gemini-metric-cell">
-                    <span class="g-metric-label">Content Screening</span>
-                    <strong id="geminiNciiExplicitVal" class="g-metric-val">NON_EXPLICIT</strong>
-                  </div>
-                  <div class="gemini-metric-cell">
-                    <span class="g-metric-label">AI Generation</span>
-                    <strong id="geminiNciiAiVal" class="g-metric-val">FALSE</strong>
-                  </div>
-                  <div class="gemini-metric-cell">
-                    <span class="g-metric-label">Manipulation / Swap</span>
-                    <strong id="geminiNciiManipVal" class="g-metric-val">CLEAN</strong>
+                  <div class="gemini-verdict-cluster">
+                    <span id="geminiThreatBadge" class="gemini-threat-badge low">LOW THREAT</span>
+                    <span id="geminiVerdictBadge" class="gemini-verdict-badge safe">SAFE</span>
                   </div>
                 </div>
 
-                <div class="gemini-indicators-container" id="geminiNciiArtifactsBox" style="display: none;">
-                  <span class="gemini-section-tag">DETECTED AI DIFFUSION ARTIFACTS:</span>
-                  <ul id="geminiNciiArtifactsList" class="gemini-indicators-list"></ul>
+                <div class="gemini-metrics-grid">
+                  <div class="gemini-metric-cell">
+                    <span class="g-metric-label">Targeted Brand / Entity</span>
+                    <strong id="geminiTargetedBrand" class="g-metric-val">None</strong>
+                  </div>
+                  <div class="gemini-metric-cell">
+                    <span class="g-metric-label">Scam Category</span>
+                    <strong id="geminiCategory" class="g-metric-val">Legitimate/None</strong>
+                  </div>
+                  <div class="gemini-metric-cell">
+                    <span class="g-metric-label">Confidence Score</span>
+                    <strong id="geminiConfidenceScore" class="g-metric-val">95%</strong>
+                  </div>
                 </div>
 
-                <div class="gemini-indicators-container" id="geminiNciiManipBox" style="display: none;">
-                  <span class="gemini-section-tag">SUSPECTED MANIPULATION TECHNIQUES:</span>
-                  <ul id="geminiNciiManipList" class="gemini-indicators-list"></ul>
+                <div class="gemini-indicators-container">
+                  <span class="gemini-section-tag">DETECTED RED FLAGS & RISK INDICATORS:</span>
+                  <ul id="geminiRiskIndicatorsList" class="gemini-indicators-list"></ul>
                 </div>
 
                 <div class="gemini-guidance-box">
                   <span class="gemini-guidance-icon">🛡️</span>
                   <div class="gemini-guidance-content">
-                    <strong id="geminiNciiTripartiteVerdict">Consolidated Forensic Finding</strong>
-                    <p id="geminiNciiSafetyAdvice">Safe guidance recommendation.</p>
+                    <strong>Safe Action Recommendation:</strong>
+                    <p id="geminiUserGuidanceText">No action needed.</p>
                   </div>
                 </div>
               </div>
 
-              <!-- Tripartite Forensics & Provenance Grid (4 Dimension Cards) -->
-              <div class="ncii-four-dimensions-grid">
-                <!-- Card 1: AI-Generation Assessment -->
-                <div class="ncii-dim-card" id="nciiCardAi">
-                  <div class="ncii-dim-head">
-                    <span class="ncii-dim-icon">🤖</span>
-                    <div>
-                      <strong class="ncii-dim-title">1. AI-Generation Forensics</strong>
-                      <span id="nciiAiVerdictPill" class="dim-score-pill danger">High Probability AI</span>
-                    </div>
+              <!-- Website & URL Safety Inspector Card -->
+              <div id="websiteInspectorCard" class="website-inspector-card" style="display: none;">
+                <div class="web-inspector-header">
+                  <div class="web-domain-pill">
+                    <span class="web-globe-icon">🌐</span>
+                    <span id="webDomainText" class="web-domain-name">example.com</span>
                   </div>
-                  <p id="nciiAiSummaryText" class="ncii-dim-desc">Calculated based on diffusion frequency falloff and dermal texture uniformity.</p>
-                  
-                  <div class="ncii-submetric-box">
-                    <div class="submetric-row">
-                      <span>Dermal Smoothness (Cellular Pores):</span>
-                      <strong id="nciiDermalVal">94 / 100 (Unnatural)</strong>
-                    </div>
-                    <div class="submetric-row">
-                      <span>Spectral High-Frequency Falloff:</span>
-                      <strong id="nciiSpectralVal">-31.2 dB (Diffusion VAE)</strong>
-                    </div>
-                    <div class="submetric-row">
-                      <span>Fourier Symmetry Score:</span>
-                      <strong id="nciiFourierVal">88 / 100</strong>
-                    </div>
+                  <div class="web-verdict-cluster">
+                    <span id="webConfidenceBadge" class="web-confidence-pill">Confidence: 96%</span>
+                    <span id="webVerdictBadge" class="web-verdict-pill danger">🚨 SCAM WEBSITE</span>
                   </div>
-
-                  <div class="ncii-signatures-list">
-                    <strong>Detected Synthetic Signatures:</strong>
-                    <ul id="nciiAiSignaturesList"></ul>
-                  </div>
-
-                  <div id="nciiAiLimitations" class="ncii-limitations-notice"></div>
+                </div>
+                <div class="web-summary-banner">
+                  <p id="webSummaryText" class="web-summary-desc"></p>
                 </div>
 
-                <!-- Card 2: Explicit Content Safety Screening -->
-                <div class="ncii-dim-card" id="nciiCardExplicit">
-                  <div class="ncii-dim-head">
-                    <span class="ncii-dim-icon">🔞</span>
-                    <div>
-                      <strong class="ncii-dim-title">2. Explicit Content Screening</strong>
-                      <span id="nciiExplicitVerdictPill" class="dim-score-pill danger">Explicit Detected</span>
-                    </div>
+                <div class="web-metrics-grid">
+                  <div class="web-metric-cell">
+                    <span class="metric-label">Domain Age & Registration</span>
+                    <strong id="webMetricAge" class="metric-val">&lt; 30 Days (Disposable Risk)</strong>
                   </div>
-                  <p id="nciiExplicitSummaryText" class="ncii-dim-desc">Independent exposure classification to route imagery safely.</p>
-
-                  <div class="ncii-submetric-box">
-                    <div class="submetric-row">
-                      <span>Exposure Severity Score:</span>
-                      <strong id="nciiExposureScoreVal">94 / 100</strong>
-                    </div>
-                    <div class="submetric-row">
-                      <span>Skin-Tone Cluster Coverage:</span>
-                      <strong id="nciiSkinRatioVal">68% of Total Pixels</strong>
-                    </div>
-                    <div class="submetric-row">
-                      <span>Privacy Routing Action:</span>
-                      <strong id="nciiRoutingVal" style="color: #dc2626;">Shield Blur Applied</strong>
-                    </div>
+                  <div class="web-metric-cell">
+                    <span class="metric-label">TLD Extension Risk</span>
+                    <strong id="webMetricTld" class="metric-val">High-Risk Disposable (.xyz)</strong>
                   </div>
-
-                  <div class="ncii-signatures-list">
-                    <strong>Anatomical Exposure Flags:</strong>
-                    <ul id="nciiExplicitAnatomyList"></ul>
+                  <div class="web-metric-cell">
+                    <span class="metric-label">SSL Padlock Status</span>
+                    <strong id="webMetricSsl" class="metric-val">Active Free TLS (Let's Encrypt)</strong>
+                  </div>
+                  <div class="web-metric-cell">
+                    <span class="metric-label">Hosting & Blacklist DB</span>
+                    <strong id="webMetricBlacklist" class="metric-val">Flagged in Threat Intel Feed</strong>
                   </div>
                 </div>
 
-                <!-- Card 3: Image Manipulation & Face-Swap -->
-                <div class="ncii-dim-card" id="nciiCardManip">
-                  <div class="ncii-dim-head">
-                    <span class="ncii-dim-icon">🎭</span>
-                    <div>
-                      <strong class="ncii-dim-title">3. Manipulation & Face-Swap</strong>
-                      <span id="nciiManipVerdictPill" class="dim-score-pill danger">Suspected Deepfake</span>
-                    </div>
-                  </div>
-                  <p id="nciiManipSummaryText" class="ncii-dim-desc">Checks for localized splicing, seam blending, and ELA recompression differences.</p>
-
-                  <div class="ncii-submetric-box">
-                    <div class="submetric-row">
-                      <span>Boundary Seam Blending:</span>
-                      <strong id="nciiBoundaryVal">Anomalous Mask Edge</strong>
-                    </div>
-                    <div class="submetric-row">
-                      <span>Color Temp Divergence (Face vs Torso):</span>
-                      <strong id="nciiColorMismatchVal">Discrepancy (+14%)</strong>
-                    </div>
-                    <div class="submetric-row">
-                      <span>Error Level Analysis (ELA Discrepancy):</span>
-                      <strong id="nciiElaVal">42.6% Compression Divergence</strong>
-                    </div>
-                  </div>
-
-                  <div class="ncii-signatures-list">
-                    <strong>Manipulation Forensics Verdict:</strong>
-                    <p id="nciiManipExplain" style="font-size: 0.8rem; margin: 4px 0 0 0; color: var(--text-main);"></p>
+                <div id="webSslNotice" class="web-ssl-notice-box">
+                  <span class="ssl-notice-icon">🔒</span>
+                  <div>
+                    <strong>The HTTPS Padlock Fallacy:</strong>
+                    <span>A padlock icon only means traffic is encrypted — it says NOTHING about whether the website owner is honest. Scammers acquire free automated SSL certificates in under 5 minutes.</span>
                   </div>
                 </div>
 
-                <!-- Card 4: Provenance & Content Credentials (C2PA) -->
-                <div class="ncii-dim-card" id="nciiCardProv">
-                  <div class="ncii-dim-head">
-                    <span class="ncii-dim-icon">📜</span>
-                    <div>
-                      <strong class="ncii-dim-title">4. Provenance & C2PA Credentials</strong>
-                      <span id="nciiProvVerdictPill" class="dim-score-pill safe">Inspected</span>
+                <div id="webMlSection" class="web-ml-section">
+                  <div class="web-ml-header">
+                    <div class="web-ml-badge-cluster">
+                      <span class="web-ml-pill-tag">🤖 ML PHISHING FORENSICS</span>
+                      <span id="webMlModelName" class="web-ml-model-name">RandomForestClassifier (100 Trees)</span>
+                      <span id="webMlSourceBadge" class="web-ml-source-badge">Dual-Pipeline (Flask API + Client ML)</span>
                     </div>
-                  </div>
-                  <p id="nciiProvSummaryText" class="ncii-dim-desc">Examines verifiable provenance manifests, EXIF metadata, and generation software footprints.</p>
-
-                  <div class="ncii-submetric-box">
-                    <div class="submetric-row">
-                      <span>C2PA Content Credentials:</span>
-                      <strong id="nciiC2paVal">None Present</strong>
-                    </div>
-                    <div class="submetric-row">
-                      <span>Embedded AI Tool Metadata:</span>
-                      <strong id="nciiExifVal">None</strong>
-                    </div>
-                    <div class="submetric-row">
-                      <span>Invisible Watermark (SynthID):</span>
-                      <strong id="nciiWatermarkVal">None Detected</strong>
+                    <div class="web-ml-verdict-cluster">
+                      <span id="webMlProbability" class="web-ml-prob-pill">ML Phishing Risk: 100%</span>
+                      <span id="webMlVerdictPill" class="web-ml-verdict-pill danger">🚨 PHISHING DETECTED</span>
                     </div>
                   </div>
 
-                  <div class="ncii-signatures-list">
-                    <strong>Provenance Note:</strong>
-                    <p style="font-size: 0.76rem; color: var(--text-muted); margin: 4px 0 0 0;">
-                      Missing metadata does not prove an image is real; bad actors frequently strip EXIF to hide AI generation.
-                    </p>
+                  <div class="web-ml-body">
+                    <div class="web-ml-intro">
+                      <span>10-Dimensional Numerical Cybersecurity Feature Vector:</span>
+                      <span class="web-ml-sub">scikit-learn & tldextract telemetry</span>
+                    </div>
+                    <div id="webMlFeaturesGrid" class="web-ml-features-grid"></div>
                   </div>
+                </div>
+
+                <div id="webHeuristicsSection" class="web-heuristics-section">
+                  <div class="web-heuristics-header">
+                    <div class="web-heuristics-badge-cluster">
+                      <span class="web-heuristics-pill-tag">⚡ PRODUCTION HEURISTICS</span>
+                      <span class="web-heuristics-subtitle">15 Concrete Cybersecurity Rules</span>
+                      <span id="webHeuristicsScoreBadge" class="web-heuristics-score-badge">Threat Score: 0/100</span>
+                    </div>
+                    <div class="web-heuristics-verdict-cluster">
+                      <span id="webHeuristicsRiskPill" class="web-heuristics-risk-pill low">0–25: Low Risk (Likely Safe)</span>
+                    </div>
+                  </div>
+
+                  <div class="web-heuristics-threshold-bar">
+                    <div class="threshold-segment seg-low active" title="0–25: Low Risk (Likely Safe)">
+                      <span class="threshold-dot"></span>
+                      <span class="threshold-label">0–25 Low Risk (Safe)</span>
+                    </div>
+                    <div class="threshold-segment seg-med" title="26–55: Medium Risk (Suspicious)">
+                      <span class="threshold-dot"></span>
+                      <span class="threshold-label">26–55 Medium Risk (Suspicious)</span>
+                    </div>
+                    <div class="threshold-segment seg-high" title="56+: High Risk (Likely Phishing / Scam)">
+                      <span class="threshold-dot"></span>
+                      <span class="threshold-label">56+ High Risk (Scam / Phishing)</span>
+                    </div>
+                  </div>
+
+                  <div class="web-heuristics-body">
+                    <div class="web-heuristics-subhead">
+                      <span>Fired Heuristic Rule Triggers & Point Allocations:</span>
+                      <span id="webHeuristicsRulesCount" class="heuristics-count-tag">0 Rules Fired</span>
+                    </div>
+                    <div id="webHeuristicsRulesList" class="web-heuristics-rules-list"></div>
+                  </div>
+                </div>
+
+                <div id="webThreatsContainer" class="web-threats-container">
+                  <h4 class="web-threats-title">Detected Domain Threat Signals</h4>
+                  <div id="webThreatsList" class="web-threats-list"></div>
+                </div>
+
+                <div id="webRecommendationsContainer" class="web-recommendations-container">
+                  <h4 class="web-threats-title">🛡️ Consumer Safety Protocol & Next Steps</h4>
+                  <ul id="webRecommendationsList" class="web-recs-list"></ul>
                 </div>
               </div>
 
-              <!-- Emergency NCII Victim & Takedown Action Protocol -->
-              <div class="ncii-emergency-section">
-                <div class="ncii-emergency-header">
-                  <div class="ncii-emergency-title">
-                    <span class="shield-pulse">🛡️</span>
-                    <h4>Non-Consensual Intimate Imagery (NCII) & Deepfake Legal Protocol</h4>
-                  </div>
-                  <span class="ncii-emergency-badge">Immediate Action Guide</span>
+              <!-- Original Message (with highlights) -->
+              <div class="original-message-section">
+                <div class="message-section-top">
+                  <span class="section-label">Original Message (with highlights)</span>
+                  <button id="btnCopyHighlights" class="icon-tool-btn" title="Copy original text with summary" type="button">📋</button>
                 </div>
+                <div id="highlightedTextBox" class="highlighted-display-box" tabindex="0"></div>
+              </div>
 
-                <div class="ncii-action-grid">
-                  <!-- Tool 1: StopNCII.org -->
-                  <div class="ncii-action-card">
-                    <div class="action-card-head">
-                      <strong>StopNCII.org (Adults 18+)</strong>
-                      <span class="action-tag">Proactive Hash Shield</span>
-                    </div>
-                    <p>Creates cryptographic digital hashes directly on your device (no images uploaded) to block sharing across Meta, OnlyFans, TikTok, Reddit, and Threads.</p>
-                    <a href="https://stopncii.org" target="_blank" rel="noopener" class="btn-ncii-action">Visit StopNCII.org →</a>
-                  </div>
-
-                  <!-- Tool 2: Take It Down -->
-                  <div class="ncii-action-card">
-                    <div class="action-card-head">
-                      <strong>Take It Down by NCMEC (Under 18)</strong>
-                      <span class="action-tag">Youth Protection</span>
-                    </div>
-                    <p>Free, anonymous tool operated by the National Center for Missing & Exploited Children to remove intimate images of individuals under 18.</p>
-                    <a href="https://takeitdown.ncmec.org" target="_blank" rel="noopener" class="btn-ncii-action">Visit Take It Down →</a>
-                  </div>
-
-                  <!-- Tool 3: Cybercrime Helpline 1930 -->
-                  <div class="ncii-action-card">
-                    <div class="action-card-head">
-                      <strong>National Cyber Crime Helpline (India)</strong>
-                      <span class="action-tag">Law Enforcement</span>
-                    </div>
-                    <p>Report extortion, deepfakes, and non-consensual sharing under IT Act Sec 66E, 67 & 67A (punishable with up to 5 years imprisonment).</p>
-                    <a href="https://cybercrime.gov.in" target="_blank" rel="noopener" class="btn-ncii-action">Dial 1930 / cybercrime.gov.in →</a>
+              <!-- Detected Warning Signs -->
+              <div class="warning-signs-section">
+                <div class="warning-signs-heading">
+                  <div class="heading-left">
+                    <span class="crown-small">👑</span>
+                    <strong>Detected Warning Signs</strong>
+                    <span class="info-badge" title="Deterministic points awarded by verified heuristic rules">ⓘ</span>
                   </div>
                 </div>
+                <div id="warningSignsMount" class="warning-signs-table"></div>
+              </div>
 
-                <!-- Evidence Preservation Checklist -->
-                <div class="ncii-evidence-box">
-                  <strong>📋 Victim Evidence Preservation Protocol:</strong>
-                  <ul class="ncii-evidence-list">
-                    <li><strong>DO NOT PAY EXTORTION DEMANDS:</strong> Complying with blackmail demands leads to escalating financial demands.</li>
-                    <li><strong>PRESERVE COMPLETE EVIDENCE:</strong> Take full screenshots capturing sender handles, phone numbers, UPI VPAs, and timestamps.</li>
-                    <li><strong>RECORD SHA-256 HASH:</strong> Save the cryptographic hash above for legal non-repudiation in formal police filings.</li>
-                    <li><strong>CEASE & DESIST NOTICE:</strong> Inform the perpetrator that creation and distribution of deepfake intimate media is a non-bailable offense.</li>
-                  </ul>
+              <!-- Collapsible Clean Checks Drawer -->
+              <div id="unmatchedMount" class="unmatched-mount-area"></div>
+
+              <!-- Interactive AI Safety Assistant -->
+              <div class="ai-safety-assistant-card">
+                <div class="assistant-header">
+                  <div class="assistant-title-group">
+                    <span class="assistant-badge">AI Safety Assistant</span>
+                    <h4>Ask Questions About This Scam</h4>
+                  </div>
+                  <span class="privacy-badge">🔒 PII Masked & Offline Verified</span>
                 </div>
+                <p class="assistant-intro">Get instant, safe guidance on emergency response, reporting, and law enforcement protocols:</p>
+                
+                <div class="quick-prompts-row">
+                  <button class="prompt-chip" data-q="Should I answer their Skype or video call?" type="button">
+                    📹 Should I answer their video call?
+                  </button>
+                  <button class="prompt-chip" data-q="Can I get my money back if already paid?" type="button">
+                    💸 Can I get my money back?
+                  </button>
+                  <button class="prompt-chip" data-q="How do I report this number to the police?" type="button">
+                    👮 How do I report to police?
+                  </button>
+                  <button class="prompt-chip" data-q="Is it safe to click if I didn't enter OTP?" type="button">
+                    🔗 Is it safe if I only clicked?
+                  </button>
+                </div>
+
+                <div id="assistantResponseBox" class="assistant-response-area" style="display: none;"></div>
+
+                <div class="assistant-input-row">
+                  <input id="assistantQueryInput" type="text" placeholder="Ask custom safety question..." class="assistant-text-input" />
+                  <button id="btnSendAssistantQuery" class="btn-send-assistant" type="button">Ask Assistant</button>
+                </div>
+              </div>
+
+              <!-- Model Evaluation & Feedback Bar -->
+              <div class="model-feedback-bar">
+                <span class="feedback-label">Was this detection accurate?</span>
+                <div class="feedback-buttons">
+                  <button id="btnFeedbackYes" class="btn-feedback" type="button">👍 Accurate</button>
+                  <button id="btnFeedbackNo" class="btn-feedback" type="button">👎 False Alarm / Issue</button>
+                  <button id="btnOpenModelEval" class="btn-feedback-eval" type="button">📊 View Benchmark Accuracy</button>
+                </div>
+                <div id="feedbackNotice" class="feedback-status-msg" style="display: none;"></div>
               </div>
             </div>
+          </div>
+        </section>
 
-            <!-- Original Message (with highlights) -->
-            <div class="original-message-section">
-              <div class="message-section-top">
-                <span class="section-label">Original Message (with highlights)</span>
-                <button id="btnCopyHighlights" class="icon-tool-btn" title="Copy original text with summary" type="button">
-                  📋
-                </button>
-              </div>
-              <div id="highlightedTextBox" class="highlighted-display-box" tabindex="0"></div>
+        <!-- ================================================================
+             2. THREAT DATABASE SUBVIEW (Dedicated Page)
+             ================================================================ -->
+        <section id="subviewThreatDb" class="workspace-subview" style="display: none;" aria-label="Threat Database">
+          <div class="subview-header">
+            <h2 class="subview-title">Verified Scam <span class="text-accent-red">Indicator Database</span></h2>
+            <p class="subview-subtitle">Search verified phishing domains, fraudulent call-center numbers, and malicious UPI VPAs.</p>
+          </div>
+
+          <div class="card-box threat-db-card">
+            <div class="threat-db-search-bar">
+              <input id="threatDbSearchInput" type="text" placeholder="Search indicator (e.g. sbi-kyc, 9876543210, refund-desk)..." class="threat-search-field" />
             </div>
+            <div id="threatDbResultsMount" class="threat-indicators-list"></div>
+          </div>
+        </section>
 
-            <!-- Detected Warning Signs -->
-            <div class="warning-signs-section">
-              <div class="warning-signs-heading">
-                <div class="heading-left">
-                  <span class="crown-small">👑</span>
-                  <strong>Detected Warning Signs</strong>
-                  <span class="info-badge" title="Deterministic points awarded by verified heuristic rules">ⓘ</span>
-                </div>
-              </div>
-              <div id="warningSignsMount" class="warning-signs-table"></div>
+        <!-- ================================================================
+             3. MODEL BENCHMARK SUBVIEW (Dedicated Page)
+             ================================================================ -->
+        <section id="subviewBenchmark" class="workspace-subview" style="display: none;" aria-label="Model Benchmark">
+          <div class="subview-header">
+            <h2 class="subview-title">Model Benchmark & <span class="text-accent-red">Precision Metrics</span></h2>
+            <p class="subview-subtitle">Empirical performance evaluation across the standardized 100-sample benchmark dataset (50 Scams, 50 Benign Controls).</p>
+          </div>
+
+          <div class="card-box benchmark-card">
+            <div id="benchmarkMetricsMount"></div>
+          </div>
+        </section>
+
+        <!-- ================================================================
+             4. SCAN HISTORY SUBVIEW (Dedicated Page)
+             ================================================================ -->
+        <section id="subviewHistory" class="workspace-subview" style="display: none;" aria-label="Scan History">
+          <div class="subview-header" style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+              <h2 class="subview-title">Scan <span class="text-accent-red">History</span></h2>
+              <p class="subview-subtitle">Stored and synchronized securely with your MySQL database & session.</p>
             </div>
+            <button id="btnClearHistory" class="btn-clear-history" type="button">Clear All</button>
+          </div>
 
-            <!-- Collapsible Clean Checks Drawer -->
-            <div id="unmatchedMount" class="unmatched-mount-area"></div>
+          <div class="card-box history-card">
+            <div id="historyListMount"></div>
+          </div>
+        </section>
 
-            <!-- Interactive AI Safety Assistant (Conversational Q&A + Prompt-Injection Proof Advice) -->
-            <div class="ai-safety-assistant-card">
-              <div class="assistant-header">
-                <div class="assistant-title-group">
-                  <span class="assistant-badge">AI Safety Assistant</span>
-                  <h4>Ask Questions About This Scam</h4>
-                </div>
-                <span class="privacy-badge">🔒 PII Masked & Offline Verified</span>
-              </div>
-              <p class="assistant-intro">Get instant, safe guidance on emergency response, reporting, and law enforcement protocols:</p>
-              
-              <!-- Quick Safety Prompts -->
-              <div class="quick-prompts-row">
-                <button class="prompt-chip" data-q="Should I answer their Skype or video call?" type="button">
-                  📹 Should I answer their video call?
-                </button>
-                <button class="prompt-chip" data-q="Can I get my money back if already paid?" type="button">
-                  💸 Can I get my money back?
-                </button>
-                <button class="prompt-chip" data-q="How do I report this number to the police?" type="button">
-                  👮 How do I report to police?
-                </button>
-                <button class="prompt-chip" data-q="Is it safe to click if I didn't enter OTP?" type="button">
-                  🔗 Is it safe if I only clicked?
-                </button>
-              </div>
+        <!-- ================================================================
+             5. HOW IT WORKS / LEARN SUBVIEW (Dedicated Page)
+             ================================================================ -->
+        <section id="subviewLearn" class="workspace-subview" style="display: none;" aria-label="How Scamy Works">
+          <div class="subview-header">
+            <h2 class="subview-title">How <span class="text-accent-red">Scamy Works</span></h2>
+            <p class="subview-subtitle">Deterministic, mathematical heuristics ensuring 100% explainable fraud detection without hallucinations.</p>
+          </div>
 
-              <!-- Assistant Q&A Box -->
-              <div id="assistantResponseBox" class="assistant-response-area" style="display: none;"></div>
-
-              <div class="assistant-input-row">
-                <input id="assistantQueryInput" type="text" placeholder="Ask custom safety question..." class="assistant-text-input" />
-                <button id="btnSendAssistantQuery" class="btn-send-assistant" type="button">Ask Assistant</button>
-              </div>
+          <div class="learn-steps-grid">
+            <div class="learn-step-card">
+              <div class="learn-card-icon">🔍</div>
+              <strong>1. Exact Evidence Detection</strong>
+              <p>Every urgency phrase, bank threat, and fake OTP verb is identified deterministically with zero hallucination.</p>
             </div>
-
-            <!-- Model Evaluation & Feedback Bar -->
-            <div class="model-feedback-bar">
-              <span class="feedback-label">Was this detection accurate?</span>
-              <div class="feedback-buttons">
-                <button id="btnFeedbackYes" class="btn-feedback" type="button">👍 Accurate</button>
-                <button id="btnFeedbackNo" class="btn-feedback" type="button">👎 False Alarm / Issue</button>
-                <button id="btnOpenModelEval" class="btn-feedback-eval" type="button">📊 View Benchmark Accuracy</button>
-              </div>
-              <div id="feedbackNotice" class="feedback-status-msg" style="display: none;"></div>
+            <div class="learn-step-card">
+              <div class="learn-card-icon">⚖️</div>
+              <strong>2. Group Capping (Anti-Amplification)</strong>
+              <p>Prevents runaway scores by capping correlated signals to avoid unfair false alarms on benign messages.</p>
             </div>
-          </section>
-        </div>
-
-        <!-- Right Column (Risk Score, Why it matters, Safe Next Steps) -->
-        <div class="right-column">
-          <!-- Card 1: Risk Score -->
-          <section class="card-box widget-card risk-score-widget">
-            <div class="widget-header">
-              <div class="widget-title">
-                <span class="widget-icon">🎯</span>
-                <h3>Risk Score</h3>
-              </div>
-              <button id="btnShareScore" class="icon-tool-btn" title="Copy / Share Score" type="button">🔗</button>
+            <div class="learn-step-card">
+              <div class="learn-card-icon">🧱</div>
+              <strong>3. Floor Rules & Risk Thresholds</strong>
+              <p>Critical red flags (like unverified links combined with urgent bank freeze threats) instantly trigger high-risk floors.</p>
             </div>
-
-            <div class="gauge-presentation-row">
-              <!-- SVG Donut Chart -->
-              <div class="donut-chart-container">
-                <svg class="donut-svg" viewBox="0 0 100 100" aria-hidden="true">
-                  <circle class="donut-track" cx="50" cy="50" r="40" />
-                  <circle id="donutArc" class="donut-meter" cx="50" cy="50" r="40" stroke-dasharray="251.2" stroke-dashoffset="251.2" />
-                </svg>
-                <div class="donut-value-center">
-                  <span id="gaugeScoreNum" class="gauge-big-num">0</span>
-                  <span class="gauge-denom">/100</span>
-                </div>
-              </div>
-
-              <!-- Risk Badge & Summary Text -->
-              <div class="risk-info-column">
-                <div id="riskLevelPill" class="risk-badge-pill low">Low Risk</div>
-                <p id="riskSummaryText" class="risk-summary-copy">
-                  Paste a message and click Analyze to view verified warning signs and score.
-                </p>
-              </div>
+            <div class="learn-step-card">
+              <div class="learn-card-icon">🛡️</div>
+              <strong>4. Plain-Language Guidance</strong>
+              <p>Provides actionable, panic-reducing next steps and official reporting helplines (1930 / cybercrime.gov.in).</p>
             </div>
+          </div>
+        </section>
 
-            <!-- Low / Medium / High Scale Bar -->
-            <div class="scale-bar-wrapper">
-              <div class="scale-bar-track">
-                <div class="scale-segment low"></div>
-                <div class="scale-segment medium"></div>
-                <div class="scale-segment high"></div>
-              </div>
-              <div class="scale-labels-row">
-                <div class="scale-col">
-                  <strong>Low</strong>
-                  <small>0 – 29</small>
-                </div>
-                <div class="scale-col">
-                  <strong>Medium</strong>
-                  <small>30 – 59</small>
-                </div>
-                <div class="scale-col">
-                  <strong>High</strong>
-                  <small>60 – 100</small>
-                </div>
-              </div>
-            </div>
-          </section>
+        <!-- ================================================================
+             6. REPORT THREAT SUBVIEW (Dedicated Page)
+             ================================================================ -->
+        <section id="subviewReport" class="workspace-subview" style="display: none;" aria-label="Report Threat">
+          <div class="subview-header">
+            <h2 class="subview-title">Report a <span class="text-accent-red">Threat</span></h2>
+            <p class="subview-subtitle">Help protect students and families across India by submitting verified scam indicators to our threat feed.</p>
+          </div>
 
-          <!-- Card 2: Why it matters -->
-          <section class="card-box widget-card why-matters-widget">
-            <div class="widget-header">
-              <div class="widget-title">
-                <span class="widget-icon">💡</span>
-                <h3>Why it matters</h3>
+          <div class="card-box report-card" style="max-width: 640px;">
+            <form id="reportForm">
+              <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600;">Indicator Type</label>
+                <select id="reportType" style="width: 100%; padding: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px;">
+                  <option value="DOMAIN">Phishing Web Domain / URL</option>
+                  <option value="PHONE">Fraudulent Phone Number (SMS/Call)</option>
+                  <option value="UPI_ID">Fraudulent UPI VPA Address</option>
+                </select>
               </div>
+              <div style="margin-bottom: 14px;">
+                <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600;">Target Value</label>
+                <input id="reportValue" type="text" placeholder="e.g. sbi-kyc-verify.xyz or +919876543210" required style="width: 100%; padding: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px;" />
+              </div>
+              <div style="margin-bottom: 18px;">
+                <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; font-weight: 600;">Fraud Category</label>
+                <input id="reportCategory" type="text" placeholder="e.g. Bank KYC / Electricity Threat" required style="width: 100%; padding: 10px; background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); border-radius: 8px;" />
+              </div>
+              <button type="submit" class="btn-analyze-red" style="width: 100%; justify-content: center;">
+                Submit for Verification
+              </button>
+            </form>
+            <div id="reportSuccess" style="display: none; margin-top: 14px; color: #16a34a; font-size: 0.9rem; font-weight: 600;">
+              ✓ Report successfully recorded for community threat intelligence verification.
             </div>
-            <p id="whyMattersText" class="why-matters-body">
-              Scammers use urgent wording, fake account threats, and suspicious links to create fear and trick you into sharing sensitive information like OTPs or passwords.
-            </p>
-          </section>
-
-          <!-- Card 3: Safe Next Steps -->
-          <section class="card-box widget-card next-steps-widget">
-            <div class="widget-header">
-              <div class="widget-title">
-                <span class="widget-icon">🛡️</span>
-                <h3>Safe Next Steps</h3>
-              </div>
-            </div>
-
-            <div id="safeNextStepsMount" class="safe-steps-stack">
-              <div class="safe-step-item">
-                <span class="step-num-badge">1</span>
-                <div class="step-text">Do not click the link and do not share the OTP.</div>
-              </div>
-              <div class="safe-step-item">
-                <span class="step-num-badge">2</span>
-                <div class="step-text">Contact the bank only through its official app, website or the number printed on your card or passbook.</div>
-              </div>
-              <div class="safe-step-item">
-                <span class="step-num-badge">3</span>
-                <div class="step-text">If an OTP was already shared, contact the bank straight away.</div>
-              </div>
-              <div class="safe-step-item">
-                <span class="step-num-badge">4</span>
-                <div class="step-text">Report scams at cybercrime.gov.in or call 1930 (India).</div>
-              </div>
-            </div>
-
-            <div class="emergency-action-buttons">
-              <a href="tel:1930" class="btn-helpline-dial">📞 Call Helpline: 1930</a>
-              <a href="https://cybercrime.gov.in" target="_blank" rel="noopener" class="btn-portal-link">🌐 cybercrime.gov.in</a>
-            </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
     </div>
 
@@ -1880,17 +1494,7 @@
       </div>
     </div>
 
-    <!-- 3. Model Benchmark & Evaluation Modal (Phase 8) -->
-    <div id="evalModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="evalModalTitle">
-      <div class="modal-container" style="max-width: 820px;">
-        <button id="closeEvalModal" class="modal-close-btn" aria-label="Close modal">×</button>
-        <h3 id="evalModalTitle" style="margin-bottom: 8px;">Model Benchmark & Confusion Matrix</h3>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 16px;">
-          Evaluated against the standardized 100-message benchmark suite (50 Scams, 50 Benign Controls).
-        </p>
-        <div id="evalMetricsMount"></div>
-      </div>
-    </div>
+
 
     <!-- 4. History Modal -->
     <div id="historyModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="historyModalTitle">
@@ -1974,6 +1578,70 @@
             <p>Verified phishing URLs and known malware domains lock the minimum score to High (45+) immediately.</p>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- 8. Clean Email Sign In & Sign Up Modal -->
+    <div id="authModal" class="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="authModalTitle">
+      <div class="modal-container auth-modal-box">
+        <button id="closeAuthModal" class="modal-close-btn" aria-label="Close modal">×</button>
+        
+        <div class="auth-tabs-row">
+          <button id="btnTabLogin" class="auth-tab-btn active" type="button">Sign In</button>
+          <button id="btnTabSignup" class="auth-tab-btn" type="button">Create Account</button>
+        </div>
+
+        <!-- Dynamic Context Alert Banner (for restricted features) -->
+        <div id="authModalPromptBanner" class="auth-prompt-banner" style="display: none;"></div>
+
+        <!-- Sign In Form -->
+        <form id="formLogin" class="auth-form-panel">
+          <h3 id="authModalTitle" class="auth-title">Welcome Back</h3>
+          <p class="auth-subtitle">Sign in to sync your personal scan history and active session data.</p>
+          
+          <div class="auth-field">
+            <label for="loginEmail">Email Address</label>
+            <input id="loginEmail" type="email" placeholder="you@example.com" required autocomplete="username" />
+          </div>
+
+          <div class="auth-field">
+            <label for="loginPassword">Password</label>
+            <input id="loginPassword" type="password" placeholder="••••••••" required autocomplete="current-password" />
+          </div>
+
+          <div id="loginError" class="auth-error-box" style="display: none;"></div>
+
+          <button id="btnSubmitLogin" type="submit" class="btn-auth-submit">
+            Sign In
+          </button>
+        </form>
+
+        <!-- Sign Up Form -->
+        <form id="formSignup" class="auth-form-panel" style="display: none;">
+          <h3 class="auth-title">Create an Account</h3>
+          <p class="auth-subtitle">Create a secure profile to record all message scans across your sessions.</p>
+          
+          <div class="auth-field">
+            <label for="signupName">Full Name</label>
+            <input id="signupName" type="text" placeholder="Subham Moharana" required autocomplete="name" />
+          </div>
+
+          <div class="auth-field">
+            <label for="signupEmail">Email Address</label>
+            <input id="signupEmail" type="email" placeholder="you@example.com" required autocomplete="email" />
+          </div>
+
+          <div class="auth-field">
+            <label for="signupPassword">Password (6+ chars)</label>
+            <input id="signupPassword" type="password" placeholder="••••••••" required minlength="6" autocomplete="new-password" />
+          </div>
+
+          <div id="signupError" class="auth-error-box" style="display: none;"></div>
+
+          <button id="btnSubmitSignup" type="submit" class="btn-auth-submit">
+            Create Account
+          </button>
+        </form>
       </div>
     </div>
     </div> <!-- /appWorkspaceView -->
