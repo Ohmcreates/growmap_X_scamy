@@ -1,5 +1,11 @@
 import os
+import sys
 import uuid
+
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, 'w', encoding='utf-8')
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, 'w', encoding='utf-8')
 import json
 import secrets
 import hashlib
