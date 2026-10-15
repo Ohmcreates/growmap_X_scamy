@@ -55,10 +55,14 @@ export const SCAM_PROFILES: ScamProfile[] = [
     keySignals: ['Power disconnected at 9:30 PM', 'Call personal mobile number', 'Install APK / AnyDesk'],
     patterns: [
       /\b(?:electricity\s+power\s+will\s+be\s+disconnected|light\s+cut|bill\s+not\s+updated|call\s+electricity\s+officer)\b/i,
+      /\b(?:bijli|power|electricity|gas)\s*(?:ka\s+)?(?:connection|line)?[^\n\r.!?]{0,50}(?:kaat|kat|cut|band|disconnect)/i,
+      /\b(?:pichh?la\s+bill|bill\s+update\s+nahi|officer\s+number|bill\s+jama\s+karein)\b/i,
+      /(?:बिजली\s+(?:का\s+)?कनेक्शन|बिजली\s+बिल|बिजली\s+अधिकारी)/u,
     ],
     advicePayload: [
       'State electricity boards send official notices on electricity bills, never via random personal phone numbers.',
       'Never install remote desktop apps (AnyDesk, TeamViewer, QuickSupport) on instruction from callers.',
+      'Pay your genuine utility bills only on the official state DISCOM portal or your verified UPI app biller section.',
     ],
   },
   {

@@ -33,4 +33,13 @@ describe('Scam Spotter — Official Rules & Use Cases from Scam_Spotter_Rules.do
     expect(result.score).toBe(15);
     expect(result.riskLevel).toBe('LOW');
   });
+
+  it('Case 5: Electricity / Utility Disconnection Scam in Hinglish should score HIGH RISK', () => {
+    const text = 'Aapka bijli connection aaj raat 9:30 PM par kaat diya jayega kyunki pichhla bill update nahi hua hai. Turant diye gaye officer number 9876543210 par call karein aur bill jama karein.';
+    const result = analyzeMessage(text);
+    console.log('Case 5 Score:', result.score, 'Risk Level:', result.riskLevel, 'Profile:', result.scamProfile?.name, 'Breakdown:', result.breakdown.map(b => `${b.ruleId} (+${b.awardedPoints})`));
+    expect(result.score).toBeGreaterThanOrEqual(75);
+    expect(result.riskLevel).toBe('HIGH');
+    expect(result.scamProfile?.id).toBe('UTILITY_DISCONNECTION');
+  });
 });
