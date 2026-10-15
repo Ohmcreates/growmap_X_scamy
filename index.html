@@ -60,7 +60,7 @@
               </div>
             </a>
 
-            <nav class="metic-nav-links" aria-label="Editorial Navigation">
+            <nav class="metic-nav-links" id="meticNavLinks" aria-label="Editorial Navigation">
               <li><a href="#how-it-works">How It Works</a></li>
               <li><a href="#features">Features</a></li>
               <li><a href="#build">Inspection</a></li>
@@ -70,9 +70,10 @@
             </nav>
 
             <div class="metic-header-actions">
+              <button id="btnLandingThemeToggle" class="metic-theme-toggle" type="button" aria-label="Toggle Theme" title="Toggle Theme">☀️</button>
               <a href="#login" class="metic-btn-ghost" data-route-to="login">Sign In</a>
               <a href="#login" class="metic-btn-solid" data-route-to="login">Scan a Message</a>
-              <button class="metic-menu-toggle" type="button" aria-label="Toggle Navigation Menu">☰</button>
+              <button class="metic-menu-toggle" id="btnLandingMenuToggle" type="button" aria-label="Toggle Navigation Menu">☰</button>
             </div>
           </div>
         </div>
@@ -703,6 +704,7 @@
       </nav>
 
       <div class="nav-right">
+        <button class="sidebar-hamburger" id="btnSidebarToggle" type="button" aria-label="Toggle Menu">☰</button>
         <button id="btnThemeToggle" class="icon-nav-btn" title="Toggle Theme" aria-label="Toggle Theme">☀️</button>
         <button id="btnSearchNav" class="icon-nav-btn" title="Threat Analytics Dashboard" aria-label="Analytics Dashboard">📊</button>
         <div class="user-avatar" title="Verified Safe Profile">P</div>
@@ -711,6 +713,7 @@
 
     <!-- Main Application Layout with Left Sidebar -->
     <div class="app-layout">
+      <div class="sidebar-backdrop" id="sidebarBackdrop"></div>
       <!-- Left Sidebar Navigation -->
       <aside class="sidebar" role="navigation" aria-label="Sidebar Navigation">
         <nav class="sidebar-menu">

@@ -348,21 +348,101 @@ export function initApp() {
   let alarmTimeout: number | null = null;
 
   // --------------------------------------------------------------------------
-  // Theme Toggle (Light / Dark)
+  // Theme Toggle (Light / Dark) for Workspace & Landing Page
   // --------------------------------------------------------------------------
+  const btnLandingThemeToggle = document.getElementById('btnLandingThemeToggle') as HTMLButtonElement | null;
   const savedTheme = localStorage.getItem('scamy_theme');
-  if (savedTheme === 'dark') {
-    document.body.classList.add('theme-dark');
-    if (btnThemeToggle) btnThemeToggle.textContent = '🌙';
-  }
 
-  btnThemeToggle?.addEventListener('click', () => {
-    document.body.classList.toggle('theme-dark');
-    const isDark = document.body.classList.contains('theme-dark');
-    btnThemeToggle.textContent = isDark ? '🌙' : '☀️';
+  function applyTheme(isDark: boolean) {
+    if (isDark) {
+      document.body.classList.add('theme-dark');
+      if (btnThemeToggle) btnThemeToggle.textContent = '🌙';
+      if (btnLandingThemeToggle) btnLandingThemeToggle.textContent = '🌙';
+    } else {
+      document.body.classList.remove('theme-dark');
+      if (btnThemeToggle) btnThemeToggle.textContent = '☀️';
+      if (btnLandingThemeToggle) btnLandingThemeToggle.textContent = '☀️';
+    }
     try {
       localStorage.setItem('scamy_theme', isDark ? 'dark' : 'light');
     } catch {}
+  }
+
+  if (savedTheme === 'dark') {
+    applyTheme(true);
+  } else {
+    applyTheme(false);
+  }
+
+  btnThemeToggle?.addEventListener('click', () => {
+    const isDark = !document.body.classList.contains('theme-dark');
+    applyTheme(isDark);
+  });
+
+  btnLandingThemeToggle?.addEventListener('click', () => {
+    const isDark = !document.body.classList.contains('theme-dark');
+    applyTheme(isDark);
+  });
+
+  // --------------------------------------------------------------------------
+  // Landing Page Mobile Menu Toggle
+  // --------------------------------------------------------------------------
+  const btnLandingMenuToggle = document.getElementById('btnLandingMenuToggle') as HTMLButtonElement | null;
+  const landingNavLinks = document.getElementById('meticNavLinks') as HTMLElement | null;
+
+  function closeLandingMenu() {
+    landingNavLinks?.classList.remove('open');
+    if (btnLandingMenuToggle) btnLandingMenuToggle.textContent = '☰';
+  }
+
+  btnLandingMenuToggle?.addEventListener('click', () => {
+    const isOpen = landingNavLinks?.classList.toggle('open');
+    if (btnLandingMenuToggle) btnLandingMenuToggle.textContent = isOpen ? '✕' : '☰';
+  });
+
+  // Auto-close landing nav when link is clicked
+  landingNavLinks?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      closeLandingMenu();
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Mobile Sidebar Toggle (Scanner Workspace)
+  // --------------------------------------------------------------------------
+  const btnSidebarToggle = document.getElementById('btnSidebarToggle') as HTMLButtonElement;
+  const sidebarEl = document.querySelector('.sidebar') as HTMLElement;
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop') as HTMLElement;
+
+  function closeSidebar() {
+    sidebarEl?.classList.remove('sidebar-open');
+    sidebarBackdrop?.classList.remove('visible');
+    if (btnSidebarToggle) btnSidebarToggle.textContent = '☰';
+  }
+
+  btnSidebarToggle?.addEventListener('click', () => {
+    const isOpen = sidebarEl?.classList.toggle('sidebar-open');
+    sidebarBackdrop?.classList.toggle('visible', isOpen);
+    if (btnSidebarToggle) btnSidebarToggle.textContent = isOpen ? '✕' : '☰';
+  });
+
+  sidebarBackdrop?.addEventListener('click', closeSidebar);
+
+  // Auto-close sidebar when a menu item is clicked on mobile
+  document.querySelectorAll('.sidebar-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 1024) closeSidebar();
+    });
+  });
+
+  // Close menus on window resize to desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) {
+      closeSidebar();
+    }
+    if (window.innerWidth > 900) {
+      closeLandingMenu();
+    }
   });
 
   // --------------------------------------------------------------------------
