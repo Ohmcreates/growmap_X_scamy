@@ -43,4 +43,16 @@ describe('Scam Spotter — Phase 5 Scam Typology Profiler', () => {
     const result = analyzeMessage(text);
     expect(result.scamProfile?.id).toBe('KYC_BANKING');
   });
+
+  it('identifies Lottery / KBC Lucky Draw Scam archetype with HIGH RISK', () => {
+    const text = 'Congratulations! Your mobile number has won a cash prize of Rs. 25,00,000 in the KBC / Diwali Mega Lucky Draw. Call Mr. Sharma at 9123456789 or WhatsApp to claim.';
+    const result = analyzeMessage(text);
+    expect(result.scamProfile?.id).toBe('LOTTERY_PRIZE');
+    expect(result.riskLevel).toBe('HIGH');
+    expect(result.score).toBeGreaterThanOrEqual(45);
+    const fired = result.breakdown.map((b) => b.ruleId);
+    expect(fired).toContain('REWARD_BAIT');
+    expect(fired).toContain('AUTHORITY_IMPERSONATION');
+    expect(fired).toContain('PRIZE_CLAIM_TRICK');
+  });
 });

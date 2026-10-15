@@ -119,6 +119,22 @@ export const SCAM_PROFILES: ScamProfile[] = [
       'Never enter card details or UPI PIN on links received via SMS.',
     ],
   },
+  {
+    id: 'LOTTERY_PRIZE',
+    name: 'Lottery / KBC Lucky Draw Scam',
+    description: 'Fake alerts claiming your mobile number won a cash prize in a lucky draw or KBC lottery, asking you to call/WhatsApp an unofficial number to claim.',
+    keySignals: ['Cash prize / Rs. 25 Lakhs', 'KBC / Lucky Draw lure', 'Call / WhatsApp to claim', 'No lottery ticket purchased'],
+    patterns: [
+      /\b(?:kbc|kaun\s+banega\s+crorepati|lucky\s+draw|lottery|cash\s+prize|diwali\s+mega\s+draw|won\s+(?:rs\.?|₹)\s*[\d,]+|claim\s+(?:prize|cash))\b/i,
+      /(?:केबीसी|लकी\s+ड्रॉ|लॉटरी|इनाम|कैश\s+प्राइज)/u,
+    ],
+    advicePayload: [
+      'You cannot win a lottery or prize draw you never registered or bought a ticket for.',
+      'KBC and television reality shows NEVER select random mobile numbers or contact winners via personal phone/WhatsApp numbers.',
+      'Scammers will demand an upfront "file charge", "GST", or "processing fee" to release your prize. Never pay any money.',
+      'Report the scammer\'s number on the Chakshu Portal (sancharsaathi.gov.in) and National Cyber Crime Helpline 1930.',
+    ],
+  },
 ];
 
 export function identifyScamProfile(
@@ -158,6 +174,13 @@ export function identifyScamProfile(
       score += 5;
     }
     if (profile.id === 'DELIVERY_CUSTOMS' && /\b(?:package|parcel|delivery|courier|fedex|india\s+post|dhl)\b/i.test(text)) {
+      score += 5;
+    }
+    if (
+      profile.id === 'LOTTERY_PRIZE' &&
+      (firedRuleIds.has('REWARD_BAIT') || firedRuleIds.has('PRIZE_CLAIM_TRICK')) &&
+      /\b(?:kbc|lucky\s+draw|lottery|prize|won)\b/i.test(text)
+    ) {
       score += 5;
     }
 
