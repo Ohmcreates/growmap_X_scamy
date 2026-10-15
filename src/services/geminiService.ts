@@ -76,7 +76,12 @@ export class GeminiService {
     targetModel: string = PRIMARY_MODEL
   ): Promise<any> {
     // 1. Attempt secure backend proxy call (Shields credentials from network tab)
-    const proxyEndpoints = ['http://127.0.0.1:5001/api/gemini/generate', '/api/gemini/generate'];
+    const apiBase = (import.meta as any).env?.VITE_API_URL?.replace(/\/$/, '');
+    const proxyEndpoints = [
+      ...(apiBase ? [`${apiBase}/api/gemini/generate`] : []),
+      '/api/gemini/generate',
+      'http://127.0.0.1:5001/api/gemini/generate',
+    ];
     for (const endpoint of proxyEndpoints) {
       try {
         const controller = new AbortController();

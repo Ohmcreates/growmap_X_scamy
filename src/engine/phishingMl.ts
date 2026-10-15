@@ -203,12 +203,14 @@ export function evaluatePhishingMl(url: string): MlModelAssessment {
 export async function predictPhishingMlAsync(url: string): Promise<MlModelAssessment> {
   const localAssessment = evaluatePhishingMl(url);
 
-  // Attempt local Flask endpoint http://127.0.0.1:5001/predict
+  // Attempt remote Render backend or local Flask endpoint
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 1200);
+    const timeoutId = setTimeout(() => controller.abort(), 2000);
+    const apiBase = (import.meta as any).env?.VITE_API_URL?.replace(/\/$/, '') || 'http://127.0.0.1:5001';
+    const targetUrl = apiBase.startsWith('http') ? `${apiBase}/predict` : '/predict';
 
-    const res = await fetch('http://127.0.0.1:5001/predict', {
+    const res = await fetch(targetUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ url }),

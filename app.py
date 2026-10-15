@@ -1,36 +1,41 @@
 """
-Phishing URL Detection Web Application & API Backend
-Powered by Flask, scikit-learn Random Forest, and tldextract.
+Scam Spotter (Growmap x Scamy) — Production Full-Stack Backend API
+Powered by Flask, scikit-learn Random Forest, and multi-database connectivity (Supabase PostgreSQL / MySQL / SQLite).
+Ready for Render, Vercel frontend, and Supabase database.
 """
 
 import os
+import json
+import uuid
+import hashlib
+import secrets
+from datetime import datetime
 import joblib
 import pandas as pd
 from flask import Flask, request, jsonify, render_template
 
 from feature_extractor import extract_features, FEATURE_NAMES
 from url_heuristics import inspect_url
+from db import get_connection, init_db, DB_TYPE
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
-# CORS support fallback
+# Permissive CORS headers for cross-origin frontend (e.g. Vercel -> Render)
 @app.after_request
 def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization'
-    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization,X-Session-ID,X-Requested-With'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
     return response
 
-# Try enabling flask_cors if present
 try:
     from flask_cors import CORS
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 except ImportError:
     pass
 
 MODEL_PATH = os.path.join(os.path.dirname(__file__), 'phishing_model.pkl')
 _model = None
-
 
 def get_model():
     """Lazy load and cache model in memory."""
@@ -43,126 +48,359 @@ def get_model():
         _model = joblib.load(MODEL_PATH)
     return _model
 
+def hash_password(password: str) -> str:
+    salt = secrets.token_hex(16)
+    hashed = hashlib.sha256((salt + password).encode('utf-8')).hexdigest()
+    return f"{salt}${hashed}"
+
+def verify_password(stored_hash: str, password_attempt: str) -> bool:
+    if not stored_hash or '$' not in stored_hash:
+        return False
+    salt, hashed = stored_hash.split('$', 1)
+    attempt_hash = hashlib.sha256((salt + password_attempt).encode('utf-8')).hexdigest()
+    return secrets.compare_digest(hashed, attempt_hash)
+
+def generate_session_id() -> str:
+    return secrets.token_urlsafe(16)[:10]
+
+def get_authenticated_user():
+    session_id = request.headers.get('X-Session-ID') or request.cookies.get('session_id')
+    if not session_id:
+        return None, None
+
+    try:
+        conn = get_connection()
+    except Exception:
+        return None, session_id
+
+    try:
+        with conn.cursor() as cur:
+            cur.execute("""
+                SELECT s.session_id, s.user_id, u.email, u.name, s.created_at as session_created
+                FROM user_sessions s
+                JOIN users u ON s.user_id = u.id
+                WHERE s.session_id = %s AND s.is_active = TRUE
+            """, (session_id,))
+            row = cur.fetchone()
+            if row:
+                if isinstance(row, dict):
+                    user_dict = row
+                else:
+                    user_dict = dict(row)
+                try:
+                    cur.execute("UPDATE user_sessions SET last_active = CURRENT_TIMESTAMP WHERE session_id = %s", (session_id,))
+                except Exception:
+                    pass
+                return user_dict, session_id
+    except Exception:
+        return None, session_id
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    return None, session_id
 
 @app.route('/')
 def home():
-    """Serve the single-page frontend interface."""
-    return render_template('index.html')
-
-
-@app.route('/health', methods=['GET'])
-def health():
-    """Health check endpoint."""
-    model_loaded = os.path.exists(MODEL_PATH)
+    """Serve the index page or API status."""
     return jsonify({
-        'status': 'healthy',
-        'service': 'Phishing URL Detection ML API',
-        'model_loaded': model_loaded,
-        'features': FEATURE_NAMES
+        'service': 'Scam Spotter API Backend',
+        'status': 'online',
+        'database': DB_TYPE,
+        'endpoints': ['/health', '/predict', '/api/auth/signup', '/api/auth/login', '/api/scans', '/api/gemini/generate']
     })
 
+@app.route('/health', methods=['GET'])
+@app.route('/api/health', methods=['GET'])
+def health():
+    return jsonify({
+        'status': 'healthy',
+        'service': 'Scam Spotter Full-Stack API',
+        'database': DB_TYPE,
+        'model_loaded': os.path.exists(MODEL_PATH)
+    })
+
+@app.route('/api/auth/signup', methods=['POST', 'OPTIONS'])
+def api_signup():
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    data = request.get_json(silent=True) or {}
+    email = (data.get('email') or '').strip().lower()
+    name = (data.get('name') or '').strip()
+    password = data.get('password') or ''
+
+    if not email or '@' not in email:
+        return jsonify({'error': 'Valid email address is required.'}), 400
+    if len(name) < 2:
+        return jsonify({'error': 'Full name must be at least 2 characters.'}), 400
+    if len(password) < 6:
+        return jsonify({'error': 'Password must be at least 6 characters.'}), 400
+
+    try:
+        conn = get_connection()
+    except Exception as exc:
+        return jsonify({'error': f'Database service currently unavailable ({exc}).'}), 503
+
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id FROM users WHERE email = %s", (email,))
+            if cur.fetchone():
+                return jsonify({'error': 'Account with this email already exists.'}), 409
+
+            user_id = str(uuid.uuid4())
+            pw_hash = hash_password(password)
+            cur.execute(
+                "INSERT INTO users (id, email, name, password_hash) VALUES (%s, %s, %s, %s)",
+                (user_id, email, name, pw_hash)
+            )
+
+            session_id = generate_session_id()
+            ip_addr = request.remote_addr
+            user_agent = request.headers.get('User-Agent', '')[:250]
+            cur.execute(
+                "INSERT INTO user_sessions (session_id, user_id, ip_address, user_agent) VALUES (%s, %s, %s, %s)",
+                (session_id, user_id, ip_addr, user_agent)
+            )
+
+            return jsonify({
+                'message': 'Account created successfully.',
+                'sessionId': session_id,
+                'user': {
+                    'id': user_id,
+                    'name': name,
+                    'email': email
+                }
+            }), 201
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+@app.route('/api/auth/login', methods=['POST', 'OPTIONS'])
+def api_login():
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    data = request.get_json(silent=True) or {}
+    email = (data.get('email') or '').strip().lower()
+    password = data.get('password') or ''
+
+    if not email or not password:
+        return jsonify({'error': 'Email and password are required.'}), 400
+
+    try:
+        conn = get_connection()
+    except Exception as exc:
+        return jsonify({'error': f'Database service currently unavailable ({exc}).'}), 503
+
+    try:
+        with conn.cursor() as cur:
+            cur.execute("SELECT id, email, name, password_hash FROM users WHERE email = %s", (email,))
+            user = cur.fetchone()
+            if not user:
+                return jsonify({'error': 'No account found with this email. Please sign up.'}), 404
+
+            if not isinstance(user, dict):
+                user = dict(user)
+
+            if not verify_password(user['password_hash'], password):
+                return jsonify({'error': 'Invalid password. Please check your credentials.'}), 401
+
+            session_id = generate_session_id()
+            ip_addr = request.remote_addr
+            user_agent = request.headers.get('User-Agent', '')[:250]
+            cur.execute(
+                "INSERT INTO user_sessions (session_id, user_id, ip_address, user_agent) VALUES (%s, %s, %s, %s)",
+                (session_id, user['id'], ip_addr, user_agent)
+            )
+
+            return jsonify({
+                'message': 'Login successful.',
+                'sessionId': session_id,
+                'user': {
+                    'id': user['id'],
+                    'name': user['name'],
+                    'email': user['email']
+                }
+            })
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+
+@app.route('/api/auth/me', methods=['GET', 'OPTIONS'])
+def api_auth_me():
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    user, session_id = get_authenticated_user()
+    if not user:
+        return jsonify({'authenticated': False, 'user': None}), 200
+
+    return jsonify({
+        'authenticated': True,
+        'sessionId': session_id,
+        'user': {
+            'id': user['user_id'],
+            'name': user['name'],
+            'email': user['email']
+        }
+    })
+
+@app.route('/api/auth/logout', methods=['POST', 'OPTIONS'])
+def api_logout():
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    session_id = request.headers.get('X-Session-ID')
+    if session_id:
+        try:
+            conn = get_connection()
+            with conn.cursor() as cur:
+                cur.execute("UPDATE user_sessions SET is_active = FALSE WHERE session_id = %s", (session_id,))
+            conn.close()
+        except Exception:
+            pass
+
+    return jsonify({'message': 'Logged out successfully.'})
+
+@app.route('/api/scans', methods=['GET', 'POST', 'OPTIONS'])
+def api_scans():
+    if request.method == 'OPTIONS':
+        return ('', 204)
+
+    user, session_id = get_authenticated_user()
+
+    # Guests do not persist history
+    if not user:
+        if request.method == 'POST':
+            return jsonify({'message': 'Guest mode: In-memory analysis only. No data stored.'}), 200
+        return jsonify({'history': []}), 200
+
+    if request.method == 'POST':
+        data = request.get_json(silent=True) or {}
+        content_preview = (data.get('content') or '').strip()
+        risk_score = int(data.get('riskScore', 0))
+        risk_level = (data.get('riskLevel') or 'LOW').upper()
+        scan_type = data.get('scanType', 'TEXT_MESSAGE')
+        headline = data.get('headline', '')
+        rules_fired = data.get('rulesFired') or []
+
+        if not content_preview:
+            return jsonify({'error': 'Scan content is required.'}), 400
+
+        scan_id = str(uuid.uuid4())
+        user_id = user['user_id']
+
+        try:
+            conn = get_connection()
+        except Exception:
+            return jsonify({'error': 'Database unavailable.'}), 503
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    INSERT INTO scan_records 
+                    (id, user_id, session_id, scan_type, content_preview, risk_score, risk_level, headline, rules_fired_json)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
+                """, (
+                    scan_id,
+                    user_id,
+                    session_id,
+                    scan_type,
+                    content_preview[:2000],
+                    risk_score,
+                    risk_level,
+                    headline[:250],
+                    json.dumps(rules_fired)
+                ))
+            return jsonify({
+                'id': scan_id,
+                'message': 'Scan record saved to database.',
+                'createdAt': datetime.utcnow().isoformat()
+            }), 201
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
+
+    if request.method == 'GET':
+        user_id = user['user_id']
+        try:
+            conn = get_connection()
+        except Exception:
+            return jsonify({'history': []}), 200
+
+        try:
+            with conn.cursor() as cur:
+                cur.execute("""
+                    SELECT id, scan_type, content_preview, risk_score, risk_level, headline, rules_fired_json, created_at
+                    FROM scan_records
+                    WHERE user_id = %s
+                    ORDER BY created_at DESC
+                    LIMIT 100
+                """, (user_id,))
+                rows = cur.fetchall()
+                history_list = []
+                for row in rows:
+                    r = dict(row) if not isinstance(row, dict) else row
+                    if r.get('created_at'):
+                        r['created_at'] = r['created_at'].isoformat()
+                    if isinstance(r.get('rules_fired_json'), str):
+                        try:
+                            r['rules_fired_json'] = json.loads(r['rules_fired_json'])
+                        except Exception:
+                            pass
+                    history_list.append(r)
+                return jsonify({'history': history_list})
+        finally:
+            try:
+                conn.close()
+            except Exception:
+                pass
 
 @app.route('/predict', methods=['POST', 'OPTIONS'])
 def predict():
-    """
-    Accepts JSON: {"url": "..."}
-    Returns: {"url": ..., "is_phishing": bool, "confidence_score": float, "features": dict}
-    """
-    if request.method == 'OPTIONS':
-        return ('', 204)
-
-    data = request.get_json(silent=True) or {}
-    url = data.get('url', '').strip()
-
-    if not url:
-        return jsonify({'error': 'URL parameter is required.'}), 400
-
-    try:
-        model = get_model()
-    except Exception as e:
-        return jsonify({'error': f'Model load failure: {str(e)}'}), 500
-
-    try:
-        # Extract 10 numerical features
-        features_dict = extract_features(url)
-        df = pd.DataFrame([features_dict])[FEATURE_NAMES]
-
-        # Predict
-        prediction = int(model.predict(df)[0])
-        probabilities = model.predict_proba(df)[0]
-        phishing_prob = float(probabilities[1])
-        safe_prob = float(probabilities[0])
-
-        is_phishing = bool(prediction == 1)
-        # Confidence is the probability of the predicted class
-        confidence_score = round(float(phishing_prob if is_phishing else safe_prob) * 100, 2)
-
-        heuristics_data = inspect_url(url)
-
-        return jsonify({
-            'url': url,
-            'is_phishing': is_phishing,
-            'confidence_score': confidence_score,
-            'phishing_probability': round(phishing_prob * 100, 2),
-            'safe_probability': round(safe_prob * 100, 2),
-            'verdict': 'Phishing / Suspicious' if is_phishing else 'Legitimate / Safe',
-            'features': features_dict,
-            'heuristics': heuristics_data
-        })
-    except Exception as err:
-        return jsonify({'error': f'Inference error: {str(err)}'}), 500
-
-
-@app.route('/inspect', methods=['POST', 'OPTIONS'])
-def inspect():
-    """
-    Evaluates URL against 15 Production Heuristic Rules (LEX-01..07, SEM-01..04, NET-01..04).
-    Thresholds: 0-25 Low, 26-55 Medium, 56+ High.
-    Accepts JSON: {"url": "..."}
-    """
     if request.method == 'OPTIONS':
         return ('', 204)
 
     data = request.get_json(silent=True) or {}
     url = data.get('url', '').strip()
     if not url:
-        return jsonify({'error': 'URL parameter is required.'}), 400
+        return jsonify({'error': 'No URL provided.'}), 400
 
-    result = inspect_url(url)
-    return jsonify(result)
+    heuristics = inspect_url(url)
+    model = get_model()
+    raw_feats = extract_features(url)
+    df_feat = pd.DataFrame([raw_feats])[FEATURE_NAMES]
 
+    probs = model.predict_proba(df_feat)[0]
+    phish_prob = float(probs[1])
+    is_phishing = phish_prob >= 0.50
+
+    return jsonify({
+        'url': url,
+        'is_phishing': is_phishing,
+        'confidence_score': round(phish_prob * 100, 2),
+        'risk_level': 'HIGH' if phish_prob >= 0.60 else 'MEDIUM' if phish_prob >= 0.30 else 'LOW',
+        'features': raw_feats,
+        'heuristics': heuristics
+    })
 
 def _get_gemini_key():
-    """Retrieves Gemini key from environment or .env without exposing plaintext."""
-    env_key = os.environ.get('GEMINI_API_KEY')
-    if env_key:
-        return env_key
-    env_file = os.path.join(os.path.dirname(__file__), '.env')
-    if os.path.exists(env_file):
-        try:
-            with open(env_file, 'r', encoding='utf-8') as f:
-                for line in f:
-                    line = line.strip()
-                    if line.startswith('GEMINI_API_KEY=') or line.startswith('VITE_GEMINI_API_KEY='):
-                        return line.split('=', 1)[1].strip()
-        except Exception:
-            pass
-    # Obfuscated char-code fallback
-    _k = [65, 81, 46, 65, 98, 56, 82, 78, 54, 76, 99, 78, 113, 78, 50, 108, 109, 114, 56, 98, 109, 100, 49, 89, 76, 81, 48, 101, 88, 98, 52, 104, 109, 72, 88, 56, 120, 73, 45, 121, 114, 72, 109, 86, 72, 56, 86, 72, 71, 54, 56, 81, 119]
-    return ''.join(chr(c) for c in _k)
-
+    return os.environ.get('GEMINI_API_KEY') or os.environ.get('VITE_GEMINI_API_KEY') or ''
 
 @app.route('/api/gemini/generate', methods=['POST', 'OPTIONS'])
 def gemini_proxy():
-    """
-    Secure server-side proxy for Google Gemini API.
-    Shields API credentials completely from frontend network exposure.
-    """
     if request.method == 'OPTIONS':
         return ('', 204)
 
     import urllib.request
-    import json
 
     data = request.get_json(silent=True) or {}
     payload = data.get('payload')
@@ -199,8 +437,11 @@ def gemini_proxy():
 
     return jsonify({'error': last_err or 'All Gemini candidate models failed.'}), 502
 
-
 if __name__ == '__main__':
+    try:
+        init_db()
+    except Exception as e:
+        print(f"[*] Database init skipped or failed ({e}). Proceeding.")
     port = int(os.environ.get('PORT', 5001))
-    print(f"[*] Starting Phishing URL Detection Flask server on http://127.0.0.1:{port}")
-    app.run(host='0.0.0.0', port=port, debug=False)
+    print(f"[*] Starting Scam Spotter Full-Stack Backend on http://0.0.0.0:{port} (DB: {DB_TYPE})")
+    app.run(host='0.0.0.0', port=port, debug=False, threaded=True)
