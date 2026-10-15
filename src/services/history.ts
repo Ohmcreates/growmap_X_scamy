@@ -1,5 +1,5 @@
 import { RiskLevel, ScanResult } from '../engine/types.js';
-import { AuthService } from './authService.js';
+import { AuthService, getApiUrl } from './authService.js';
 
 export interface HistoryItem {
   id: string;
@@ -59,7 +59,8 @@ export class HistoryService {
     }
 
     try {
-      const res = await fetch('/api/scans', {
+      const endpoint = getApiUrl('/api/scans');
+      const res = await fetch(endpoint, {
         headers: { 'X-Session-ID': session }
       });
       if (!res.ok) return this.getLocalHistory();
@@ -124,7 +125,8 @@ export class HistoryService {
     }
 
     const session = AuthService.getSessionId();
-    fetch('/api/scans', {
+    const endpoint = getApiUrl('/api/scans');
+    fetch(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
