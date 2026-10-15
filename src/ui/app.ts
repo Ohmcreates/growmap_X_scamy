@@ -65,6 +65,10 @@ export function initApp() {
   const btnExampleDigitalArrest = document.getElementById('btnExampleDigitalArrest') as HTMLButtonElement;
   const btnExampleHinglish = document.getElementById('btnExampleHinglish') as HTMLButtonElement;
   const btnExampleHindi = document.getElementById('btnExampleHindi') as HTMLButtonElement;
+  const btnExampleBengali = document.getElementById('btnExampleBengali') as HTMLButtonElement;
+  const btnExampleTamil = document.getElementById('btnExampleTamil') as HTMLButtonElement;
+  const btnExampleTelugu = document.getElementById('btnExampleTelugu') as HTMLButtonElement;
+  const btnExampleOdia = document.getElementById('btnExampleOdia') as HTMLButtonElement;
 
   // Submit & Clear
   const btnAnalyze = document.getElementById('btnAnalyze') as HTMLButtonElement;
@@ -329,12 +333,10 @@ export function initApp() {
 
     if (text.trim().length > 0) {
       const scriptInfo = detectScript(text);
-      if (scriptInfo.script === 'DEVANAGARI') {
-        langScriptPill.textContent = '🌐 Script: Devanagari (हिन्दी)';
-      } else if (scriptInfo.isHinglishCandidate) {
-        langScriptPill.textContent = '🌐 Script: Hinglish (Transliteration)';
+      if (scriptInfo.isIndicLanguage) {
+        langScriptPill.textContent = `🇮🇳 ${scriptInfo.languageName} (${scriptInfo.nativeScriptName})`;
       } else if (scriptInfo.script === 'MIXED') {
-        langScriptPill.textContent = '🌐 Script: Mixed Multilingual';
+        langScriptPill.textContent = `🌐 ${scriptInfo.languageName}`;
       } else {
         langScriptPill.textContent = '🌐 Script: Latin (English)';
       }
@@ -421,6 +423,38 @@ export function initApp() {
     switchTab('TEXT');
     textarea.value =
       'प्रिय ग्राहक, आपका बिजली बिल बकाया है। आज रात 9:30 बजे बिजली का कनेक्शन काट दिया जाएगा। तुरंत बिजली अधिकारी को 9876543210 पर कॉल करें।';
+    updateInputMetrics();
+    runAnalysis();
+  });
+
+  btnExampleBengali?.addEventListener('click', () => {
+    switchTab('TEXT');
+    textarea.value =
+      'প্রিয় গ্রাহক, আপনার বিদ্যুৎ বিল বকেয়া রয়েছে। আজ রাতে বিদ্যুৎ সংযোগ বিচ্ছিন্ন করা হবে। অবিলম্বে বিদ্যুৎ দপ্তর 9876543210 নম্বরে যোগাযোগ করুন।';
+    updateInputMetrics();
+    runAnalysis();
+  });
+
+  btnExampleTamil?.addEventListener('click', () => {
+    switchTab('TEXT');
+    textarea.value =
+      'அன்புள்ள வாடிக்கையாளரே, உங்கள் மின்சார கட்டணம் நிலுவையில் உள்ளது. இன்றிரவு மின் இணைப்பு துண்டிக்கப்படும். உடனடியாக மின்சார வாரியத்தை 9876543210 அழைக்கவும்.';
+    updateInputMetrics();
+    runAnalysis();
+  });
+
+  btnExampleTelugu?.addEventListener('click', () => {
+    switchTab('TEXT');
+    textarea.value =
+      'ప్రియమైన వినియోగదారు, మీ విద్యుత్ బిల్లు బకాయి ఉంది. ఈ రాత్రి కరెంట్ కట్ అవుతుంది. వెంటనే విద్యుత్ అధికారిని 9876543210 నంబర్‌లో సంప్రదించండి.';
+    updateInputMetrics();
+    runAnalysis();
+  });
+
+  btnExampleOdia?.addEventListener('click', () => {
+    switchTab('TEXT');
+    textarea.value =
+      'ପ୍ରିୟ ଗ୍ରାହକ, ଆପଣଙ୍କ ବିଦ୍ୟୁତ ବିଲ ବକେୟା ଅଛି। ଆଜି ରାତିରେ ବିଦ୍ୟୁତ ସଂଯୋଗ ବିଚ୍ଛିନ୍ନ ହେବ। ତୁରନ୍ତ ବିଦ୍ୟୁତ ଅଧିକାରୀଙ୍କୁ 9876543210 ରେ କଲ କରନ୍ତୁ।';
     updateInputMetrics();
     runAnalysis();
   });

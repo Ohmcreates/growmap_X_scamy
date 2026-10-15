@@ -56,8 +56,8 @@ export const SCAM_PROFILES: ScamProfile[] = [
     patterns: [
       /\b(?:electricity\s+power\s+will\s+be\s+disconnected|light\s+cut|bill\s+not\s+updated|call\s+electricity\s+officer)\b/i,
       /\b(?:bijli|power|electricity|gas)\s*(?:ka\s+)?(?:connection|line)?[^\n\r.!?]{0,50}(?:kaat|kat|cut|band|disconnect)/i,
-      /\b(?:pichh?la\s+bill|bill\s+update\s+nahi|officer\s+number|bill\s+jama\s+karein)\b/i,
-      /(?:बिजली\s+(?:का\s+)?कनेक्शन|बिजली\s+बिल|बिजली\s+अधिकारी)/u,
+      /\b(?:pichh?la\s+bill|bill\s+update\s+nahi|officer\s+number|bill\s+jama\s+karein|biddyut|vidyut|minsara|vijli|vidyuth|vaidyuthi|bidyut)\b/i,
+      /(?:बिजली\s+(?:का\s+)?कनेक्शन|बिजली\s+बिल|बिजली\s+अधिकारी|বিদ্যুৎ|విద్యుత్|மின்சார|વીજળી|ವಿದ್ಯುತ್|വൈദ്യുതി|ବିଦ୍ୟୁତ|ਬਿਜਲੀ|بجلی)/u,
     ],
     advicePayload: [
       'State electricity boards send official notices on electricity bills, never via random personal phone numbers.',
