@@ -351,6 +351,40 @@ body.theme-dark .heading-left {
   color: #94a3b8 !important;
 }
 
+body.theme-dark .btn-ai-advisory {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #f8fafc;
+}
+
+body.theme-dark .phone-screen-graphic {
+  background: #111827;
+}
+
+body.theme-dark .ncii-limitations-notice {
+  background: #271418;
+  border-color: #501621;
+  color: #fca5a5;
+}
+
+body.theme-dark .threat-badge-pill.verified {
+  background: #271418;
+  border-color: #501621;
+  color: #f87171;
+}
+
+body.theme-dark .threat-badge-pill.review {
+  background: #271e0c;
+  border-color: #4a3410;
+  color: #fbbf24;
+}
+
+body.theme-dark .chip-lang {
+  background-color: #064e3b !important;
+  border-color: #047857 !important;
+  color: #a7f3d0 !important;
+}
+
 *, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
@@ -2182,6 +2216,19 @@ code, pre, .font-mono {
   color: var(--text-muted);
 }
 
+/* Mobile Sidebar Toggle */
+.sidebar-hamburger {
+  display: none;
+  background: none;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px 10px;
+  color: var(--text-main);
+  line-height: 1;
+}
+
 /* Responsive Breakpoints */
 @media (max-width: 1024px) {
   .main-body-grid {
@@ -2203,15 +2250,43 @@ code, pre, .font-mono {
     flex-direction: column;
   }
   .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid var(--border-color);
+    position: fixed;
+    top: 68px;
+    left: 0;
+    width: 280px;
+    max-width: 85vw;
+    height: calc(100vh - 68px);
+    z-index: 900;
+    transform: translateX(-100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    overflow-y: auto;
+    background-color: var(--bg-card);
+    border-right: 1px solid var(--border-color);
+    border-bottom: none;
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+  }
+  .sidebar.sidebar-open {
+    transform: translateX(0);
+  }
+  .sidebar-backdrop {
+    display: none;
+    position: fixed;
+    inset: 0;
+    top: 68px;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 899;
+  }
+  .sidebar-backdrop.visible {
+    display: block;
   }
   .sidebar-cards-group {
     display: none;
   }
   .nav-center {
     display: none;
+  }
+  .sidebar-hamburger {
+    display: block;
   }
 }
 
@@ -2229,6 +2304,9 @@ code, pre, .font-mono {
   }
   .pricing-grid {
     grid-template-columns: 1fr;
+  }
+  .top-nav {
+    padding: 0 14px;
   }
 }
 

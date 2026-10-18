@@ -1,0 +1,58 @@
+// ====================================================================
+// Scam Spotter (Growmap x Scamy) — Prisma ORM Schema for Supabase
+// ====================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id           String        @id @default(uuid())
+  email        String        @unique
+  name         String
+  passwordHash String        @map("password_hash")
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @default(now()) @updatedAt @map("updated_at")
+  sessions     UserSession[]
+  scans        ScanRecord[]
+
+  @@map("users")
+}
+
+model UserSession {
+  sessionId  String   @id @map("session_id")
+  userId     String   @map("user_id")
+  createdAt  DateTime @default(now()) @map("created_at")
+  lastActive DateTime @default(now()) @map("last_active")
+  ipAddress  String?  @map("ip_address")
+  userAgent  String?  @map("user_agent")
+  isActive   Boolean  @default(true) @map("is_active")
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_sessions")
+}
+
+model ScanRecord {
+  id             String   @id @default(uuid())
+  userId         String?  @map("user_id")
+  sessionId      String?  @map("session_id")
+  scanType       String   @default("TEXT_MESSAGE") @map("scan_type")
+  contentPreview String   @map("content_preview")
+  riskScore      Int      @map("risk_score")
+  riskLevel      String   @map("risk_level")
+  headline       String?
+  rulesFiredJson Json?    @map("rules_fired_json")
+  createdAt      DateTime @default(now()) @map("created_at")
+  user           User?    @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([sessionId])
+  @@index([createdAt(sort: Desc)])
+  @@map("scan_records")
+}

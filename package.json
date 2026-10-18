@@ -6,19 +6,24 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc && vite build",
+    "build": "prisma generate && tsc && vite build",
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "benchmark": "vitest run src/engine/__tests__/benchmark.test.ts"
+    "benchmark": "vitest run src/engine/__tests__/benchmark.test.ts",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push"
   },
   "devDependencies": {
     "@types/jszip": "^3.4.0",
+    "@types/node": "^22.0.0",
+    "prisma": "^5.22.0",
     "typescript": "^5.7.0",
     "vite": "^6.0.0",
     "vitest": "^3.0.0"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "jsqr": "^1.4.0",
     "jszip": "^3.10.2",
     "tesseract.js": "^7.0.0"

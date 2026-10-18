@@ -1,36 +1,42 @@
+"""
+Scam Spotter (Growmap x Scamy) — Production Full-Stack Backend API
+Powered by Flask, scikit-learn Random Forest, and multi-database connectivity (Supabase PostgreSQL / MySQL / SQLite).
+Ready for Render, Vercel frontend, and Supabase database.
+"""
+
 import os
 import sys
-import uuid
 
 if sys.stdout is None:
     sys.stdout = open(os.devnull, 'w', encoding='utf-8')
 if sys.stderr is None:
     sys.stderr = open(os.devnull, 'w', encoding='utf-8')
 import json
-import secrets
+import uuid
 import hashlib
-import string
+import secrets
 from datetime import datetime
-from flask import Flask, request, jsonify, render_template
 import joblib
 import pandas as pd
+from flask import Flask, request, jsonify, render_template
 
 from feature_extractor import extract_features, FEATURE_NAMES
 from url_heuristics import inspect_url
-from db import get_connection, init_db
+from db import get_connection, init_db, DB_TYPE
 
 app = Flask(__name__, template_folder='templates', static_folder='static')
 
+# Permissive CORS headers for cross-origin frontend (e.g. Vercel -> Render)
 @app.after_request
 def add_cors_headers(response):
     response.headers['Access-Control-Allow-Origin'] = '*'
-    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization,X-Session-ID'
-    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,OPTIONS,DELETE'
+    response.headers['Access-Control-Allow-Headers'] = 'Content-Type,Authorization,X-Session-ID,X-Requested-With'
+    response.headers['Access-Control-Allow-Methods'] = 'GET,POST,PUT,DELETE,OPTIONS'
     return response
 
 try:
     from flask_cors import CORS
-    CORS(app)
+    CORS(app, resources={r"/*": {"origins": "*"}})
 except ImportError:
     pass
 
@@ -38,30 +44,30 @@ MODEL_PATH = os.path.join(os.path.dirname(__file__), 'phishing_model.pkl')
 _model = None
 
 def get_model():
+    """Lazy load and cache model in memory."""
     global _model
     if _model is None:
         if not os.path.exists(MODEL_PATH):
-            raise FileNotFoundError(f"Model file '{MODEL_PATH}' not found.")
+            raise FileNotFoundError(
+                f"Model file '{MODEL_PATH}' not found. Please run fetch_and_train.py first."
+            )
         _model = joblib.load(MODEL_PATH)
     return _model
-
-def generate_session_id() -> str:
-    # Generates a clean, compact 10-character cryptographically secure token
-    alphabet = string.ascii_letters + string.digits
-    return ''.join(secrets.choice(alphabet) for _ in range(10))
 
 def hash_password(password: str) -> str:
     salt = secrets.token_hex(16)
     hashed = hashlib.sha256((salt + password).encode('utf-8')).hexdigest()
     return f"{salt}${hashed}"
 
-def verify_password(stored_password: str, provided_password: str) -> bool:
-    try:
-        salt, hashed = stored_password.split('$', 1)
-        test_hash = hashlib.sha256((salt + provided_password).encode('utf-8')).hexdigest()
-        return secrets.compare_digest(hashed, test_hash)
-    except Exception:
+def verify_password(stored_hash: str, password_attempt: str) -> bool:
+    if not stored_hash or '$' not in stored_hash:
         return False
+    salt, hashed = stored_hash.split('$', 1)
+    attempt_hash = hashlib.sha256((salt + password_attempt).encode('utf-8')).hexdigest()
+    return secrets.compare_digest(hashed, attempt_hash)
+
+def generate_session_id() -> str:
+    return secrets.token_urlsafe(16)[:10]
 
 def get_authenticated_user():
     session_id = request.headers.get('X-Session-ID') or request.cookies.get('session_id')
@@ -83,8 +89,15 @@ def get_authenticated_user():
             """, (session_id,))
             row = cur.fetchone()
             if row:
-                cur.execute("UPDATE user_sessions SET last_active = NOW() WHERE session_id = %s", (session_id,))
-                return row, session_id
+                if isinstance(row, dict):
+                    user_dict = row
+                else:
+                    user_dict = dict(row)
+                try:
+                    cur.execute("UPDATE user_sessions SET last_active = CURRENT_TIMESTAMP WHERE session_id = %s", (session_id,))
+                except Exception:
+                    pass
+                return user_dict, session_id
     except Exception:
         return None, session_id
     finally:
@@ -96,7 +109,13 @@ def get_authenticated_user():
 
 @app.route('/')
 def home():
-    return render_template('index.html')
+    """Serve the index page or API status."""
+    return jsonify({
+        'service': 'Scam Spotter API Backend',
+        'status': 'online',
+        'database': DB_TYPE,
+        'endpoints': ['/health', '/predict', '/api/auth/signup', '/api/auth/login', '/api/scans', '/api/gemini/generate']
+    })
 
 @app.route('/health', methods=['GET'])
 @app.route('/api/health', methods=['GET'])
@@ -104,6 +123,7 @@ def health():
     return jsonify({
         'status': 'healthy',
         'service': 'Scam Spotter Full-Stack API',
+        'database': DB_TYPE,
         'model_loaded': os.path.exists(MODEL_PATH)
     })
 
@@ -127,7 +147,7 @@ def api_signup():
     try:
         conn = get_connection()
     except Exception as exc:
-        return jsonify({'error': 'Database service currently unavailable. Please verify MySQL is running.'}), 503
+        return jsonify({'error': f'Database service currently unavailable ({exc}).'}), 503
 
     try:
         with conn.cursor() as cur:
@@ -151,7 +171,7 @@ def api_signup():
             )
 
             return jsonify({
-                'message': 'Signup successful.',
+                'message': 'Account created successfully.',
                 'sessionId': session_id,
                 'user': {
                     'id': user_id,
@@ -180,14 +200,17 @@ def api_login():
     try:
         conn = get_connection()
     except Exception as exc:
-        return jsonify({'error': 'Database service currently unavailable. Please verify MySQL is running.'}), 503
+        return jsonify({'error': f'Database service currently unavailable ({exc}).'}), 503
 
     try:
         with conn.cursor() as cur:
             cur.execute("SELECT id, email, name, password_hash FROM users WHERE email = %s", (email,))
             user = cur.fetchone()
             if not user:
-                return jsonify({'error': 'No account found with this email. Please sign up first.'}), 404
+                return jsonify({'error': 'No account found with this email. Please sign up.'}), 404
+
+            if not isinstance(user, dict):
+                user = dict(user)
 
             if not verify_password(user['password_hash'], password):
                 return jsonify({'error': 'Invalid password. Please check your credentials.'}), 401
@@ -241,12 +264,13 @@ def api_logout():
 
     session_id = request.headers.get('X-Session-ID')
     if session_id:
-        conn = get_connection()
         try:
+            conn = get_connection()
             with conn.cursor() as cur:
                 cur.execute("UPDATE user_sessions SET is_active = FALSE WHERE session_id = %s", (session_id,))
-        finally:
             conn.close()
+        except Exception:
+            pass
 
     return jsonify({'message': 'Logged out successfully.'})
 
@@ -257,7 +281,7 @@ def api_scans():
 
     user, session_id = get_authenticated_user()
 
-    # Strict Privacy & Security: Guests never store data to database and cannot fetch history
+    # Guests do not persist history
     if not user:
         if request.method == 'POST':
             return jsonify({'message': 'Guest mode: In-memory analysis only. No data stored.'}), 200
@@ -328,15 +352,18 @@ def api_scans():
                     LIMIT 100
                 """, (user_id,))
                 rows = cur.fetchall()
+                history_list = []
                 for row in rows:
-                    if row.get('created_at'):
-                        row['created_at'] = row['created_at'].isoformat()
-                    if isinstance(row.get('rules_fired_json'), str):
+                    r = dict(row) if not isinstance(row, dict) else row
+                    if r.get('created_at'):
+                        r['created_at'] = r['created_at'].isoformat()
+                    if isinstance(r.get('rules_fired_json'), str):
                         try:
-                            row['rules_fired_json'] = json.loads(row['rules_fired_json'])
+                            r['rules_fired_json'] = json.loads(r['rules_fired_json'])
                         except Exception:
                             pass
-                return jsonify({'history': rows})
+                    history_list.append(r)
+                return jsonify({'history': history_list})
         finally:
             try:
                 conn.close()
@@ -420,9 +447,9 @@ if __name__ == '__main__':
     try:
         init_db()
     except Exception as e:
-        print(f"[*] MySQL connection skipped ({e}). Continuing with in-memory/client fallback.")
+        print(f"[*] Database init skipped or failed ({e}). Proceeding.")
     port = int(os.environ.get('PORT', 5001))
-    print(f"[*] Starting Scam Spotter Full-Stack Backend on http://127.0.0.1:{port}")
+    print(f"[*] Starting Scam Spotter Full-Stack Backend on http://0.0.0.0:{port} (DB: {DB_TYPE})")
     try:
         from waitress import serve
         print(f"[*] Serving with Waitress production WSGI on 0.0.0.0:{port}")

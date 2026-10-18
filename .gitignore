@@ -4,6 +4,7 @@ dist
 .vite
 venv/
 .venv/
+*.db
 __pycache__/
 *.pyc
 .env

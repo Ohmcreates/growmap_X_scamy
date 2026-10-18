@@ -45,14 +45,16 @@ export class AppRouter {
     // Delegate clicks for routing and anchor links
     document.addEventListener('click', (e) => {
       // 1. Check data-route-to or clean path links
-      const target = (e.target as HTMLElement).closest('[data-route-to], a[href="/workspace"], a[href="/login"], a[href="/"]') as HTMLElement | null;
+      const target = (e.target as HTMLElement).closest(
+        '[data-route-to], a[href="/workspace"], a[href="#workspace"], a[href="/login"], a[href="#login"], a[href="/"], a[href="#landing"]'
+      ) as HTMLElement | null;
       if (target) {
         let route = target.getAttribute('data-route-to') as AppRoute | null;
         if (!route) {
-          const href = target.getAttribute('href');
-          if (href === '/workspace') route = 'workspace';
-          else if (href === '/login') route = 'login';
-          else if (href === '/') route = 'landing';
+          const href = target.getAttribute('href') || '';
+          if (href === '/workspace' || href === '#workspace') route = 'workspace';
+          else if (href === '/login' || href === '#login') route = 'login';
+          else if (href === '/' || href === '#landing') route = 'landing';
         }
 
         if (route && (route === 'landing' || route === 'login' || route === 'workspace')) {
@@ -300,7 +302,7 @@ export class AppRouter {
       this.landingView.classList.remove('active');
       this.authView.style.display = 'none';
       this.authView.classList.remove('active');
-      this.appWorkspaceView.style.display = 'block';
+      this.appWorkspaceView.style.display = 'flex';
       this.appWorkspaceView.classList.add('active');
       if (scrollToTop) {
         window.scrollTo(0, 0);

@@ -189,21 +189,153 @@ export function initApp() {
   let alarmTimeout: number | null = null;
 
   // --------------------------------------------------------------------------
-  // Theme Toggle (Light / Dark)
+  // Theme Toggle (Light / Dark) for Workspace & Landing Page
   // --------------------------------------------------------------------------
+  const btnLandingThemeToggle = document.getElementById('btnLandingThemeToggle') as HTMLButtonElement | null;
   const savedTheme = localStorage.getItem('scamy_theme');
-  if (savedTheme === 'dark') {
-    document.body.classList.add('theme-dark');
-    if (btnThemeToggle) btnThemeToggle.textContent = '🌙';
-  }
 
-  btnThemeToggle?.addEventListener('click', () => {
-    document.body.classList.toggle('theme-dark');
-    const isDark = document.body.classList.contains('theme-dark');
-    btnThemeToggle.textContent = isDark ? '🌙' : '☀️';
+  function applyTheme(isDark: boolean) {
+    if (isDark) {
+      document.body.classList.add('theme-dark');
+      if (btnThemeToggle) btnThemeToggle.textContent = '🌙';
+      if (btnLandingThemeToggle) btnLandingThemeToggle.textContent = '🌙';
+    } else {
+      document.body.classList.remove('theme-dark');
+      if (btnThemeToggle) btnThemeToggle.textContent = '☀️';
+      if (btnLandingThemeToggle) btnLandingThemeToggle.textContent = '☀️';
+    }
     try {
       localStorage.setItem('scamy_theme', isDark ? 'dark' : 'light');
     } catch {}
+  }
+
+  if (savedTheme === 'dark') {
+    applyTheme(true);
+  } else {
+    applyTheme(false);
+  }
+
+  btnThemeToggle?.addEventListener('click', () => {
+    const isDark = !document.body.classList.contains('theme-dark');
+    applyTheme(isDark);
+  });
+
+  btnLandingThemeToggle?.addEventListener('click', () => {
+    const isDark = !document.body.classList.contains('theme-dark');
+    applyTheme(isDark);
+  });
+
+  // --------------------------------------------------------------------------
+  // Landing Page Mobile Menu Toggle
+  // --------------------------------------------------------------------------
+  const btnLandingMenuToggle = document.getElementById('btnLandingMenuToggle') as HTMLButtonElement | null;
+  const landingNavLinks = document.getElementById('meticNavLinks') as HTMLElement | null;
+
+  function closeLandingMenu() {
+    landingNavLinks?.classList.remove('open');
+    if (btnLandingMenuToggle) btnLandingMenuToggle.textContent = '☰';
+  }
+
+  btnLandingMenuToggle?.addEventListener('click', () => {
+    const isOpen = landingNavLinks?.classList.toggle('open');
+    if (btnLandingMenuToggle) btnLandingMenuToggle.textContent = isOpen ? '✕' : '☰';
+  });
+
+  // Auto-close landing nav when link is clicked
+  landingNavLinks?.querySelectorAll('a').forEach((link) => {
+    link.addEventListener('click', () => {
+      closeLandingMenu();
+    });
+  });
+
+  // --------------------------------------------------------------------------
+  // Sidebar Toggle (Mobile Drawer & Desktop Collapse)
+  // --------------------------------------------------------------------------
+  const btnSidebarToggle = document.getElementById('btnSidebarToggle') as HTMLButtonElement | null;
+  const btnMobileSidebarToggle = document.getElementById('btnMobileSidebarToggle') as HTMLButtonElement | null;
+  const sidebarEl = document.querySelector('.sidebar') as HTMLElement | null;
+  const sidebarBackdrop = document.getElementById('sidebarBackdrop') as HTMLElement | null;
+  const SIDEBAR_STATE_KEY = 'scam_spotter_sidebar_state';
+
+  function applySidebarState(collapsed: boolean) {
+    if (!sidebarEl || !btnSidebarToggle) return;
+    if (collapsed) {
+      sidebarEl.classList.add('collapsed');
+      btnSidebarToggle.classList.remove('is-open');
+      btnSidebarToggle.setAttribute('aria-expanded', 'false');
+    } else {
+      sidebarEl.classList.remove('collapsed');
+      btnSidebarToggle.classList.add('is-open');
+      btnSidebarToggle.setAttribute('aria-expanded', 'true');
+    }
+  }
+
+  // Restore remembered sidebar state from localStorage on page load / refresh
+  try {
+    const savedSidebarState = localStorage.getItem(SIDEBAR_STATE_KEY);
+    if (savedSidebarState === 'collapsed') {
+      applySidebarState(true);
+    } else if (savedSidebarState === 'open') {
+      applySidebarState(false);
+    }
+  } catch {}
+
+  function closeSidebar() {
+    sidebarEl?.classList.remove('sidebar-open');
+    sidebarBackdrop?.classList.remove('visible');
+    if (btnSidebarToggle) btnSidebarToggle.textContent = '☰';
+    if (btnMobileSidebarToggle) btnMobileSidebarToggle.textContent = '☰';
+  }
+
+  function toggleMobileSidebar() {
+    const isOpen = sidebarEl?.classList.toggle('sidebar-open');
+    sidebarBackdrop?.classList.toggle('visible', isOpen);
+    const icon = isOpen ? '✕' : '☰';
+    if (btnSidebarToggle) btnSidebarToggle.textContent = icon;
+    if (btnMobileSidebarToggle) btnMobileSidebarToggle.textContent = icon;
+  }
+
+  btnMobileSidebarToggle?.addEventListener('click', toggleMobileSidebar);
+
+  btnSidebarToggle?.addEventListener('click', () => {
+    if (window.innerWidth <= 1024) {
+      toggleMobileSidebar();
+    } else {
+      if (!sidebarEl) return;
+      const isCollapsed = sidebarEl.classList.toggle('collapsed');
+      if (isCollapsed) {
+        btnSidebarToggle?.classList.remove('is-open');
+        btnSidebarToggle?.setAttribute('aria-expanded', 'false');
+        try {
+          localStorage.setItem(SIDEBAR_STATE_KEY, 'collapsed');
+        } catch {}
+      } else {
+        btnSidebarToggle?.classList.add('is-open');
+        btnSidebarToggle?.setAttribute('aria-expanded', 'true');
+        try {
+          localStorage.setItem(SIDEBAR_STATE_KEY, 'open');
+        } catch {}
+      }
+    }
+  });
+
+  sidebarBackdrop?.addEventListener('click', closeSidebar);
+
+  // Auto-close sidebar when a menu item is clicked on mobile
+  document.querySelectorAll('.sidebar-item').forEach((item) => {
+    item.addEventListener('click', () => {
+      if (window.innerWidth <= 1024) closeSidebar();
+    });
+  });
+
+  // Close menus on window resize to desktop
+  window.addEventListener('resize', () => {
+    if (window.innerWidth > 1024) {
+      closeSidebar();
+    }
+    if (window.innerWidth > 900) {
+      closeLandingMenu();
+    }
   });
 
   // --------------------------------------------------------------------------
@@ -1234,51 +1366,6 @@ export function initApp() {
   });
   closeEvalModal?.addEventListener('click', () => evalModal?.classList.remove('open'));
 
-  // Sidebar toggle button (collapse / expand sidebar with animated hamburger icon)
-  const btnSidebarToggle = document.getElementById('btnSidebarToggle') as HTMLButtonElement | null;
-  const sidebarEl = document.querySelector('.sidebar') as HTMLElement | null;
-  const SIDEBAR_STATE_KEY = 'scam_spotter_sidebar_state';
-
-  function applySidebarState(collapsed: boolean) {
-    if (!sidebarEl || !btnSidebarToggle) return;
-    if (collapsed) {
-      sidebarEl.classList.add('collapsed');
-      btnSidebarToggle.classList.remove('is-open');
-      btnSidebarToggle.setAttribute('aria-expanded', 'false');
-    } else {
-      sidebarEl.classList.remove('collapsed');
-      btnSidebarToggle.classList.add('is-open');
-      btnSidebarToggle.setAttribute('aria-expanded', 'true');
-    }
-  }
-
-  // Restore remembered sidebar state from localStorage on page load / refresh
-  try {
-    const savedSidebarState = localStorage.getItem(SIDEBAR_STATE_KEY);
-    if (savedSidebarState === 'collapsed') {
-      applySidebarState(true);
-    } else if (savedSidebarState === 'open') {
-      applySidebarState(false);
-    }
-  } catch {}
-
-  btnSidebarToggle?.addEventListener('click', () => {
-    if (!sidebarEl) return;
-    const isCollapsed = sidebarEl.classList.toggle('collapsed');
-    if (isCollapsed) {
-      btnSidebarToggle.classList.remove('is-open');
-      btnSidebarToggle.setAttribute('aria-expanded', 'false');
-      try {
-        localStorage.setItem(SIDEBAR_STATE_KEY, 'collapsed');
-      } catch {}
-    } else {
-      btnSidebarToggle.classList.add('is-open');
-      btnSidebarToggle.setAttribute('aria-expanded', 'true');
-      try {
-        localStorage.setItem(SIDEBAR_STATE_KEY, 'open');
-      } catch {}
-    }
-  });
 
   // --------------------------------------------------------------------------
   // Feature 1: Scam Reporting & Verified Indicator Database

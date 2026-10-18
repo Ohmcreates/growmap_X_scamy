@@ -2475,6 +2475,405 @@ body {
   color: #ffffff;
 }
 
+
+/* ==========================================================================
+   DARK MODE & RESPONSIVE MOBILE MENU — Landing Page Overrides
+   Applied when body.theme-dark is active
+   ========================================================================== */
+body.theme-dark {
+  --metic-canvas: #0b0f19;
+  --metic-canvas-subtle: #111827;
+  --metic-canvas-card: #161e2e;
+  --metic-ink: #f1f5f9;
+  --metic-ink-muted: #94a3b8;
+  --metic-ink-light: #64748b;
+  --metic-border: #27354a;
+  --metic-border-strong: #374151;
+  --metic-surface: #111827;
+  --metic-surface-hover: #1e293b;
+  --metic-crimson: #ef4444;
+  --metic-crimson-dark: #dc2626;
+  --metic-crimson-soft: #271418;
+  --metic-crimson-border: #501621;
+}
+
+/* Header */
+body.theme-dark .metic-header {
+  background: rgba(11, 15, 25, 0.94);
+  border-bottom-color: var(--metic-border);
+}
+
+body.theme-dark .metic-logo-mark {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border-color: #ef4444 !important;
+}
+
+body.theme-dark .metic-brand-name {
+  color: #f8fafc;
+}
+
+/* Solid Buttons in Dark Mode: Crisp White with Dark Text for Maximum Contrast */
+body.theme-dark .metic-btn-solid,
+body.theme-dark .metic-btn-primary,
+body.theme-dark .metic-btn-cta-large,
+body.theme-dark .metic-btn-auth-submit,
+body.theme-dark .metic-btn-analyze-demo,
+body.theme-dark .metic-btn-workspace-link {
+  background: #ffffff !important;
+  color: #0b0f19 !important;
+  border-color: #ffffff !important;
+  font-weight: 700 !important;
+}
+
+body.theme-dark .metic-btn-solid:hover,
+body.theme-dark .metic-btn-primary:hover,
+body.theme-dark .metic-btn-cta-large:hover,
+body.theme-dark .metic-btn-auth-submit:hover,
+body.theme-dark .metic-btn-analyze-demo:hover,
+body.theme-dark .metic-btn-workspace-link:hover {
+  background: #e2e8f0 !important;
+  color: #0b0f19 !important;
+  transform: translateY(-1px);
+}
+
+body.theme-dark .dock-btn.active {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+}
+
+/* Hero Preview Box */
+body.theme-dark .metic-hero-preview-box {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+body.theme-dark .metic-preview-header {
+  border-bottom-color: var(--metic-border);
+}
+body.theme-dark .preview-risk-chip {
+  background: #371520;
+  color: #fca5a5;
+}
+body.theme-dark .metic-sample-message {
+  color: var(--metic-ink);
+}
+body.theme-dark .preview-signal-item {
+  border-bottom-color: var(--metic-border);
+}
+body.theme-dark .metic-preview-footer {
+  border-top-color: var(--metic-border);
+  color: var(--metic-ink-muted);
+}
+
+/* Feature Cards */
+body.theme-dark .metic-feature-card {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+body.theme-dark .metic-feature-card:hover {
+  background: var(--metic-surface-hover);
+  border-color: #374151;
+}
+body.theme-dark .feature-meta {
+  background: #1e293b;
+  border-color: var(--metic-border);
+  color: var(--metic-ink-muted);
+}
+
+/* Step Boxes */
+body.theme-dark .metic-step-box {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+body.theme-dark .step-num {
+  background: #1e293b !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #334155 !important;
+}
+
+/* Trust Cards */
+body.theme-dark .metic-trust-card {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+body.theme-dark .trust-badge {
+  background: #1e293b;
+  border-color: var(--metic-border);
+  color: var(--metic-ink-muted);
+}
+
+/* Security Cards */
+body.theme-dark .metic-security-card {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+body.theme-dark .security-code-block {
+  background: #1e293b;
+  border-color: var(--metic-border);
+  color: #e2e8f0;
+}
+
+/* Demo Sandbox */
+body.theme-dark .metic-demo-sandbox {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+body.theme-dark .metic-demo-textarea {
+  background: #1e293b;
+  border-color: var(--metic-border);
+  color: var(--metic-ink);
+}
+body.theme-dark .metic-demo-score-banner {
+  background: #1e293b;
+  border-color: var(--metic-border);
+}
+body.theme-dark .demo-annotation-view {
+  background: #0f172a;
+  border-color: var(--metic-border);
+}
+body.theme-dark .annotation-header {
+  border-bottom-color: var(--metic-border);
+  color: var(--metic-ink-muted);
+}
+body.theme-dark .demo-safe-steps-box {
+  background: #0f172a;
+  border-color: var(--metic-border);
+}
+body.theme-dark .metic-sample-chip {
+  background: #1e293b;
+  border-color: var(--metic-border);
+  color: var(--metic-ink);
+}
+body.theme-dark .metic-sample-chip.active,
+body.theme-dark .metic-sample-chip:hover {
+  background: #27354a;
+  border-color: #475569;
+}
+
+/* Build Workspace */
+body.theme-dark .metic-build-workspace {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+body.theme-dark .metic-build-canvas {
+  background: #0f172a;
+}
+body.theme-dark .metic-stage-pill {
+  background: #1e293b;
+  border-color: var(--metic-border);
+  color: var(--metic-ink-muted);
+}
+body.theme-dark .metic-stage-pill.active {
+  background: #ffffff !important;
+  color: #0b0f19 !important;
+  font-weight: 700;
+}
+body.theme-dark .wire-box {
+  border-color: #374151;
+  color: var(--metic-ink-muted);
+}
+body.theme-dark .build-stage-spec {
+  background: #1e293b;
+  color: var(--metic-ink-muted);
+}
+
+/* Buttons */
+body.theme-dark .metic-btn-ghost {
+  color: var(--metic-ink);
+  border-color: var(--metic-border);
+}
+body.theme-dark .metic-btn-ghost:hover {
+  background: var(--metic-surface-hover);
+}
+body.theme-dark .metic-btn-secondary {
+  border-color: var(--metic-border);
+  color: var(--metic-ink);
+}
+body.theme-dark .metic-btn-secondary:hover {
+  background: var(--metic-surface-hover);
+}
+body.theme-dark .metic-btn-step {
+  border-color: var(--metic-border);
+  color: var(--metic-ink);
+}
+body.theme-dark .metic-btn-step:hover:not(:disabled) {
+  background: var(--metic-surface-hover);
+}
+
+/* Final CTA */
+body.theme-dark .metic-final-cta-section {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+
+/* Footer */
+body.theme-dark .metic-footer {
+  background: #0f172a;
+  border-top-color: var(--metic-border);
+}
+body.theme-dark .metic-footer a {
+  color: var(--metic-ink-muted);
+}
+body.theme-dark .metic-footer a:hover {
+  color: var(--metic-ink);
+}
+body.theme-dark .metic-footer-bottom {
+  border-top-color: var(--metic-border);
+  color: var(--metic-ink-muted);
+}
+
+/* Auth Card */
+body.theme-dark .metic-auth-container {
+  background: var(--metic-canvas);
+}
+body.theme-dark .metic-auth-card {
+  background: var(--metic-surface);
+  border-color: var(--metic-border);
+}
+body.theme-dark .metic-auth-form input {
+  background: #1e293b;
+  border-color: var(--metic-border);
+  color: var(--metic-ink);
+}
+body.theme-dark .metic-auth-divider span {
+  background: var(--metic-surface);
+  color: var(--metic-ink-muted);
+}
+body.theme-dark .metic-btn-auth-demo {
+  background: #1e293b;
+  border-color: var(--metic-border);
+  color: var(--metic-ink);
+}
+body.theme-dark .metic-btn-auth-demo:hover {
+  background: var(--metic-surface-hover);
+}
+
+/* Blueprint Grid Overlay */
+body.theme-dark .metic-blueprint-grid {
+  opacity: 0.12;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Magnifier Dock Bar in Dark Mode */
+body.theme-dark .magnifier-dock-bar {
+  background: rgba(17, 24, 39, 0.94);
+  border-color: var(--metic-border);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
+}
+body.theme-dark .dock-status-label {
+  color: var(--metic-ink);
+  border-right-color: var(--metic-border);
+}
+body.theme-dark .dock-btn {
+  color: var(--metic-ink-muted);
+}
+body.theme-dark .dock-btn:hover {
+  background: var(--metic-surface-hover);
+  border-color: var(--metic-border);
+  color: var(--metic-ink);
+}
+
+/* Landing Page Theme Toggle Button */
+.metic-theme-toggle {
+  background: transparent;
+  border: 1px solid var(--metic-border);
+  border-radius: 6px;
+  font-size: 16px;
+  padding: 6px 10px;
+  cursor: pointer;
+  line-height: 1;
+  color: var(--metic-ink);
+  transition: all 0.15s ease;
+}
+.metic-theme-toggle:hover {
+  background: var(--metic-canvas-subtle);
+}
+body.theme-dark .metic-theme-toggle:hover {
+  background: var(--metic-surface-hover);
+}
+
+/* ==========================================================================
+   MOBILE RESPONSIVE NAVIGATION & ASPECT RATIO SAFEGUARDS
+   ========================================================================== */
+@media (max-width: 900px) {
+  .metic-nav-links {
+    display: none;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: var(--metic-canvas);
+    border-bottom: 1px solid var(--metic-border);
+    flex-direction: column;
+    padding: 16px 28px 24px;
+    gap: 8px;
+    box-shadow: 0 16px 36px rgba(0, 0, 0, 0.16);
+    z-index: 1000;
+    box-sizing: border-box;
+  }
+
+  .metic-nav-links.open {
+    display: flex;
+  }
+
+  .metic-nav-links li {
+    width: 100%;
+    list-style: none;
+  }
+
+  .metic-nav-links a {
+    display: block;
+    font-size: 15px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--metic-border);
+    color: var(--metic-ink);
+  }
+
+  .metic-menu-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 1px solid var(--metic-border);
+    border-radius: 6px;
+    font-size: 20px;
+    color: var(--metic-ink);
+    padding: 6px 10px;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .metic-btn-ghost {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Prevent physical desktop magnifier and dock from covering entire mobile viewport */
+  .draggable-magnifier,
+  .magnifier-dock-bar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .metic-btn-solid {
+    padding: 6px 12px;
+    font-size: 12px;
+  }
+  .metic-tagline {
+    display: none;
+  }
+  .metic-header-inner {
+    height: 60px;
+  }
+  .metic-nav-links {
+    top: 60px;
+  }
+}
 /* ==========================================================================
    FLOATING CIRCULAR BOTTOM-RIGHT CORNER TOGGLE WITH DYNAMIC CROSS SLASH
    ========================================================================== */
@@ -2555,5 +2954,4 @@ body {
   border-color: rgba(239, 68, 68, 0.65);
   background: rgba(18, 19, 22, 0.95);
 }
-
 
