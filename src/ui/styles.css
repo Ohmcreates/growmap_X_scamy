@@ -4898,7 +4898,7 @@ body.theme-dark .gemini-guidance-content strong {
 }
 
 /* --------------------------------------------------------------------------
-   GUEST RESTRICTIONS & 5-MINUTE COUNTDOWN TIMER BAR
+   GUEST RESTRICTIONS & 30-MINUTE COUNTDOWN TIMER BAR
    -------------------------------------------------------------------------- */
 .guest-tab-lock-badge {
   font-size: 0.68rem;
@@ -4984,7 +4984,7 @@ body.theme-dark .gemini-guidance-content strong {
   line-height: 1;
 }
 
-/* 5-Minute Sticky Guest Session Countdown Bar */
+/* 30-Minute Sticky Guest Session Countdown Bar */
 .guest-session-timer-bar {
   display: flex;
   align-items: center;

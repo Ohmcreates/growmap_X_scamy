@@ -356,7 +356,7 @@ def api_scans():
                 for row in rows:
                     r = dict(row) if not isinstance(row, dict) else row
                     if r.get('created_at'):
-                        r['created_at'] = r['created_at'].isoformat()
+                        r['created_at'] = r['created_at'].isoformat() if hasattr(r['created_at'], 'isoformat') else str(r['created_at'])
                     if isinstance(r.get('rules_fired_json'), str):
                         try:
                             r['rules_fired_json'] = json.loads(r['rules_fired_json'])

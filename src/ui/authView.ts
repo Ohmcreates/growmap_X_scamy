@@ -59,10 +59,6 @@ export class AuthViewController {
     });
 
     this.btnDemo?.addEventListener('click', () => {
-      if (AuthService.isGuestExpired()) {
-        this.showAlert('⏱️ Your 5-minute guest evaluation period has already expired. Please create an account or sign in to continue.', 'error');
-        return;
-      }
       AuthService.setGuestMode();
       router.navigate('workspace');
     });
